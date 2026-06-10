@@ -1,0 +1,17 @@
+{
+  "name": "@erabi/sdk-py",
+  "version": "0.1.0",
+  "description": "Test harness wrapper for the Erabi Python SDK (the SDK itself is the erabi-sdk Python package in this directory).",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@erabi/node": "workspace:*",
+    "@types/node": "^20.19.42",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

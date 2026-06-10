@@ -36,6 +36,8 @@ export const events = sqliteTable("events", {
 
 export const revShareEntries = sqliteTable("rev_share_entries", {
   entryId: text("entry_id").primaryKey(),
+  /** rev_share | referral */
+  entryKind: text("entry_kind").notNull().default("rev_share"),
   eventId: text("event_id").notNull(),
   auctionId: text("auction_id").notNull(),
   /** The consumer-side developer who monetized the moment of choice. */
@@ -89,6 +91,7 @@ CREATE INDEX IF NOT EXISTS idx_events_provider ON events (provider_id);
 CREATE INDEX IF NOT EXISTS idx_events_auction ON events (auction_id);
 CREATE TABLE IF NOT EXISTS rev_share_entries (
   entry_id TEXT PRIMARY KEY,
+  entry_kind TEXT NOT NULL DEFAULT 'rev_share',
   event_id TEXT NOT NULL,
   auction_id TEXT NOT NULL,
   beneficiary_id TEXT NOT NULL,

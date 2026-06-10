@@ -9,6 +9,8 @@ export interface DirectoryAgent {
   publicKey: string;
   tier: Tier;
   reputation: number;
+  /** Node-authoritative registration time (not the self-declared manifest one). */
+  registeredAt: string;
 }
 
 export interface OrganicCandidate {
@@ -34,6 +36,7 @@ export function registryDirectory(registry: RegistryService): AgentDirectory {
           publicKey: view.public_key,
           tier: view.tier,
           reputation: view.reputation,
+          registeredAt: view.created_at,
         };
       } catch (error) {
         if (error instanceof RegistryError && error.code === "agent_not_found") return null;

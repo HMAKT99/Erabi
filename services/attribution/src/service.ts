@@ -1,7 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { and, desc, eq, lte } from "drizzle-orm";
 import { z } from "zod";
-import { HOLDBACK_HOURS, REV_SHARE, TIER_POLICIES } from "@erabi/config";
+import {
+  HOLDBACK_HOURS,
+  REFERRAL_SHARE,
+  REFERRAL_WINDOW_DAYS,
+  REV_SHARE,
+  TIER_POLICIES,
+} from "@erabi/config";
 import {
   hashCanonical,
   InMemoryNonceStore,
@@ -81,6 +87,8 @@ export interface AttributionServiceOptions {
   rails?: PayoutRail[];
   nonceStore?: NonceStore;
   now?: () => number;
+  /** Override per-category-group holdback hours (demo/e2e use 0). */
+  holdbackHours?: Record<string, number>;
 }
 
 export class AttributionService {
@@ -93,8 +101,10 @@ export class AttributionService {
   private readonly rails: Map<string, PayoutRail>;
   private readonly nonceStore: NonceStore;
   private readonly now: () => number;
+  private readonly holdbackHours: Record<string, number>;
 
   constructor(options: AttributionServiceOptions) {
+    this.holdbackHours = options.holdbackHours ?? HOLDBACK_HOURS;
     this.db = options.db;
     this.directory = options.directory;
     this.auctions = options.auctions;
@@ -300,7 +310,7 @@ export class AttributionService {
     await this.checkSignature(envelope);
 
     const group = row.category.split(".")[0]!;
-    const holdbackHours = HOLDBACK_HOURS[group] ?? HOLDBACK_HOURS.default!;
+    const holdbackHours = this.holdbackHours[group] ?? this.holdbackHours.default ?? 72;
     const holdbackUntil = new Date(this.now() + holdbackHours * 3_600_000).toISOString();
     this.db
       .update(events)
@@ -439,6 +449,7 @@ export class AttributionService {
           tx.insert(revShareEntries)
             .values({
               entryId: randomUUID(),
+              entryKind: "rev_share",
               eventId: row.eventId,
               auctionId: row.auctionId,
               beneficiaryId: row.consumerId,
@@ -450,6 +461,35 @@ export class AttributionService {
               createdAt: nowIso,
             })
             .run();
+
+          // Referral primitive (§9.2), Sybil-guarded: accrues ONLY on
+          // dual-signed confirmed settlements from tier-anchored recruits
+          // within their first 90 days.
+          const recruit = this.directory.getAgent(row.consumerId);
+          const referrer = recruit?.manifest.referrer;
+          if (
+            recruit &&
+            referrer &&
+            recruit.tier !== "unverified" &&
+            this.now() - Date.parse(recruit.registeredAt) <= REFERRAL_WINDOW_DAYS * 86_400_000 &&
+            this.directory.getAgent(referrer)
+          ) {
+            tx.insert(revShareEntries)
+              .values({
+                entryId: randomUUID(),
+                entryKind: "referral",
+                eventId: row.eventId,
+                auctionId: row.auctionId,
+                beneficiaryId: referrer,
+                providerId: row.providerId,
+                basisUsd: basis,
+                developerUsd: round6(basis * REFERRAL_SHARE),
+                protocolUsd: 0,
+                reservedUsd: 0,
+                createdAt: nowIso,
+              })
+              .run();
+          }
         }
       });
 
@@ -564,6 +604,9 @@ export class AttributionService {
     const accrued = entries
       .filter((e) => e.status !== "frozen")
       .reduce((sum, e) => sum + e.developerUsd, 0);
+    const referral = entries
+      .filter((e) => e.status !== "frozen" && e.entryKind === "referral")
+      .reduce((sum, e) => sum + e.developerUsd, 0);
     const frozen = entries
       .filter((e) => e.status === "frozen")
       .reduce((sum, e) => sum + e.developerUsd, 0);
@@ -580,6 +623,7 @@ export class AttributionService {
     return {
       agent_id: agentId,
       accrued_usd: round6(accrued),
+      referral_usd: round6(referral),
       frozen_usd: round6(frozen),
       paid_usd: round6(paid),
       available_usd: available,

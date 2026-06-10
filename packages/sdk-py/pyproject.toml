@@ -1,0 +1,15 @@
+[project]
+name = "erabi-sdk"
+version = "0.1.0"
+description = "Erabi Protocol SDK for Python agents: register, fire intents, report outcomes, get paid."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+dependencies = ["cryptography>=42"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["erabi_sdk*"]

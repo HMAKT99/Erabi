@@ -1,0 +1,37 @@
+{
+  "name": "@erabi/bridge-affiliate",
+  "version": "0.1.0",
+  "description": "Affiliate bridge: converts affiliate catalogs and commissions into CPA bids; mock postback adapter included.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@erabi/attribution": "workspace:*",
+    "@erabi/constants": "workspace:*",
+    "@erabi/crypto": "workspace:*",
+    "@erabi/exchange": "workspace:*",
+    "@erabi/registry": "workspace:*",
+    "@erabi/schemas": "workspace:*",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@erabi/node": "workspace:*",
+    "@erabi/sdk": "workspace:*",
+    "@types/node": "^20.19.42",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

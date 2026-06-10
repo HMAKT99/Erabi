@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           pnpm install --frozen-lockfile
-          pip install pydantic
+          pip install pydantic cryptography
 
       - name: Codegen drift check
         run: |

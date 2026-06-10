@@ -1,0 +1,38 @@
+{
+  "name": "@erabi/node",
+  "version": "0.1.0",
+  "description": "Erabi Protocol reference node: registry + exchange + attribution + reputation composed into one runnable network.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "dev": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "@erabi/attribution": "workspace:*",
+    "@erabi/config": "workspace:*",
+    "@erabi/constants": "workspace:*",
+    "@erabi/crypto": "workspace:*",
+    "@erabi/exchange": "workspace:*",
+    "@erabi/registry": "workspace:*",
+    "@erabi/reputation": "workspace:*",
+    "fastify": "^4.29.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.42",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

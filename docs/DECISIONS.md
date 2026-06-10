@@ -2,6 +2,22 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0017 — @erabi/node composes the reference node; holdbacks are overridable
+
+`startReferenceNode()` wires registry + exchange + attribution + reputation with an
+in-process directory, shared event bus, mock verifiers/rails, and ephemeral ports —
+the substrate for SDK tests, bridge tests, the golden-path E2E, and `pnpm demo`.
+`holdbackHours: { default: 0 }` lets demos settle instantly; production uses the
+config defaults.
+
+## 0016 — The frozen signing vectors are protocol law across SDKs
+
+`packages/crypto/test/vectors.json` is generated once and never regenerated; both
+@erabi/sdk (TS) and erabi-sdk (Python) must reproduce every byte (canonical JSON,
+public keys, agent ids, signatures). sdk-py implements ECMAScript number→string
+semantics (decimal for 1e-6 ≤ |x| < 1e21, no zero-padded exponents) so RFC 8785
+canonical forms match across languages.
+
 ## 0015 — Disputes are recorded as already-confirmed chain events
 
 A dispute is a single-sided attestation by a party; it freezes the disputed entry (and

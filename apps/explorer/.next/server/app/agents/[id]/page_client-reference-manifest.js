@@ -77,10 +77,10 @@ globalThis.__RSC_MANIFEST["/agents/[id]/page"] = {
         ],
         async: false,
       },
-    "/Users/arun/erabi/apps/explorer/app/dashboard/page.tsx": {
-      id: 7420,
+    "/Users/arun/erabi/apps/explorer/app/agents/[id]/page.tsx": {
+      id: 8677,
       name: "*",
-      chunks: [],
+      chunks: ["996", "static/chunks/app/agents/%5Bid%5D/page-d5eb598120382260.js"],
       async: false,
     },
     "/Users/arun/erabi/apps/explorer/app/agents/page.tsx": {
@@ -89,10 +89,10 @@ globalThis.__RSC_MANIFEST["/agents/[id]/page"] = {
       chunks: ["718", "static/chunks/app/agents/page-7190267e7921c9b4.js"],
       async: false,
     },
-    "/Users/arun/erabi/apps/explorer/app/agents/[id]/page.tsx": {
-      id: 8677,
+    "/Users/arun/erabi/apps/explorer/app/dashboard/page.tsx": {
+      id: 7420,
       name: "*",
-      chunks: ["996", "static/chunks/app/agents/%5Bid%5D/page-d5eb598120382260.js"],
+      chunks: [],
       async: false,
     },
     "/Users/arun/erabi/apps/explorer/app/disclosures/page.tsx": {

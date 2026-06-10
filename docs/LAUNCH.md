@@ -1,7 +1,15 @@
 # Launch checklist
 
-Everything code-side is ready; each item below is blocked only on an account,
-credential, or naming decision.
+Everything code-side is ready; each unchecked item below is blocked only on an
+account, credential, or naming decision.
+
+## 0. Already executed
+
+- [x] **v0.1.0 tagged and released**: https://github.com/HMAKT99/Erabi/releases/tag/v0.1.0
+- [x] Repo description + topics set (discoverability on GitHub search).
+- [x] npm publish validated: all 7 public packages pack cleanly (`pnpm publish --dry-run`).
+- [x] PyPI distribution validated: `erabi_sdk-0.1.0` wheel + sdist build, and the wheel
+      installs and signs correctly from a clean environment.
 
 ## 1. Identity decisions (you)
 
@@ -11,6 +19,11 @@ credential, or naming decision.
       `@, explorer, registry, exchange, attribution, reputation`.
 - [ ] **npm scope**: claim the `@erabi` org on npmjs.com; create an automation token.
 - [ ] **PyPI**: register the `erabi-sdk` project name; create an API token.
+
+- [ ] Local Docker image build verification: Docker Desktop on this Mac is waiting on
+      its first-run dialog — open it, accept, then
+      `docker build --build-arg PKG=@erabi/node -t erabi-node .` (the Dockerfile is
+      review-validated; this is the execution check).
 
 ## 2. Hosted node (docs/DEPLOY.md)
 

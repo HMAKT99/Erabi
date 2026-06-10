@@ -77,8 +77,8 @@ globalThis.__RSC_MANIFEST["/agents/page"] = {
         ],
         async: false,
       },
-    "/Users/arun/erabi/apps/explorer/app/dashboard/page.tsx": {
-      id: 7420,
+    "/Users/arun/erabi/apps/explorer/app/agents/[id]/page.tsx": {
+      id: 8677,
       name: "*",
       chunks: [],
       async: false,
@@ -89,8 +89,8 @@ globalThis.__RSC_MANIFEST["/agents/page"] = {
       chunks: ["718", "static/chunks/app/agents/page-7190267e7921c9b4.js"],
       async: false,
     },
-    "/Users/arun/erabi/apps/explorer/app/agents/[id]/page.tsx": {
-      id: 8677,
+    "/Users/arun/erabi/apps/explorer/app/dashboard/page.tsx": {
+      id: 7420,
       name: "*",
       chunks: [],
       async: false,

@@ -21,6 +21,7 @@ invariant, not a feature.
 | `packages/constants` | Branding, category taxonomy, protocol constants                                |
 | `packages/config`    | Every economics and retention knob, in one commented place                     |
 | `services/registry`  | Identity: self-registration, tiers, fleets, discovery, key rotation            |
+| `services/exchange`  | Intent auction: GSP clearing, signed disclosures, decision tuples, SSE         |
 
 Any agent can join with zero human steps: generate a keypair, self-sign an
 `AgentManifest`, `POST /v1/agents`. Verification (DNS TXT / GitHub) lifts tier caps;

@@ -2,6 +2,27 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0012 — Exchange signatures are detached over canonical JSON
+
+`exchange_sig` on DisclosureRecords and ConsiderationSets is
+`ed25519(canonical_json(object minus exchange_sig))` — no ts/nonce envelope, since
+these objects are server-issued artifacts with their own `issued_at`/`auction_id`
+identity. The exchange's public key is published in its well-known document.
+
+## 0011 — Budget pacing charges at serve time
+
+Daily budgets are debited by the clearing price when a sponsored slot is served (CPC
+semantics) even for CPA bids, as a v0.1 simplification. True CPA budget accounting
+(charge on confirmed conversion, release on expiry) arrives with attribution in
+Phase 3. Slots a provider can no longer afford are dropped, not re-auctioned.
+
+## 0010 — constraints_filter is a CEL subset
+
+Spec 0.1 supports `intent.constraints.<key> <op> <number>` clauses joined by `&&`,
+parsed with a strict grammar and rejected loudly at bid submission. Full CEL would pull
+in an evaluator dependency before any bidder needs it; the seam (parse/evaluate in
+`filter.ts`) allows a real CEL engine later without schema changes.
+
 ## 0009 — Key rotation keeps the agent id stable
 
 `erabi:agent:<base58(pubkey)>` derives from the _genesis_ key. Rotation (signed by the

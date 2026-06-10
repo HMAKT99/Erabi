@@ -41,6 +41,8 @@ export const discoverRequestZod = z
 
 export interface AgentView {
   manifest: AgentManifest;
+  /** Current signing key — differs from manifest.public_key after rotation. */
+  public_key: string;
   tier: Tier;
   reputation: number;
   key_seq: number;
@@ -210,6 +212,7 @@ export class RegistryService {
       .get();
     return {
       manifest: row.manifest as AgentManifest,
+      public_key: row.publicKey,
       tier: row.tier as Tier,
       reputation: row.reputation,
       key_seq: seqRow?.seq ?? 1,

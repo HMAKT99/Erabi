@@ -2,6 +2,25 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0009 — Key rotation keeps the agent id stable
+
+`erabi:agent:<base58(pubkey)>` derives from the _genesis_ key. Rotation (signed by the
+old key) updates the current signing key in `agents.public_key` and appends to
+`key_history`; the id never changes, so reputation and ledger history survive rotation.
+Envelopes always verify against the current key.
+
+## 0008 — Registry schema bootstrap via idempotent DDL
+
+Dev/test SQLite schema is created with `CREATE TABLE IF NOT EXISTS` at startup instead
+of drizzle-kit migrations — zero-dependency `pnpm dev` and hermetic in-memory tests.
+Proper migrations arrive with the Postgres production target.
+
+## 0007 — Economics knobs live in the @erabi/config package
+
+The brief calls for `config/economics.ts`; it lives as `packages/config/src/economics.ts`
+(`@erabi/config`) so every service imports the same typed knobs through the workspace
+rather than a root-level path alias.
+
 ## 0006 — Raw control characters avoided in source
 
 Test fixtures spell control characters as `\uXXXX` escapes, never raw bytes, so diffs and

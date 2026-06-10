@@ -1,0 +1,39 @@
+{
+  "name": "@erabi/registry",
+  "version": "0.1.0",
+  "description": "Erabi Protocol registry: identity, manifests, discovery, tiers, key rotation, fleet registration.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@erabi/config": "workspace:*",
+    "@erabi/constants": "workspace:*",
+    "@erabi/crypto": "workspace:*",
+    "@erabi/schemas": "workspace:*",
+    "better-sqlite3": "^11.5.0",
+    "drizzle-orm": "^0.36.0",
+    "fastify": "^4.28.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^20.19.42",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

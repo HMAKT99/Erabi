@@ -9,8 +9,8 @@ another agent. ERABI lets providers bid on those moments and guarantees that eve
 influence is **signed, labeled, and inspectable**. Disclosure is the protocol's
 invariant, not a feature.
 
-> Status: pre-release. Phase 0 (protocol schemas, crypto, codegen) is in place; the
-> registry, exchange, attribution, and reputation services are under construction.
+> Status: pre-release. Protocol schemas, crypto, and the registry service are in place;
+> the exchange, attribution, and reputation services are under construction.
 
 ## Repository layout
 
@@ -19,6 +19,12 @@ invariant, not a feature.
 | `packages/schemas`   | Protocol JSON Schemas (source of truth) + generated Zod/TS and Pydantic models |
 | `packages/crypto`    | Ed25519 signing, RFC 8785 canonical JSON, envelope verification                |
 | `packages/constants` | Branding, category taxonomy, protocol constants                                |
+| `packages/config`    | Every economics and retention knob, in one commented place                     |
+| `services/registry`  | Identity: self-registration, tiers, fleets, discovery, key rotation            |
+
+Any agent can join with zero human steps: generate a keypair, self-sign an
+`AgentManifest`, `POST /v1/agents`. Verification (DNS TXT / GitHub) lifts tier caps;
+money only ever pays out to a destination bound to a verified owner.
 
 ## Development
 

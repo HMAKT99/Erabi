@@ -6,6 +6,7 @@ import {
   REFERRAL_SHARE,
   REFERRAL_WINDOW_DAYS,
   REV_SHARE,
+  STAKE_SLASH_FRACTION,
   TIER_POLICIES,
 } from "@erabi/config";
 import {
@@ -21,7 +22,7 @@ import type { AuctionSummary, EventBus } from "@erabi/exchange";
 import type { AgentDirectory } from "@erabi/exchange";
 import { RuleAnomalyEngine, type AnomalyEngine, type OwnerAnchors } from "./anomaly.js";
 import type { AttributionDb } from "./db/client.js";
-import { events, payouts, revShareEntries } from "./db/schema.js";
+import { events, payouts, revShareEntries, stakeEvents } from "./db/schema.js";
 import { AttributionError } from "./errors.js";
 import { MockRail, type PayoutRail } from "./rails.js";
 
@@ -67,6 +68,11 @@ export interface TupleSink {
   ): void;
 }
 
+/** Exchange-side CPA budget accounting: confirmed outcomes charge reservations. */
+export interface SpendSink {
+  settleSpend(auctionId: string, providerId: string): void;
+}
+
 export type EventStatus = "pending" | "countersigned" | "confirmed" | "disputed" | "under_review";
 
 export interface LedgerEntry extends OutcomeEvent {
@@ -82,6 +88,7 @@ export interface AttributionServiceOptions {
   directory: AgentDirectory;
   auctions: AuctionSource;
   tupleSink?: TupleSink;
+  spendSink?: SpendSink;
   bus?: EventBus;
   anomaly?: AnomalyEngine;
   rails?: PayoutRail[];
@@ -96,6 +103,7 @@ export class AttributionService {
   private readonly directory: AgentDirectory;
   private readonly auctions: AuctionSource;
   private readonly tupleSink?: TupleSink;
+  private readonly spendSink?: SpendSink;
   private readonly bus?: EventBus;
   private readonly anomaly: AnomalyEngine;
   private readonly rails: Map<string, PayoutRail>;
@@ -109,6 +117,7 @@ export class AttributionService {
     this.directory = options.directory;
     this.auctions = options.auctions;
     this.tupleSink = options.tupleSink;
+    this.spendSink = options.spendSink;
     this.bus = options.bus;
     this.anomaly = options.anomaly ?? new RuleAnomalyEngine();
     const rails = options.rails ?? [new MockRail()];
@@ -249,6 +258,10 @@ export class AttributionService {
       providerOwner: this.ownerAnchors(submission.provider_id),
       consumerOwner: this.ownerAnchors(auction.consumer_id),
     });
+
+    if (reasons.length > 0) {
+      this.slashStake(submission.provider_id, `frozen:${reasons.join(",")}`);
+    }
 
     const sponsoredSlot = auction.sponsored.find((s) => s.provider_id === submission.provider_id);
     this.db
@@ -429,6 +442,7 @@ export class AttributionService {
           .set({ status: "under_review", freezeReason: reasons.join(",") })
           .where(eq(events.eventId, row.eventId))
           .run();
+        this.slashStake(row.providerId, `frozen:${reasons.join(",")}`);
         continue;
       }
 
@@ -492,6 +506,14 @@ export class AttributionService {
           }
         }
       });
+
+      // A confirmed paid outcome charges the exchange-side CPA reservation.
+      if (
+        row.clearingPriceUsd !== null &&
+        (row.kind === "conversion" || row.kind === "task_success" || row.kind === "assisted")
+      ) {
+        this.spendSink?.settleSpend(row.auctionId, row.providerId);
+      }
 
       this.tupleSink?.recordOutcome(row.auctionId, {
         selection: { provider_id: row.providerId },
@@ -696,6 +718,169 @@ export class AttributionService {
       `<text x="${(width + 24) / 2}" y="16" font-family="monospace" font-size="11" fill="#e6edf3" text-anchor="middle">${label}</text>`,
       `</svg>`,
     ].join("");
+  }
+
+  // ---- stakes (skin in the game; slashable) ----
+
+  /**
+   * Deposit toward the staked tier. The rail receipt proves the transfer;
+   * the registry promotes verified agents whose balance clears the minimum.
+   */
+  async depositStake(body: unknown) {
+    const envelope = this.parseEnvelope(body);
+    const parsed = z
+      .object({
+        agent_id: z.string().regex(AGENT_ID_PATTERN),
+        amount_usd: z.number().positive(),
+        rail_receipt: z
+          .object({ rail: z.enum(["x402", "ap2", "ledger_only"]), ref: z.string().min(1).max(512) })
+          .strict(),
+      })
+      .strict()
+      .safeParse(envelope.payload);
+    if (!parsed.success) {
+      throw new AttributionError(
+        "invalid_request",
+        "payload must be { agent_id, amount_usd, rail_receipt }",
+        parsed.error.issues,
+      );
+    }
+    if (envelope.key_id !== parsed.data.agent_id) {
+      throw new AttributionError("id_mismatch", "envelope key_id does not match agent_id");
+    }
+    await this.checkSignature(envelope);
+
+    const railRef = parsed.data.rail_receipt.ref;
+    const duplicate = this.db
+      .select()
+      .from(stakeEvents)
+      .all()
+      .some((row) => row.railRef === railRef);
+    if (duplicate) {
+      throw new AttributionError(
+        "invalid_request",
+        `rail receipt ${railRef} already funded a stake`,
+      );
+    }
+
+    this.db
+      .insert(stakeEvents)
+      .values({
+        stakeEventId: randomUUID(),
+        agentId: parsed.data.agent_id,
+        kind: "deposit",
+        amountUsd: parsed.data.amount_usd,
+        railRef,
+        createdAt: new Date(this.now()).toISOString(),
+      })
+      .run();
+    return this.getStake(parsed.data.agent_id);
+  }
+
+  stakeOf(agentId: string): number {
+    const rows = this.db.select().from(stakeEvents).where(eq(stakeEvents.agentId, agentId)).all();
+    const balance = rows.reduce(
+      (sum, row) => sum + (row.kind === "deposit" ? row.amountUsd : -row.amountUsd),
+      0,
+    );
+    return Math.max(0, round6(balance));
+  }
+
+  getStake(agentId: string) {
+    const rows = this.db.select().from(stakeEvents).where(eq(stakeEvents.agentId, agentId)).all();
+    return {
+      agent_id: agentId,
+      balance_usd: this.stakeOf(agentId),
+      events: rows.map((row) => ({
+        kind: row.kind,
+        amount_usd: row.amountUsd,
+        rail_ref: row.railRef,
+        reason: row.reason,
+        created_at: row.createdAt,
+      })),
+    };
+  }
+
+  /** Fraud freezes burn a fraction of any ledger-held stake (§9.5). */
+  private slashStake(agentId: string, reason: string): void {
+    const balance = this.stakeOf(agentId);
+    if (balance <= 0) return;
+    this.db
+      .insert(stakeEvents)
+      .values({
+        stakeEventId: randomUUID(),
+        agentId,
+        kind: "slash",
+        amountUsd: round6(balance * STAKE_SLASH_FRACTION),
+        reason,
+        createdAt: new Date(this.now()).toISOString(),
+      })
+      .run();
+  }
+
+  // ---- settlement-graph analysis (§9.6, the nightly Sybil sweep) ----
+
+  /**
+   * Flags closed clusters: groups of agents whose confirmed settlements
+   * form a directed cycle among themselves (A pays B pays … pays A).
+   * Honest commerce is overwhelmingly acyclic — consumers pay providers;
+   * circular value flow is the signature of a cluster farming itself.
+   */
+  analyzeSettlementGraph(options: { minEvents?: number } = {}) {
+    const confirmed = this.db.select().from(events).where(eq(events.status, "confirmed")).all();
+    const edges = new Map<string, Map<string, number>>(); // consumer → provider → count
+    for (const row of confirmed) {
+      if (row.kind === "dispute") continue;
+      const out = edges.get(row.consumerId) ?? new Map<string, number>();
+      out.set(row.providerId, (out.get(row.providerId) ?? 0) + 1);
+      edges.set(row.consumerId, out);
+    }
+
+    // Find directed cycles via DFS coloring.
+    const colors = new Map<string, "active" | "done">();
+    const stack: string[] = [];
+    const cycles: string[][] = [];
+    const visit = (agent: string): void => {
+      colors.set(agent, "active");
+      stack.push(agent);
+      for (const next of edges.get(agent)?.keys() ?? []) {
+        const color = colors.get(next);
+        if (color === "active") {
+          cycles.push(stack.slice(stack.indexOf(next)));
+        } else if (color === undefined) {
+          visit(next);
+        }
+      }
+      stack.pop();
+      colors.set(agent, "done");
+    };
+    for (const agent of edges.keys()) {
+      if (!colors.has(agent)) visit(agent);
+    }
+
+    const minEvents = options.minEvents ?? 4;
+    const clusters = cycles
+      .map((members) => {
+        const memberSet = new Set(members);
+        const eventCount = confirmed.filter(
+          (row) => memberSet.has(row.consumerId) && memberSet.has(row.providerId),
+        ).length;
+        return {
+          agents: [...memberSet].sort(),
+          internal_confirmed_events: eventCount,
+          reason: "settlement_cycle",
+        };
+      })
+      .filter((cluster) => cluster.internal_confirmed_events >= minEvents);
+
+    // Dedupe identical clusters discovered via different entry points.
+    const seen = new Set<string>();
+    return clusters.filter((cluster) => {
+      const key = cluster.agents.join(",");
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }
 
   // ---- payouts (the owner-binding invariant) ----

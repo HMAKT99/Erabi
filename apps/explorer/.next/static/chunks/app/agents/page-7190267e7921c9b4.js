@@ -1,0 +1,361 @@
+(self.webpackChunk_N_E = self.webpackChunk_N_E || []).push([
+  [718],
+  {
+    5409: function (e, t, n) {
+      Promise.resolve().then(n.bind(n, 8183));
+    },
+    8183: function (e, t, n) {
+      "use strict";
+      (n.r(t),
+        n.d(t, {
+          default: function () {
+            return a;
+          },
+        }));
+      var r = n(5853),
+        i = n(4254),
+        s = n(7800);
+      function a() {
+        let [e, t] = (0, i.useState)([]),
+          [n, a] = (0, i.useState)(""),
+          [l, o] = (0, i.useState)(""),
+          [c, u] = (0, i.useState)(0);
+        (0, i.useEffect)(() => {
+          (0, s.L)("".concat(s.b.registry, "/v1/agents")).then((e) => {
+            var n;
+            return t(null !== (n = null == e ? void 0 : e.agents) && void 0 !== n ? n : []);
+          });
+        }, []);
+        let d = (0, i.useMemo)(
+            () => [...new Set(e.flatMap((e) => e.manifest.capabilities))].sort(),
+            [e],
+          ),
+          h = (0, i.useMemo)(() => {
+            let t = n.trim().toLowerCase();
+            return e
+              .filter(
+                (e) =>
+                  (!l || e.manifest.capabilities.includes(l)) &&
+                  (!t ||
+                    e.manifest.name.toLowerCase().includes(t) ||
+                    e.manifest.id.toLowerCase().includes(t)),
+              )
+              .sort((e, t) => t.reputation - e.reputation);
+          }, [e, n, l]),
+          m = Math.max(1, Math.ceil(h.length / 25)),
+          f = h.slice(25 * c, (c + 1) * 25);
+        return (0, r.jsxs)("main", {
+          className: "space-y-4",
+          children: [
+            (0, r.jsxs)("section", {
+              className: "panel flex flex-wrap items-center gap-2",
+              children: [
+                (0, r.jsx)("h1", { className: "label mr-2", children: "agent directory" }),
+                (0, r.jsx)("input", {
+                  value: n,
+                  onChange: (e) => {
+                    (a(e.target.value), u(0));
+                  },
+                  placeholder: "search name or id…",
+                  className:
+                    "flex-1 rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs outline-none focus:border-terminal-green",
+                }),
+                (0, r.jsxs)("select", {
+                  value: l,
+                  onChange: (e) => {
+                    (o(e.target.value), u(0));
+                  },
+                  className:
+                    "rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs outline-none focus:border-terminal-green",
+                  children: [
+                    (0, r.jsx)("option", { value: "", children: "all capabilities" }),
+                    d.map((e) => (0, r.jsx)("option", { value: e, children: e }, e)),
+                  ],
+                }),
+                (0, r.jsxs)("span", {
+                  className: "text-xs text-terminal-dim",
+                  children: [h.length, " agents"],
+                }),
+              ],
+            }),
+            (0, r.jsxs)("section", {
+              className: "panel",
+              children: [
+                (0, r.jsxs)("table", {
+                  className: "w-full text-xs",
+                  children: [
+                    (0, r.jsx)("thead", {
+                      className: "text-left text-terminal-dim",
+                      children: (0, r.jsxs)("tr", {
+                        children: [
+                          (0, r.jsx)("th", { className: "py-1", children: "agent" }),
+                          (0, r.jsx)("th", { children: "capabilities" }),
+                          (0, r.jsx)("th", { className: "text-right", children: "reputation" }),
+                          (0, r.jsx)("th", { className: "text-right", children: "tier" }),
+                          (0, r.jsx)("th", { className: "text-right", children: "joined" }),
+                        ],
+                      }),
+                    }),
+                    (0, r.jsx)("tbody", {
+                      children: f.map((e) =>
+                        (0, r.jsxs)(
+                          "tr",
+                          {
+                            className: "border-t border-terminal-border",
+                            children: [
+                              (0, r.jsx)("td", {
+                                className: "py-1.5",
+                                children: (0, r.jsx)("a", {
+                                  href: "/agents/".concat(encodeURIComponent(e.manifest.id)),
+                                  className: "hover:text-terminal-green",
+                                  children: e.manifest.name,
+                                }),
+                              }),
+                              (0, r.jsx)("td", {
+                                className: "text-terminal-dim",
+                                children: e.manifest.capabilities.join(", "),
+                              }),
+                              (0, r.jsx)("td", {
+                                className: "text-right text-terminal-green",
+                                children: e.reputation,
+                              }),
+                              (0, r.jsx)("td", {
+                                className: "text-right uppercase text-terminal-dim",
+                                children: e.tier,
+                              }),
+                              (0, r.jsx)("td", {
+                                className: "text-right text-terminal-dim",
+                                children: e.created_at.slice(0, 10),
+                              }),
+                            ],
+                          },
+                          e.manifest.id,
+                        ),
+                      ),
+                    }),
+                  ],
+                }),
+                m > 1 &&
+                  (0, r.jsxs)("div", {
+                    className: "mt-3 flex items-center justify-end gap-2 text-xs",
+                    children: [
+                      (0, r.jsx)("button", {
+                        disabled: 0 === c,
+                        onClick: () => u(c - 1),
+                        className:
+                          "rounded border border-terminal-border px-2 py-0.5 disabled:opacity-40",
+                        children: "prev",
+                      }),
+                      (0, r.jsxs)("span", {
+                        className: "text-terminal-dim",
+                        children: [c + 1, " / ", m],
+                      }),
+                      (0, r.jsx)("button", {
+                        disabled: c >= m - 1,
+                        onClick: () => u(c + 1),
+                        className:
+                          "rounded border border-terminal-border px-2 py-0.5 disabled:opacity-40",
+                        children: "next",
+                      }),
+                    ],
+                  }),
+              ],
+            }),
+          ],
+        });
+      }
+    },
+    7800: function (e, t, n) {
+      "use strict";
+      n.d(t, {
+        L: function () {
+          return c;
+        },
+        b: function () {
+          return o;
+        },
+      });
+      var r,
+        i,
+        s,
+        a,
+        l = n(3206);
+      let o = {
+        registry:
+          null !== (r = l.env.NEXT_PUBLIC_ERABI_REGISTRY_URL) && void 0 !== r
+            ? r
+            : "http://localhost:4001",
+        exchange:
+          null !== (i = l.env.NEXT_PUBLIC_ERABI_EXCHANGE_URL) && void 0 !== i
+            ? i
+            : "http://localhost:4002",
+        attribution:
+          null !== (s = l.env.NEXT_PUBLIC_ERABI_ATTRIBUTION_URL) && void 0 !== s
+            ? s
+            : "http://localhost:4003",
+        reputation:
+          null !== (a = l.env.NEXT_PUBLIC_ERABI_REPUTATION_URL) && void 0 !== a
+            ? a
+            : "http://localhost:4004",
+      };
+      async function c(e) {
+        try {
+          let t = await fetch(e, { cache: "no-store" });
+          if (!t.ok) return null;
+          return await t.json();
+        } catch (e) {
+          return null;
+        }
+      }
+    },
+    3206: function (e, t, n) {
+      "use strict";
+      var r, i;
+      e.exports =
+        (null == (r = n.g.process) ? void 0 : r.env) &&
+        "object" == typeof (null == (i = n.g.process) ? void 0 : i.env)
+          ? n.g.process
+          : n(8041);
+    },
+    8041: function (e) {
+      !(function () {
+        var t = {
+            229: function (e) {
+              var t,
+                n,
+                r,
+                i = (e.exports = {});
+              function s() {
+                throw Error("setTimeout has not been defined");
+              }
+              function a() {
+                throw Error("clearTimeout has not been defined");
+              }
+              function l(e) {
+                if (t === setTimeout) return setTimeout(e, 0);
+                if ((t === s || !t) && setTimeout) return ((t = setTimeout), setTimeout(e, 0));
+                try {
+                  return t(e, 0);
+                } catch (n) {
+                  try {
+                    return t.call(null, e, 0);
+                  } catch (n) {
+                    return t.call(this, e, 0);
+                  }
+                }
+              }
+              !(function () {
+                try {
+                  t = "function" == typeof setTimeout ? setTimeout : s;
+                } catch (e) {
+                  t = s;
+                }
+                try {
+                  n = "function" == typeof clearTimeout ? clearTimeout : a;
+                } catch (e) {
+                  n = a;
+                }
+              })();
+              var o = [],
+                c = !1,
+                u = -1;
+              function d() {
+                c && r && ((c = !1), r.length ? (o = r.concat(o)) : (u = -1), o.length && h());
+              }
+              function h() {
+                if (!c) {
+                  var e = l(d);
+                  c = !0;
+                  for (var t = o.length; t; ) {
+                    for (r = o, o = []; ++u < t; ) r && r[u].run();
+                    ((u = -1), (t = o.length));
+                  }
+                  ((r = null),
+                    (c = !1),
+                    (function (e) {
+                      if (n === clearTimeout) return clearTimeout(e);
+                      if ((n === a || !n) && clearTimeout)
+                        return ((n = clearTimeout), clearTimeout(e));
+                      try {
+                        n(e);
+                      } catch (t) {
+                        try {
+                          return n.call(null, e);
+                        } catch (t) {
+                          return n.call(this, e);
+                        }
+                      }
+                    })(e));
+                }
+              }
+              function m(e, t) {
+                ((this.fun = e), (this.array = t));
+              }
+              function f() {}
+              ((i.nextTick = function (e) {
+                var t = Array(arguments.length - 1);
+                if (arguments.length > 1)
+                  for (var n = 1; n < arguments.length; n++) t[n - 1] = arguments[n];
+                (o.push(new m(e, t)), 1 !== o.length || c || l(h));
+              }),
+                (m.prototype.run = function () {
+                  this.fun.apply(null, this.array);
+                }),
+                (i.title = "browser"),
+                (i.browser = !0),
+                (i.env = {}),
+                (i.argv = []),
+                (i.version = ""),
+                (i.versions = {}),
+                (i.on = f),
+                (i.addListener = f),
+                (i.once = f),
+                (i.off = f),
+                (i.removeListener = f),
+                (i.removeAllListeners = f),
+                (i.emit = f),
+                (i.prependListener = f),
+                (i.prependOnceListener = f),
+                (i.listeners = function (e) {
+                  return [];
+                }),
+                (i.binding = function (e) {
+                  throw Error("process.binding is not supported");
+                }),
+                (i.cwd = function () {
+                  return "/";
+                }),
+                (i.chdir = function (e) {
+                  throw Error("process.chdir is not supported");
+                }),
+                (i.umask = function () {
+                  return 0;
+                }));
+            },
+          },
+          n = {};
+        function r(e) {
+          var i = n[e];
+          if (void 0 !== i) return i.exports;
+          var s = (n[e] = { exports: {} }),
+            a = !0;
+          try {
+            (t[e](s, s.exports, r), (a = !1));
+          } finally {
+            a && delete n[e];
+          }
+          return s.exports;
+        }
+        r.ab = "//";
+        var i = r(229);
+        e.exports = i;
+      })();
+    },
+  },
+  function (e) {
+    (e.O(0, [285, 749, 744], function () {
+      return e((e.s = 5409));
+    }),
+      (_N_E = e.O()));
+  },
+]);

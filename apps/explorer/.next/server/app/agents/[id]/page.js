@@ -23,11 +23,11 @@
         "use strict";
         (t.r(s),
           t.d(s, {
-            GlobalError: () => l.a,
+            GlobalError: () => n.a,
             __next_app__: () => m,
             originalPathname: () => x,
             pages: () => o,
-            routeModule: () => p,
+            routeModule: () => h,
             tree: () => c,
           }),
           t(1683),
@@ -35,8 +35,8 @@
           t(8714));
         var a = t(3653),
           r = t(4966),
-          n = t(6070),
-          l = t.n(n),
+          l = t(6070),
+          n = t.n(l),
           i = t(2555),
           d = {};
         for (let e in i)
@@ -91,7 +91,7 @@
           o = ["/Users/arun/erabi/apps/explorer/app/agents/[id]/page.tsx"],
           x = "/agents/[id]/page",
           m = { require: t, loadChunk: () => Promise.resolve() },
-          p = new a.AppPageRouteModule({
+          h = new a.AppPageRouteModule({
             definition: {
               kind: r.x.APP_PAGE,
               page: "/agents/[id]/page",
@@ -122,16 +122,16 @@
         (t.r(s), t.d(s, { default: () => i }));
         var a = t(2064),
           r = t(5032),
-          n = t(246),
-          l = t(2856);
+          l = t(246),
+          n = t(2856);
         function i() {
-          let e = decodeURIComponent((0, n.useParams)().id),
+          let e = decodeURIComponent((0, l.useParams)().id),
             [s, t] = (0, r.useState)(null),
             [i, o] = (0, r.useState)(null),
             [x, m] = (0, r.useState)(null),
-            [p, u] = (0, r.useState)(null),
-            [h, b] = (0, r.useState)(!1);
-          return h
+            [h, u] = (0, r.useState)(null),
+            [p, b] = (0, r.useState)(!1);
+          return p
             ? (0, a.jsxs)("p", {
                 className: "text-terminal-red",
                 children: ["no agent ", e, " on this node."],
@@ -183,7 +183,7 @@
                           ],
                         }),
                         a.jsx("img", {
-                          src: `${l.b.attribution}/v1/badge/${encodeURIComponent(e)}.svg`,
+                          src: `${n.b.attribution}/v1/badge/${encodeURIComponent(e)}.svg`,
                           alt: "Erabi badge",
                           className: "mt-4 h-6",
                         }),
@@ -286,8 +286,8 @@
                           children: [
                             "provider ledger",
                             " ",
-                            p &&
-                              (p.chain_valid
+                            h &&
+                              (h.chain_valid
                                 ? a.jsx("span", {
                                     className: "text-terminal-green",
                                     children: "\xb7 chain verified",
@@ -298,7 +298,7 @@
                                   })),
                           ],
                         }),
-                        p && 0 !== p.events.length
+                        h && 0 !== h.events.length
                           ? a.jsx("div", {
                               className: "max-h-80 overflow-y-auto",
                               children: (0, a.jsxs)("table", {
@@ -316,7 +316,7 @@
                                     }),
                                   }),
                                   a.jsx("tbody", {
-                                    children: p.events.map((e) =>
+                                    children: h.events.map((e) =>
                                       (0, a.jsxs)(
                                         "tr",
                                         {
@@ -409,16 +409,16 @@
       },
       1595: (e, s, t) => {
         "use strict";
-        (t.r(s), t.d(s, { default: () => l, metadata: () => n }));
+        (t.r(s), t.d(s, { default: () => n, metadata: () => l }));
         var a = t(9222),
           r = t(3023);
         t(6557);
-        let n = {
+        let l = {
           title: "Erabi Explorer",
           description:
             "Live view of the Erabi intent exchange: agents joining, intents flowing, auctions clearing, settlements confirming.",
         };
-        function l({ children: e }) {
+        function n({ children: e }) {
           return a.jsx("html", {
             lang: "en",
             children: a.jsx("body", {
@@ -441,7 +441,7 @@
                         ],
                       }),
                       (0, a.jsxs)("nav", {
-                        className: "flex gap-6 text-sm",
+                        className: "flex gap-5 text-sm",
                         children: [
                           a.jsx(r.default, {
                             href: "/",
@@ -449,9 +449,24 @@
                             children: "ticker",
                           }),
                           a.jsx(r.default, {
+                            href: "/agents",
+                            className: "hover:text-terminal-green",
+                            children: "agents",
+                          }),
+                          a.jsx(r.default, {
+                            href: "/leaderboard",
+                            className: "hover:text-terminal-green",
+                            children: "leaderboard",
+                          }),
+                          a.jsx(r.default, {
                             href: "/disclosures",
                             className: "hover:text-terminal-green",
-                            children: "disclosure inspector",
+                            children: "disclosures",
+                          }),
+                          a.jsx(r.default, {
+                            href: "/dashboard",
+                            className: "hover:text-terminal-green",
+                            children: "dashboard",
                           }),
                         ],
                       }),

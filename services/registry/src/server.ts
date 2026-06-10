@@ -83,6 +83,14 @@ export function buildServer(
     service.rotateKey(request.params.id, request.body),
   );
 
+  app.post<{ Params: { id: string } }>("/v1/agents/:id/consent", async (request) =>
+    service.setAutonomousConsent(request.params.id, request.body),
+  );
+
+  app.post<{ Params: { id: string } }>("/v1/agents/:id/stake-tier", async (request) =>
+    service.promoteToStaked(request.params.id, request.body),
+  );
+
   app.post("/v1/fleets", async (request, reply) => {
     const members = await service.registerFleet(request.body);
     return reply.status(201).send({ agents: members });

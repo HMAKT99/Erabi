@@ -10,6 +10,7 @@ import {
 import {
   DISCOVERY_FRESHNESS_HALF_LIFE_DAYS,
   FLEET_MAX_MEMBERS,
+  STAKE_MINIMUM_USD,
   TIER_POLICIES,
   type Tier,
 } from "@erabi/config";
@@ -30,6 +31,8 @@ import type { VerifierSet } from "./verifiers.js";
 const PUBLIC_KEY_PATTERN = /^ed25519:[1-9A-HJ-NP-Za-km-z]{32,50}$/;
 
 const verifyRequestZod = z.object({ method: z.string().min(1).max(256) }).strict();
+const consentZod = z.object({ autonomous_sponsorship: z.boolean() }).strict();
+const stakeTierZod = z.object({ agent_id: z.string() }).strict();
 const rotateKeyZod = z.object({ new_public_key: z.string().regex(PUBLIC_KEY_PATTERN) }).strict();
 const fleetRequestZod = z.object({ members: z.array(z.unknown()).min(1) }).strict();
 export const discoverRequestZod = z
@@ -45,6 +48,8 @@ export interface AgentView {
   public_key: string;
   tier: Tier;
   reputation: number;
+  /** Owner-level consent to sponsorship on autonomous-spend intents. */
+  autonomous_sponsorship_consent: boolean;
   key_seq: number;
   created_at: string;
   updated_at: string;
@@ -60,6 +65,11 @@ export interface DiscoverResult {
   evidence_url: string;
 }
 
+/** Minimal event-bus surface (matches @erabi/exchange's EventBus). */
+export interface NetworkEventSink {
+  emit(type: "agent.registered", data: Record<string, unknown>): unknown;
+}
+
 export interface RegistryServiceOptions {
   db: RegistryDb;
   verifiers: VerifierSet;
@@ -67,6 +77,10 @@ export interface RegistryServiceOptions {
   baseUrl: string;
   nonceStore?: NonceStore;
   now?: () => number;
+  /** Live ticker events (agent.registered) land here when provided. */
+  bus?: NetworkEventSink;
+  /** Ledger-held stake lookups (attribution) for the staked-tier upgrade. */
+  stakeSource?: { stakeOf(agentId: string): number };
 }
 
 export class RegistryService {
@@ -76,14 +90,18 @@ export class RegistryService {
   private readonly nodeId: string;
   private readonly baseUrl: string;
   private readonly now: () => number;
+  private readonly bus?: NetworkEventSink;
+  private readonly stakeSource?: { stakeOf(agentId: string): number };
 
   constructor(options: RegistryServiceOptions) {
+    this.stakeSource = options.stakeSource;
     this.db = options.db;
     this.verifiers = options.verifiers;
     this.nonceStore = options.nonceStore ?? new InMemoryNonceStore();
     this.nodeId = options.nodeId;
     this.baseUrl = options.baseUrl.replace(/\/$/, "");
     this.now = options.now ?? Date.now;
+    this.bus = options.bus;
   }
 
   // ---- envelope plumbing ----
@@ -144,6 +162,12 @@ export class RegistryService {
     const nowIso = new Date(this.now()).toISOString();
     const tier: Tier = internal.tier ?? "unverified";
     this.insertAgent(manifest, tier, nowIso);
+    this.bus?.emit("agent.registered", {
+      agent_id: manifest.id,
+      name: manifest.name,
+      tier,
+      capabilities: manifest.capabilities,
+    });
     return this.getAgent(manifest.id);
   }
 
@@ -215,6 +239,7 @@ export class RegistryService {
       public_key: row.publicKey,
       tier: row.tier as Tier,
       reputation: row.reputation,
+      autonomous_sponsorship_consent: row.autonomousConsent === 1,
       key_seq: seqRow?.seq ?? 1,
       created_at: row.createdAt,
       updated_at: row.updatedAt,
@@ -303,6 +328,82 @@ export class RegistryService {
         .where(eq(agents.id, id))
         .run();
     }
+    return this.getAgent(id);
+  }
+
+  /**
+   * Owner-level consent to sponsored results on autonomous-spend intents
+   * (scope policy §1). Only a verified owner may grant it — an unverified
+   * agent cannot opt itself into autonomous paid influence.
+   */
+  async setAutonomousConsent(id: string, body: unknown): Promise<AgentView> {
+    const row = this.findAgentRow(id);
+    if (!row) throw new RegistryError("agent_not_found", `no agent ${id}`);
+
+    const envelope = this.parseEnvelope(body);
+    if (envelope.key_id !== id) {
+      throw new RegistryError("id_mismatch", "envelope key_id does not match agent id");
+    }
+    await this.checkSignature(envelope, row.publicKey);
+
+    const parsed = consentZod.safeParse(envelope.payload);
+    if (!parsed.success) {
+      throw new RegistryError(
+        "invalid_request",
+        "payload must be { autonomous_sponsorship }",
+        parsed.error.issues,
+      );
+    }
+    if (row.tier !== "verified" && row.tier !== "staked") {
+      throw new RegistryError(
+        "tier_required",
+        "autonomous-sponsorship consent requires a verified owner",
+      );
+    }
+    this.db
+      .update(agents)
+      .set({
+        autonomousConsent: parsed.data.autonomous_sponsorship ? 1 : 0,
+        updatedAt: new Date(this.now()).toISOString(),
+      })
+      .where(eq(agents.id, id))
+      .run();
+    return this.getAgent(id);
+  }
+
+  /**
+   * Staked-tier upgrade: a verified agent with a sufficient ledger-held
+   * deposit (attribution holds it; slashable on fraud) moves to `staked`.
+   */
+  async promoteToStaked(id: string, body: unknown): Promise<AgentView> {
+    const row = this.findAgentRow(id);
+    if (!row) throw new RegistryError("agent_not_found", `no agent ${id}`);
+
+    const envelope = this.parseEnvelope(body);
+    if (envelope.key_id !== id) {
+      throw new RegistryError("id_mismatch", "envelope key_id does not match agent id");
+    }
+    await this.checkSignature(envelope, row.publicKey);
+
+    const parsed = stakeTierZod.safeParse(envelope.payload);
+    if (!parsed.success || parsed.data.agent_id !== id) {
+      throw new RegistryError("invalid_request", "payload must be { agent_id } matching the URL");
+    }
+    if (row.tier !== "verified") {
+      throw new RegistryError("tier_required", "staking requires a verified owner first");
+    }
+    const stake = this.stakeSource?.stakeOf(id) ?? 0;
+    if (stake < STAKE_MINIMUM_USD) {
+      throw new RegistryError(
+        "verification_failed",
+        `staked tier requires a ledger-held deposit of at least $${STAKE_MINIMUM_USD} (current: $${stake})`,
+      );
+    }
+    this.db
+      .update(agents)
+      .set({ tier: "staked", updatedAt: new Date(this.now()).toISOString() })
+      .where(eq(agents.id, id))
+      .run();
     return this.getAgent(id);
   }
 
@@ -407,6 +508,15 @@ export class RegistryService {
     this.db.transaction(() => {
       for (const manifest of validated) this.insertAgent(manifest, orgTier, nowIso);
     });
+    for (const manifest of validated) {
+      this.bus?.emit("agent.registered", {
+        agent_id: manifest.id,
+        name: manifest.name,
+        tier: orgTier,
+        capabilities: manifest.capabilities,
+        fleet_org: orgRow.id,
+      });
+    }
     return validated.map((m) => this.getAgent(m.id));
   }
 

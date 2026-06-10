@@ -117,6 +117,9 @@ export async function startReferenceNode(
       ? new SqliteNonceStore(path.join(options.dataDir, "nonces.sqlite"))
       : new InMemoryNonceStore());
 
+  // Registry → attribution stake lookups are wired lazily (attribution is
+  // constructed after the registry it depends on through the directory).
+  let attributionRef: AttributionService | undefined;
   const registry = new RegistryService({
     db: createRegistryDb(db("registry")),
     verifiers:
@@ -128,6 +131,8 @@ export async function startReferenceNode(
     nodeId,
     baseUrl: urls.registry,
     nonceStore,
+    bus,
+    stakeSource: { stakeOf: (id) => attributionRef?.stakeOf(id) ?? 0 },
   });
   const directory = registryDirectory(registry);
 
@@ -148,11 +153,13 @@ export async function startReferenceNode(
     directory,
     auctions: exchange,
     tupleSink: exchange,
+    spendSink: exchange,
     bus,
     rails: [mockRail, new X402Rail("http://x402-facilitator.invalid")],
     holdbackHours: options.holdbackHours,
     nonceStore,
   });
+  attributionRef = attribution;
 
   const reputation = new ReputationService({
     ledger: attribution,

@@ -2,6 +2,23 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0021 — Sybil sweep flags circular settlement, not mere connectivity
+
+Connected components are trivially "closed", so the nightly settlement-graph job
+flags **directed cycles** instead: confirmed value flowing A→B→…→A. Honest commerce
+is overwhelmingly acyclic (consumers pay providers); circular flow above a minimum
+event count is the signature of a cluster farming itself. Flagging is advisory
+(ops endpoint + nightly log) in 0.1; auto-freezing whole clusters waits for
+precision data from real traffic.
+
+## 0020 — CPA budgets reserve at serve, charge on confirmation
+
+Replaces the ADR-0011 simplification. A sponsored CPA/rev-share serve writes a
+budget _reservation_ (96h window, `config/economics.ts`); attribution's confirmed
+outcome settles it into a charge via the SpendSink seam, and unconverted
+reservations release on expiry. CPC still charges at serve — the serve is the
+billable event there. Daily budget = charged spend + outstanding reservations.
+
 ## 0019 — Production identity and replay protection are file-backed by default
 
 The node signing key loads from `ERABI_NODE_SEED` or a 0600 key file under

@@ -1,8 +1,12 @@
-import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { createHmac, randomUUID } from "node:crypto";
+import { and, eq, like, lt } from "drizzle-orm";
 import { z } from "zod";
 import { isValidCategory, SPEC_TAG, SPONSORED_LABEL, WELL_KNOWN_PATH } from "@erabi/constants";
-import { RESERVE_PRICE_USD } from "@erabi/config";
+import {
+  CONSIDERATION_SET_AUDIT_DAYS,
+  CPA_RESERVATION_HOURS,
+  RESERVE_PRICE_USD,
+} from "@erabi/config";
 import {
   canonicalize,
   generateKeyPair,
@@ -32,7 +36,7 @@ import {
 } from "./auction.js";
 import { EventBus } from "./bus.js";
 import type { ExchangeDb } from "./db/client.js";
-import { bids, decisionTuples, disclosures } from "./db/schema.js";
+import { bidReservations, bids, decisionTuples, disclosures } from "./db/schema.js";
 import type { AgentDirectory } from "./directory.js";
 import { ExchangeError } from "./errors.js";
 import { evaluateFilter, parseFilter } from "./filter.js";
@@ -269,9 +273,11 @@ export class ExchangeService {
       .filter((candidate) => candidate.provider_id !== intent.agent_id);
 
     // Scope policy: sponsorship requires the consumer's opt-in AND a human
-    // in the loop (autonomous-spend influence is out of scope by default).
+    // in the loop — unless a VERIFIED owner explicitly consented to
+    // autonomous-spend sponsorship (the only permitted override).
     const policy = consumer.manifest.policy;
-    const sponsorshipAllowed = policy.accepts_sponsored && intent.human_in_loop;
+    const sponsorshipAllowed =
+      policy.accepts_sponsored && (intent.human_in_loop || consumer.autonomousConsent);
     const maxSlots = sponsorshipAllowed
       ? sponsoredSlotBudget(organic.length, policy.max_sponsored_ratio)
       : 0;
@@ -280,13 +286,14 @@ export class ExchangeService {
     const reserve = RESERVE_PRICE_USD[intent.category.split(".")[0]!] ?? RESERVE_PRICE_USD.default!;
     let cleared = runAuction(candidates, { maxSlots, reservePriceUsd: reserve });
 
-    // Budget pacing: drop slots the provider can no longer afford today.
+    // Budget pacing: a slot must fit within today's budget counting both
+    // charged spend (CPC) and outstanding CPA reservations.
+    this.releaseExpiredReservations();
     cleared = cleared.filter((slot) => {
       const row = this.db.select().from(bids).where(eq(bids.bidId, slot.candidate.bidId)).get();
       if (!row) return false;
       const budget = (row.payload as Bid).budget.daily_usd;
-      const spent = row.spendDate === nowIso.slice(0, 10) ? row.spentTodayUsd : 0;
-      return spent + slot.clearingPriceUsd <= budget;
+      return this.dailyCommittedUsd(row, nowIso.slice(0, 10)) + slot.clearingPriceUsd <= budget;
     });
 
     // THE INVARIANT: disclosures are persisted and signed inside the same
@@ -400,11 +407,30 @@ export class ExchangeService {
       for (const slot of cleared) {
         const row = tx.select().from(bids).where(eq(bids.bidId, slot.candidate.bidId)).get();
         if (!row) continue;
-        const spent = row.spendDate === spendDate ? row.spentTodayUsd : 0;
-        tx.update(bids)
-          .set({ spentTodayUsd: spent + slot.clearingPriceUsd, spendDate })
-          .where(eq(bids.bidId, slot.candidate.bidId))
-          .run();
+        if (slot.candidate.paymentModel === "cpc") {
+          // CPC: the click-adjacent serve is the billable event.
+          const spent = row.spendDate === spendDate ? row.spentTodayUsd : 0;
+          tx.update(bids)
+            .set({ spentTodayUsd: spent + slot.clearingPriceUsd, spendDate })
+            .where(eq(bids.bidId, slot.candidate.bidId))
+            .run();
+        } else {
+          // CPA / rev-share: reserve now, charge on confirmed outcome,
+          // release if the window passes unconverted.
+          tx.insert(bidReservations)
+            .values({
+              reservationId: randomUUID(),
+              bidId: slot.candidate.bidId,
+              auctionId,
+              providerId: slot.candidate.providerId,
+              amountUsd: slot.clearingPriceUsd,
+              expiresAt: new Date(
+                Date.parse(nowIso) + CPA_RESERVATION_HOURS * 3_600_000,
+              ).toISOString(),
+              createdAt: nowIso,
+            })
+            .run();
+        }
       }
       tx.insert(decisionTuples)
         .values({
@@ -499,6 +525,61 @@ export class ExchangeService {
     };
   }
 
+  /** Charged + reserved budget for a bid on the given UTC day. */
+  private dailyCommittedUsd(
+    row: { bidId: string; spendDate: string; spentTodayUsd: number },
+    date: string,
+  ): number {
+    const charged = row.spendDate === date ? row.spentTodayUsd : 0;
+    const reserved = this.db
+      .select()
+      .from(bidReservations)
+      .where(and(eq(bidReservations.bidId, row.bidId), like(bidReservations.createdAt, `${date}%`)))
+      .all()
+      .filter((r) => r.status !== "released")
+      .reduce((sum, r) => sum + r.amountUsd, 0);
+    return charged + reserved;
+  }
+
+  /** Attribution confirms a paid outcome: the CPA reservation becomes a charge. */
+  settleSpend(auctionId: string, providerId: string): void {
+    const reservation = this.db
+      .select()
+      .from(bidReservations)
+      .where(
+        and(
+          eq(bidReservations.auctionId, auctionId),
+          eq(bidReservations.providerId, providerId),
+          eq(bidReservations.status, "active"),
+        ),
+      )
+      .get();
+    if (!reservation) return; // CPC, already settled, or expired
+    this.db
+      .update(bidReservations)
+      .set({ status: "settled" })
+      .where(eq(bidReservations.reservationId, reservation.reservationId))
+      .run();
+  }
+
+  /** Release reservations whose conversion window passed; returns the count. */
+  releaseExpiredReservations(): number {
+    const nowIso = new Date(this.now()).toISOString();
+    const expired = this.db
+      .select()
+      .from(bidReservations)
+      .where(and(eq(bidReservations.status, "active"), lt(bidReservations.expiresAt, nowIso)))
+      .all();
+    for (const reservation of expired) {
+      this.db
+        .update(bidReservations)
+        .set({ status: "released" })
+        .where(eq(bidReservations.reservationId, reservation.reservationId))
+        .run();
+    }
+    return expired.length;
+  }
+
   /** Attribution writes outcomes back into the decision tuple (spec §10). */
   recordOutcome(
     auctionId: string,
@@ -516,6 +597,93 @@ export class ExchangeService {
       ? this.db.select().from(bids).where(eq(bids.providerId, providerId)).all()
       : this.db.select().from(bids).all();
     return rows.filter((row) => row.active).map((row) => row.payload as Bid);
+  }
+
+  /**
+   * Retention (spec privacy §9.7): decision tuples older than the audit
+   * window keep their outcome aggregates but lose per-candidate detail.
+   * (Raw query text is never stored at all — only its length.)
+   */
+  applyRetention(): number {
+    const cutoff = new Date(this.now() - CONSIDERATION_SET_AUDIT_DAYS * 86_400_000).toISOString();
+    const rows = this.db.select().from(decisionTuples).all();
+    let redacted = 0;
+    for (const row of rows) {
+      if (row.createdAt >= cutoff) continue;
+      const tuple = row.tuple as {
+        redacted?: boolean;
+        intent_features?: { category?: string; human_in_loop?: boolean };
+        candidate_set?: { organic?: unknown[]; auction?: unknown[] };
+      };
+      if (tuple.redacted) continue;
+      this.db
+        .update(decisionTuples)
+        .set({
+          tuple: {
+            redacted: true,
+            intent_features: {
+              category: tuple.intent_features?.category,
+              human_in_loop: tuple.intent_features?.human_in_loop,
+            },
+            candidate_counts: {
+              organic: tuple.candidate_set?.organic?.length ?? 0,
+              auction: tuple.candidate_set?.auction?.length ?? 0,
+            },
+          },
+        })
+        .where(eq(decisionTuples.intentId, row.intentId))
+        .run();
+      redacted += 1;
+    }
+    return redacted;
+  }
+
+  /**
+   * Open dataset export (spec/DATASET.md): JSONL of decision tuples with
+   * agent ids replaced by per-export pseudonyms and timestamps coarsened
+   * to the hour. PII-free by construction.
+   */
+  exportTuples(options: { salt: string }): string {
+    const pseudonym = (id: string) =>
+      `agent_${createHmac("sha256", options.salt).update(id).digest("hex").slice(0, 12)}`;
+    const AGENT_ID = /erabi:agent:[1-9A-HJ-NP-Za-km-z]+/g;
+    const ISO_INSTANT = /^(\d{4}-\d{2}-\d{2}T\d{2}):\d{2}:\d{2}(?:\.\d+)?Z$/;
+    const anonymize = (value: unknown): unknown => {
+      if (typeof value === "string") {
+        // Agent ids are pseudonymized wherever they appear, including
+        // inside URLs; timestamps coarsen to the hour.
+        const instant = ISO_INSTANT.exec(value);
+        if (instant) return `${instant[1]}:00:00Z`;
+        return value.replace(AGENT_ID, (id) => pseudonym(id));
+      }
+      if (Array.isArray(value)) return value.map(anonymize);
+      if (value && typeof value === "object") {
+        return Object.fromEntries(
+          Object.entries(value).map(([key, child]) => [key, anonymize(child)]),
+        );
+      }
+      return value;
+    };
+
+    const rows = this.db.select().from(decisionTuples).all();
+    const lines = [
+      JSON.stringify({
+        dataset: "erabi-tuples",
+        spec: SPEC_TAG,
+        tuples: rows.length,
+        exported_at: new Date(this.now()).toISOString().slice(0, 13) + ":00:00Z",
+      }),
+      ...rows.map((row) =>
+        JSON.stringify({
+          tuple: anonymize(row.tuple),
+          selection: anonymize(row.selection),
+          outcome: row.outcome,
+          value_usd: row.valueUsd,
+          created_at: row.createdAt.slice(0, 13) + ":00:00Z",
+        }),
+      ),
+    ];
+    return lines.join("\n") + "\n";
   }
 
   stats() {

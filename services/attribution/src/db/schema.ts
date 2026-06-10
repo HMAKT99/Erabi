@@ -53,6 +53,21 @@ export const revShareEntries = sqliteTable("rev_share_entries", {
   createdAt: text("created_at").notNull(),
 });
 
+/**
+ * Ledger-held stakes (the `staked` tier's skin in the game). Append-only
+ * event log; the balance is the sum of deposits minus slashes.
+ */
+export const stakeEvents = sqliteTable("stake_events", {
+  stakeEventId: text("stake_event_id").primaryKey(),
+  agentId: text("agent_id").notNull(),
+  /** deposit | slash */
+  kind: text("kind").notNull(),
+  amountUsd: real("amount_usd").notNull(),
+  railRef: text("rail_ref"),
+  reason: text("reason"),
+  createdAt: text("created_at").notNull(),
+});
+
 export const payouts = sqliteTable("payouts", {
   payoutId: text("payout_id").primaryKey(),
   agentId: text("agent_id").notNull(),
@@ -104,6 +119,16 @@ CREATE TABLE IF NOT EXISTS rev_share_entries (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_rev_share_beneficiary ON rev_share_entries (beneficiary_id);
+CREATE TABLE IF NOT EXISTS stake_events (
+  stake_event_id TEXT PRIMARY KEY,
+  agent_id TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  amount_usd REAL NOT NULL,
+  rail_ref TEXT,
+  reason TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_stake_events_agent ON stake_events (agent_id);
 CREATE TABLE IF NOT EXISTS payouts (
   payout_id TEXT PRIMARY KEY,
   agent_id TEXT NOT NULL,

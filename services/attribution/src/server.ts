@@ -91,6 +91,20 @@ export function buildServer(
     service.getFeedback(request.params.agentId),
   );
 
+  app.post("/v1/stakes", async (request, reply) => {
+    const stake = await service.depositStake(request.body);
+    return reply.status(201).send(stake);
+  });
+
+  app.get<{ Params: { agentId: string } }>("/v1/stakes/:agentId", async (request) =>
+    service.getStake(request.params.agentId),
+  );
+
+  /** Ops endpoint; production runs this nightly. */
+  app.get("/v1/anomalies/clusters", async () => ({
+    clusters: service.analyzeSettlementGraph(),
+  }));
+
   app.post("/v1/payouts", async (request, reply) => {
     const result = await service.requestPayout(request.body);
     return reply.status(201).send(result);

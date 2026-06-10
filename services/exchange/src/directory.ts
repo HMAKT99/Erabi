@@ -11,6 +11,8 @@ export interface DirectoryAgent {
   reputation: number;
   /** Node-authoritative registration time (not the self-declared manifest one). */
   registeredAt: string;
+  /** Owner-level consent to sponsorship on autonomous-spend intents. */
+  autonomousConsent: boolean;
 }
 
 export interface OrganicCandidate {
@@ -37,6 +39,7 @@ export function registryDirectory(registry: RegistryService): AgentDirectory {
           tier: view.tier,
           reputation: view.reputation,
           registeredAt: view.created_at,
+          autonomousConsent: view.autonomous_sponsorship_consent,
         };
       } catch (error) {
         if (error instanceof RegistryError && error.code === "agent_not_found") return null;

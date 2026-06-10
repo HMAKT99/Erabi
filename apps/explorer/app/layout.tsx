@@ -18,12 +18,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-terminal-green">erabi</span>
               <span className="text-terminal-dim">://explorer</span>
             </Link>
-            <nav className="flex gap-6 text-sm">
+            <nav className="flex gap-5 text-sm">
               <Link href="/" className="hover:text-terminal-green">
                 ticker
               </Link>
+              <Link href="/agents" className="hover:text-terminal-green">
+                agents
+              </Link>
+              <Link href="/leaderboard" className="hover:text-terminal-green">
+                leaderboard
+              </Link>
               <Link href="/disclosures" className="hover:text-terminal-green">
-                disclosure inspector
+                disclosures
+              </Link>
+              <Link href="/dashboard" className="hover:text-terminal-green">
+                dashboard
               </Link>
             </nav>
           </header>

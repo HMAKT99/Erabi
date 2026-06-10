@@ -7,6 +7,11 @@ export const agents = sqliteTable("agents", {
   publicKey: text("public_key").notNull(),
   tier: text("tier").notNull().default("unverified"),
   reputation: real("reputation").notNull().default(50),
+  /**
+   * Owner-level consent to sponsored results on human_in_loop=false intents
+   * (scope policy §1). Settable only by a verified owner.
+   */
+  autonomousConsent: integer("autonomous_consent").notNull().default(0),
   /** Full AgentManifest as registered (JSON). */
   manifest: text("manifest", { mode: "json" }).notNull(),
   referrer: text("referrer"),
@@ -38,6 +43,7 @@ CREATE TABLE IF NOT EXISTS agents (
   public_key TEXT NOT NULL,
   tier TEXT NOT NULL DEFAULT 'unverified',
   reputation REAL NOT NULL DEFAULT 50,
+  autonomous_consent INTEGER NOT NULL DEFAULT 0,
   manifest TEXT NOT NULL,
   referrer TEXT,
   created_at TEXT NOT NULL,

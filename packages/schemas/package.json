@@ -33,5 +33,24 @@
     "json-schema-to-zod": "^2.4.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HMAKT99/Erabi.git",
+    "directory": "packages/schemas"
+  },
+  "homepage": "https://github.com/HMAKT99/Erabi#readme",
+  "bugs": {
+    "url": "https://github.com/HMAKT99/Erabi/issues"
+  },
+  "keywords": [
+    "erabi",
+    "json-schema",
+    "zod",
+    "agents",
+    "protocol"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

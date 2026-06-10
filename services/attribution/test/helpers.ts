@@ -110,12 +110,14 @@ export function setupPipeline(): Pipeline {
   const now = () => clock.nowMs;
   const dns = new MockDnsVerifier();
   const bus = new EventBus();
+  let attributionRef: AttributionService | undefined;
   const registry = new RegistryService({
     db: createRegistryDb(),
     verifiers: new Map([["dns", dns]]),
     nodeId: "erabi-node-test",
     baseUrl: "http://registry.test",
     now,
+    stakeSource: { stakeOf: (id) => attributionRef?.stakeOf(id) ?? 0 },
   });
   const directory = registryDirectory(registry);
   const exchange = new ExchangeService({
@@ -133,10 +135,12 @@ export function setupPipeline(): Pipeline {
     directory,
     auctions: exchange,
     tupleSink: exchange,
+    spendSink: exchange,
     bus,
     rails: [rail],
     now,
   });
+  attributionRef = attribution;
   return { clock, registry, exchange, attribution, bus, rail, dns };
 }
 

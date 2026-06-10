@@ -12,6 +12,23 @@ export const bids = sqliteTable("bids", {
   createdAt: text("created_at").notNull(),
 });
 
+/**
+ * True CPA budget accounting: a sponsored serve RESERVES budget; the
+ * reservation charges when the outcome confirms and releases when its
+ * window expires unconverted. CPC charges at serve time directly.
+ */
+export const bidReservations = sqliteTable("bid_reservations", {
+  reservationId: text("reservation_id").primaryKey(),
+  bidId: text("bid_id").notNull(),
+  auctionId: text("auction_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  amountUsd: real("amount_usd").notNull(),
+  /** active | settled | released */
+  status: text("status").notNull().default("active"),
+  expiresAt: text("expires_at").notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
 export const disclosures = sqliteTable("disclosures", {
   disclosureId: text("disclosure_id").primaryKey(),
   auctionId: text("auction_id").notNull(),
@@ -48,6 +65,18 @@ CREATE TABLE IF NOT EXISTS bids (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_bids_provider ON bids (provider_id);
+CREATE TABLE IF NOT EXISTS bid_reservations (
+  reservation_id TEXT PRIMARY KEY,
+  bid_id TEXT NOT NULL,
+  auction_id TEXT NOT NULL,
+  provider_id TEXT NOT NULL,
+  amount_usd REAL NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active',
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_reservations_bid ON bid_reservations (bid_id);
+CREATE INDEX IF NOT EXISTS idx_reservations_auction ON bid_reservations (auction_id);
 CREATE TABLE IF NOT EXISTS disclosures (
   disclosure_id TEXT PRIMARY KEY,
   auction_id TEXT NOT NULL,

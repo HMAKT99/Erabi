@@ -77,3 +77,14 @@ export const RATE_LIMITS = {
 
 /** Fleet registration: max members per request. */
 export const FLEET_MAX_MEMBERS = 100;
+
+/** Staked tier: minimum ledger-held deposit (USD). */
+export const STAKE_MINIMUM_USD = 100;
+/** Fraction of stake slashed per fraud-frozen event. */
+export const STAKE_SLASH_FRACTION = 0.1;
+
+/**
+ * CPA/rev-share budget reservations: a sponsored serve holds budget until
+ * the outcome confirms (charge) or this window passes (release).
+ */
+export const CPA_RESERVATION_HOURS = 96;

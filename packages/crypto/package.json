@@ -30,5 +30,24 @@
     "@types/node": "^20.19.42",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HMAKT99/Erabi.git",
+    "directory": "packages/crypto"
+  },
+  "homepage": "https://github.com/HMAKT99/Erabi#readme",
+  "bugs": {
+    "url": "https://github.com/HMAKT99/Erabi/issues"
+  },
+  "keywords": [
+    "erabi",
+    "ed25519",
+    "rfc8785",
+    "canonical-json",
+    "agents"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

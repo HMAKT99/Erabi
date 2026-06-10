@@ -50,8 +50,43 @@ if (node.keySource === "ephemeral") {
   );
 }
 
+// Maintenance loops: settlement, budget releases, retention, Sybil sweep.
+const everyMinute = setInterval(() => {
+  try {
+    const confirmed = node.attribution.processHoldbacks();
+    const released = node.exchange.releaseExpiredReservations();
+    if (confirmed.length || released) {
+      console.log(`maintenance: ${confirmed.length} settled, ${released} reservations released`);
+    }
+  } catch (error) {
+    console.error("maintenance(minute) failed:", error);
+  }
+}, 60_000);
+
+const nightly = setInterval(
+  () => {
+    try {
+      const redacted = node.exchange.applyRetention();
+      const clusters = node.attribution.analyzeSettlementGraph();
+      console.log(
+        `maintenance(nightly): ${redacted} tuples redacted, ${clusters.length} suspicious clusters`,
+      );
+      for (const cluster of clusters) {
+        console.warn("settlement-graph cluster flagged:", JSON.stringify(cluster));
+      }
+    } catch (error) {
+      console.error("maintenance(nightly) failed:", error);
+    }
+  },
+  24 * 60 * 60_000,
+);
+everyMinute.unref();
+nightly.unref();
+
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, () => {
+    clearInterval(everyMinute);
+    clearInterval(nightly);
     void node.stop().then(() => process.exit(0));
   });
 }

@@ -134,17 +134,17 @@
             Gy: 0x6666666666666666666666666666666666666666666666666666666666666658n,
           },
           u = 32,
-          b = (e = "") => {
+          x = (e = "") => {
             throw Error(e);
           },
-          x = (e) => "bigint" == typeof e,
+          b = (e) => "bigint" == typeof e,
           p = (e) => "string" == typeof e,
           g = (e) =>
             e instanceof Uint8Array ||
             (ArrayBuffer.isView(e) && "Uint8Array" === e.constructor.name),
           m = (e, t) =>
             !g(e) || ("number" == typeof t && t > 0 && e.length !== t)
-              ? b("Uint8Array expected")
+              ? x("Uint8Array expected")
               : e,
           y = (e) => new Uint8Array(e),
           w = (e) => Uint8Array.from(e),
@@ -164,22 +164,22 @@
                   : void 0,
           j = (e) => {
             let t = "hex invalid";
-            if (!p(e)) return b(t);
+            if (!p(e)) return x(t);
             let r = e.length,
               n = r / 2;
-            if (r % 2) return b(t);
+            if (r % 2) return x(t);
             let i = y(n);
             for (let r = 0, s = 0; r < n; r++, s += 2) {
               let n = N(e.charCodeAt(s)),
                 a = N(e.charCodeAt(s + 1));
-              if (void 0 === n || void 0 === a) return b(t);
+              if (void 0 === n || void 0 === a) return x(t);
               i[r] = 16 * n + a;
             }
             return i;
           },
           _ = (e, t) => m(p(e) ? j(e) : w(m(e)), t),
           U = () => globalThis?.crypto,
-          B = () => U()?.subtle ?? b("crypto.subtle must be defined"),
+          B = () => U()?.subtle ?? x("crypto.subtle must be defined"),
           S = (...e) => {
             let t = y(e.reduce((e, t) => e + m(t).length, 0)),
               r = 0;
@@ -191,14 +191,14 @@
             );
           },
           I = BigInt,
-          P = (e, t, r, n = "bad number: out of range") => (x(e) && t <= e && e < r ? e : b(n)),
+          P = (e, t, r, n = "bad number: out of range") => (b(e) && t <= e && e < r ? e : x(n)),
           T = (e, t = o) => {
             let r = e % t;
             return r >= 0n ? r : t + r;
           },
           L = (e) => T(e, l),
           R = (e, t) => {
-            (0n === e || t <= 0n) && b("no inverse n=" + e + " mod=" + t);
+            (0n === e || t <= 0n) && x("no inverse n=" + e + " mod=" + t);
             let r = T(e, t),
               n = t,
               i = 0n,
@@ -212,13 +212,13 @@
                 f = s - o * e;
               ((n = r), (r = t), (i = a), (s = o), (a = l), (o = f));
             }
-            return 1n === n ? T(i, t) : b("no inverse");
+            return 1n === n ? T(i, t) : x("no inverse");
           },
           $ = (e) => {
             let t = Y[e];
-            return ("function" != typeof t && b("hashes." + e + " not set"), t);
+            return ("function" != typeof t && x("hashes." + e + " not set"), t);
           },
-          k = (e) => (e instanceof O ? e : b("Point expected")),
+          k = (e) => (e instanceof O ? e : x("Point expected")),
           C = 2n ** 256n;
         class O {
           static BASE;
@@ -245,11 +245,11 @@
             P(i, 0n, t ? C : o);
             let s = T(i * i),
               { isValid: a, value: l } = V(T(s - 1n), T(h * s + 1n));
-            a || b("bad point: y not sqrt");
+            a || x("bad point: y not sqrt");
             let f = (1n & l) === 1n,
               c = (128 & n) != 0;
             return (
-              !t && 0n === l && c && b("bad point: x==0, isLastByteOdd"),
+              !t && 0n === l && c && x("bad point: x==0, isLastByteOdd"),
               c !== f && (l = T(-l)),
               new O(l, i, 1n, T(l * i))
             );
@@ -294,9 +294,9 @@
               c = f - s,
               h = a - i,
               u = T(l * c),
-              b = T(f * h),
-              x = T(l * h);
-            return new O(u, b, T(c * f), x);
+              x = T(f * h),
+              b = T(l * h);
+            return new O(u, x, T(c * f), b);
           }
           add(e) {
             let { ex: t, ey: r, ez: n, et: i } = this,
@@ -304,14 +304,14 @@
               f = T(t * s),
               c = T(r * a),
               u = T(i * h * l),
-              b = T(n * o),
-              x = T((t + r) * (s + a) - f - c),
-              p = T(b - u),
-              g = T(b + u),
+              x = T(n * o),
+              b = T((t + r) * (s + a) - f - c),
+              p = T(x - u),
+              g = T(x + u),
               m = T(c - d * f),
-              y = T(x * p),
+              y = T(b * p),
               w = T(g * m),
-              v = T(x * m);
+              v = T(b * m);
             return new O(y, w, T(p * g), v);
           }
           multiply(e, t = !0) {
@@ -328,7 +328,7 @@
             let { ex: e, ey: t, ez: r } = this;
             if (this.equals(z)) return { x: 0n, y: 1n };
             let n = R(r, o);
-            return (1n !== T(r * n) && b("invalid inverse"), { x: T(e * n), y: T(t * n) });
+            return (1n !== T(r * n) && x("invalid inverse"), { x: T(e * n), y: T(t * n) });
           }
           toBytes() {
             let { x: e, y: t } = this.assertValidity().toAffine(),
@@ -604,8 +604,8 @@
           ed = BigInt(4294967296 - 1),
           eh = BigInt(32),
           eu = (e, t, r) => e >>> r,
-          eb = (e, t, r) => (e << (32 - r)) | (t >>> r),
-          ex = (e, t, r) => (e >>> r) | (t << (32 - r)),
+          ex = (e, t, r) => (e << (32 - r)) | (t >>> r),
+          eb = (e, t, r) => (e >>> r) | (t << (32 - r)),
           ep = (e, t, r) => (e << (32 - r)) | (t >>> r),
           eg = (e, t, r) => (e << (64 - r)) | (t >>> (r - 32)),
           em = (e, t, r) => (e >>> (r - 32)) | (t << (64 - r));
@@ -756,12 +756,12 @@
               Fl: d,
               Gh: h,
               Gl: u,
-              Hh: b,
-              Hl: x,
+              Hh: x,
+              Hl: b,
             } = this;
-            return [e, t, r, n, i, s, a, o, l, f, c, d, h, u, b, x];
+            return [e, t, r, n, i, s, a, o, l, f, c, d, h, u, x, b];
           }
-          set(e, t, r, n, i, s, a, o, l, f, c, d, h, u, b, x) {
+          set(e, t, r, n, i, s, a, o, l, f, c, d, h, u, x, b) {
             ((this.Ah = 0 | e),
               (this.Al = 0 | t),
               (this.Bh = 0 | r),
@@ -776,8 +776,8 @@
               (this.Fl = 0 | d),
               (this.Gh = 0 | h),
               (this.Gl = 0 | u),
-              (this.Hh = 0 | b),
-              (this.Hl = 0 | x));
+              (this.Hh = 0 | x),
+              (this.Hl = 0 | b));
           }
           process(e, t) {
             for (let r = 0; r < 16; r++, t += 4)
@@ -785,12 +785,12 @@
             for (let e = 16; e < 80; e++) {
               let t = 0 | eS[e - 15],
                 r = 0 | eI[e - 15],
-                n = ex(t, r, 1) ^ ex(t, r, 8) ^ eu(t, r, 7),
-                i = ep(t, r, 1) ^ ep(t, r, 8) ^ eb(t, r, 7),
+                n = eb(t, r, 1) ^ eb(t, r, 8) ^ eu(t, r, 7),
+                i = ep(t, r, 1) ^ ep(t, r, 8) ^ ex(t, r, 7),
                 s = 0 | eS[e - 2],
                 a = 0 | eI[e - 2],
-                o = ex(s, a, 19) ^ eg(s, a, 61) ^ eu(s, a, 6),
-                l = eA(i, ep(s, a, 19) ^ em(s, a, 61) ^ eb(s, a, 6), eI[e - 7], eI[e - 16]),
+                o = eb(s, a, 19) ^ eg(s, a, 61) ^ eu(s, a, 6),
+                l = eA(i, ep(s, a, 19) ^ em(s, a, 61) ^ ex(s, a, 6), eI[e - 7], eI[e - 16]),
                 f = eE(l, n, o, eS[e - 7], eS[e - 16]);
               ((eS[e] = 0 | f), (eI[e] = 0 | l));
             }
@@ -807,26 +807,26 @@
               El: d,
               Fh: h,
               Fl: u,
-              Gh: b,
-              Gl: x,
+              Gh: x,
+              Gl: b,
               Hh: p,
               Hl: g,
             } = this;
             for (let e = 0; e < 80; e++) {
-              let t = ex(c, d, 14) ^ ex(c, d, 18) ^ eg(c, d, 41),
+              let t = eb(c, d, 14) ^ eb(c, d, 18) ^ eg(c, d, 41),
                 m = ep(c, d, 14) ^ ep(c, d, 18) ^ em(c, d, 41),
-                y = (c & h) ^ (~c & b),
-                w = eN(g, m, (d & u) ^ (~d & x), eB[e], eI[e]),
+                y = (c & h) ^ (~c & x),
+                w = eN(g, m, (d & u) ^ (~d & b), eB[e], eI[e]),
                 v = ej(w, p, t, y, eU[e], eS[e]),
                 A = 0 | w,
-                E = ex(r, n, 28) ^ eg(r, n, 34) ^ eg(r, n, 39),
+                E = eb(r, n, 28) ^ eg(r, n, 34) ^ eg(r, n, 39),
                 N = ep(r, n, 28) ^ em(r, n, 34) ^ em(r, n, 39),
                 j = (r & i) ^ (r & a) ^ (i & a),
                 _ = (n & s) ^ (n & o) ^ (s & o);
-              ((p = 0 | b),
-                (g = 0 | x),
-                (b = 0 | h),
-                (x = 0 | u),
+              ((p = 0 | x),
+                (g = 0 | b),
+                (x = 0 | h),
+                (b = 0 | u),
                 (h = 0 | c),
                 (u = 0 | d),
                 ({ h: c, l: d } = ey(0 | l, 0 | f, 0 | v, 0 | A)),
@@ -845,9 +845,9 @@
               ({ h: l, l: f } = ey(0 | this.Dh, 0 | this.Dl, 0 | l, 0 | f)),
               ({ h: c, l: d } = ey(0 | this.Eh, 0 | this.El, 0 | c, 0 | d)),
               ({ h: h, l: u } = ey(0 | this.Fh, 0 | this.Fl, 0 | h, 0 | u)),
-              ({ h: b, l: x } = ey(0 | this.Gh, 0 | this.Gl, 0 | b, 0 | x)),
+              ({ h: x, l: b } = ey(0 | this.Gh, 0 | this.Gl, 0 | x, 0 | b)),
               ({ h: p, l: g } = ey(0 | this.Hh, 0 | this.Hl, 0 | p, 0 | g)),
-              this.set(r, n, i, s, a, o, l, f, c, d, h, u, b, x, p, g));
+              this.set(r, n, i, s, a, o, l, f, c, d, h, u, x, b, p, g));
           }
           roundClean() {
             es(eS, eI);
@@ -1264,7 +1264,7 @@
                         ],
                       }),
                       (0, n.jsxs)("nav", {
-                        className: "flex gap-6 text-sm",
+                        className: "flex gap-5 text-sm",
                         children: [
                           n.jsx(i.default, {
                             href: "/",
@@ -1272,9 +1272,24 @@
                             children: "ticker",
                           }),
                           n.jsx(i.default, {
+                            href: "/agents",
+                            className: "hover:text-terminal-green",
+                            children: "agents",
+                          }),
+                          n.jsx(i.default, {
+                            href: "/leaderboard",
+                            className: "hover:text-terminal-green",
+                            children: "leaderboard",
+                          }),
+                          n.jsx(i.default, {
                             href: "/disclosures",
                             className: "hover:text-terminal-green",
-                            children: "disclosure inspector",
+                            children: "disclosures",
+                          }),
+                          n.jsx(i.default, {
+                            href: "/dashboard",
+                            className: "hover:text-terminal-green",
+                            children: "dashboard",
                           }),
                         ],
                       }),

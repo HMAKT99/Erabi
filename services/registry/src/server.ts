@@ -1,10 +1,26 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { WELL_KNOWN_PATH } from "@erabi/constants";
+import { RATE_LIMITS } from "@erabi/config";
+import { TokenBucketLimiter } from "@erabi/ratelimit";
 import { RegistryError } from "./errors.js";
 import type { RegistryService } from "./service.js";
 
-export function buildServer(service: RegistryService): FastifyInstance {
-  const app = Fastify({ logger: false });
+export interface ServerOptions {
+  logger?: boolean;
+  bodyLimit?: number;
+}
+
+export function buildServer(
+  service: RegistryService,
+  options: ServerOptions = {},
+): FastifyInstance {
+  const app = Fastify({
+    logger: options.logger ?? false,
+    bodyLimit: options.bodyLimit ?? 262_144,
+  });
+  const registrationLimiter = new TokenBucketLimiter({
+    limit: RATE_LIMITS.registrationsPerMinutePerIp,
+  });
 
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof RegistryError) {
@@ -34,6 +50,15 @@ export function buildServer(service: RegistryService): FastifyInstance {
   app.get(WELL_KNOWN_PATH, async () => service.wellKnown());
 
   app.post("/v1/agents", async (request, reply) => {
+    const decision = registrationLimiter.check(`ip:${request.ip}`);
+    if (!decision.allowed) {
+      return reply
+        .status(429)
+        .header("retry-after", Math.ceil(decision.retryAfterMs / 1000))
+        .send({
+          error: { code: "rate_limited", message: "too many registrations from this address" },
+        });
+    }
     const view = await service.registerAgent(request.body);
     return reply.status(201).send(view);
   });

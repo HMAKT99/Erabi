@@ -1,8 +1,19 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import type { ReputationService } from "./service.js";
 
-export function buildServer(service: ReputationService): FastifyInstance {
-  const app = Fastify({ logger: false });
+export interface ServerOptions {
+  logger?: boolean;
+  bodyLimit?: number;
+}
+
+export function buildServer(
+  service: ReputationService,
+  options: ServerOptions = {},
+): FastifyInstance {
+  const app = Fastify({
+    logger: options.logger ?? false,
+    bodyLimit: options.bodyLimit ?? 262_144,
+  });
 
   // The explorer reads this API from the browser.
   app.addHook("onSend", (_request, reply, payload, done) => {

@@ -1,9 +1,23 @@
 import Fastify, { type FastifyInstance } from "fastify";
+import { RATE_LIMITS } from "@erabi/config";
+import { envelopeKey, TokenBucketLimiter } from "@erabi/ratelimit";
 import { AttributionError } from "./errors.js";
 import type { AttributionService } from "./service.js";
 
-export function buildServer(service: AttributionService): FastifyInstance {
-  const app = Fastify({ logger: false });
+export interface ServerOptions {
+  logger?: boolean;
+  bodyLimit?: number;
+}
+
+export function buildServer(
+  service: AttributionService,
+  options: ServerOptions = {},
+): FastifyInstance {
+  const app = Fastify({
+    logger: options.logger ?? false,
+    bodyLimit: options.bodyLimit ?? 262_144,
+  });
+  const eventLimiter = new TokenBucketLimiter({ limit: RATE_LIMITS.eventsPerMinute });
 
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof AttributionError) {
@@ -37,6 +51,13 @@ export function buildServer(service: AttributionService): FastifyInstance {
   });
 
   app.post("/v1/events", async (request, reply) => {
+    const decision = eventLimiter.check(envelopeKey(request.body, request.ip));
+    if (!decision.allowed) {
+      return reply
+        .status(429)
+        .header("retry-after", Math.ceil(decision.retryAfterMs / 1000))
+        .send({ error: { code: "rate_limited", message: "event rate limit exceeded" } });
+    }
     const entry = await service.submitEvent(request.body);
     return reply.status(201).send(entry);
   });

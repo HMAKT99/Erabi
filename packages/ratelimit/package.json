@@ -1,0 +1,28 @@
+{
+  "name": "@erabi/ratelimit",
+  "version": "0.1.0",
+  "description": "Per-identity token-bucket rate limiting for Erabi services.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.42",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

@@ -10,6 +10,7 @@ export type ExchangeErrorCode =
   | "agent_not_registered"
   | "unknown_capability"
   | "pii_rejected"
+  | "intent_expired"
   | "bid_not_found"
   | "forbidden"
   | "not_found";
@@ -26,6 +27,7 @@ const STATUS: Record<ExchangeErrorCode, number> = {
   agent_not_registered: 403,
   unknown_capability: 400,
   pii_rejected: 400,
+  intent_expired: 408,
   bid_not_found: 404,
   forbidden: 403,
   not_found: 404,

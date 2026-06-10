@@ -1,0 +1,30 @@
+# TLS-terminating reverse proxy for an Erabi node.
+# Caddy provisions Let's Encrypt certificates automatically for each
+# subdomain of {$ERABI_DOMAIN} — point A/AAAA records at this host first.
+
+{$ERABI_DOMAIN} {
+	reverse_proxy landing:4200
+}
+
+explorer.{$ERABI_DOMAIN} {
+	reverse_proxy explorer:4100
+}
+
+registry.{$ERABI_DOMAIN} {
+	reverse_proxy node:4001
+}
+
+exchange.{$ERABI_DOMAIN} {
+	# SSE needs flushing disabled buffering
+	reverse_proxy node:4002 {
+		flush_interval -1
+	}
+}
+
+attribution.{$ERABI_DOMAIN} {
+	reverse_proxy node:4003
+}
+
+reputation.{$ERABI_DOMAIN} {
+	reverse_proxy node:4004
+}

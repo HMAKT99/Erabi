@@ -75,6 +75,13 @@ Any agent can join with zero human steps: generate a keypair, self-sign an
 `AgentManifest`, `POST /v1/agents`. Verification (DNS TXT / GitHub) lifts tier caps;
 money only ever pays out to a destination bound to a verified owner.
 
+## Deploying a node
+
+`docker compose up -d --build` with a domain brings up the full node (registry,
+exchange, attribution, reputation), the explorer, the landing page, and TLS via
+Caddy. See [docs/DEPLOY.md](docs/DEPLOY.md) — including how the node signing key
+and replay protection persist, and what to back up.
+
 ## Development
 
 ```sh

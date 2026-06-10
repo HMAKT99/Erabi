@@ -29,6 +29,51 @@ export interface X402Prober {
   probe(url: string): Promise<X402Probe | null>;
 }
 
+/**
+ * Real prober: requests the endpoint and parses the HTTP 402 payment
+ * requirements body per the x402 spec. The advertised price (in the
+ * asset's atomic units) becomes the standing bid.
+ */
+export class HttpX402Prober implements X402Prober {
+  constructor(
+    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly options: { timeoutMs?: number } = {},
+  ) {}
+
+  async probe(url: string): Promise<X402Probe | null> {
+    try {
+      const response = await this.fetchImpl(url, {
+        method: "GET",
+        headers: { accept: "application/json", "user-agent": "erabi-bridge-x402" },
+        signal: AbortSignal.timeout(this.options.timeoutMs ?? 10_000),
+      });
+      if (response.status !== 402) return null;
+
+      const body = (await response.json()) as {
+        x402Version?: number;
+        accepts?: Array<{
+          scheme?: string;
+          maxAmountRequired?: string | number;
+          description?: string;
+          extra?: { decimals?: number };
+        }>;
+      };
+      const requirement = body.accepts?.find((a) => a.scheme === "exact") ?? body.accepts?.[0];
+      if (!requirement?.maxAmountRequired) return null;
+
+      const atomic = Number(requirement.maxAmountRequired);
+      // Stablecoin convention: 6 decimals unless the requirement says otherwise.
+      const decimals = requirement.extra?.decimals ?? 6;
+      const priceUsd = atomic / 10 ** decimals;
+      if (!Number.isFinite(priceUsd) || priceUsd <= 0) return null;
+
+      return { price_usd: priceUsd, description: requirement.description };
+    } catch {
+      return null; // unreachable, timeout, non-JSON — not a paywalled endpoint
+    }
+  }
+}
+
 /** Dev/test prober: a static map of known paywalled endpoints. */
 export class MockX402Prober implements X402Prober {
   private readonly endpoints = new Map<string, X402Probe>();

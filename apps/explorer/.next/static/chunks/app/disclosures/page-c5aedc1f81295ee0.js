@@ -1,1 +1,286 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[739],{364:function(e,t,n){Promise.resolve().then(n.bind(n,1740))},1740:function(e,t,n){"use strict";n.r(t),n.d(t,{default:function(){return u}});var r=n(5853),a=n(4254),i=n(300),c=n(2715),s=n(711);Object.values({data:["data.financial","data.news","data.registry","data.geo","data.market"],api:["api.fraud-scoring","api.identity","api.shipping","api.tax","api.pricing","api.search"],agent:["agent.research","agent.analysis","agent.coding","agent.content","agent.negotiation"],compute:["compute.inference","compute.gpu","compute.storage"],commerce:["commerce.retail","commerce.travel","commerce.local"]}).flat(),i.UG.sha512Sync=function(){for(var e=arguments.length,t=Array(e),n=0;n<e;n++)t[n]=arguments[n];return(0,c.o)(i.UG.concatBytes(...t))};let l="ed25519:";new TextEncoder,new TextEncoder;var o=n(7800);function u(){let[e,t]=(0,a.useState)(""),[n,c]=(0,a.useState)(null),[u,d]=(0,a.useState)("idle"),[h,m]=(0,a.useState)(null);async function p(t){t.preventDefault(),m(null),c(null),d("idle");let n=await (0,o.L)("".concat(o.b.exchange,"/v1/disclosures/").concat(encodeURIComponent(e.trim())));if(!n){m("no disclosure with that id on this node");return}c(n);let r=await (0,o.L)("".concat(o.b.exchange,"/.well-known/erabi.json"));if(!(null==r?void 0:r.exchange_public_key)){d("no-key");return}let{exchange_sig:a,...u}=n;d(!function(e,t,n){let r;try{r=function(e){if(!e.startsWith(l))throw TypeError('signatureFromString: missing "'.concat(l,'" prefix'));let t=s.Jq.decode(e.slice(l.length));if(64!==t.length)throw TypeError("signatureFromString: expected 64-byte signature, got ".concat(t.length));return t}(t)}catch(e){return!1}return i.T(r,e,n)}(new TextEncoder().encode(function e(t){if(null===t)return"null";switch(typeof t){case"boolean":return t?"true":"false";case"number":if(!Number.isFinite(t))throw TypeError("canonicalize: non-finite number ".concat(t," is not valid JSON"));return JSON.stringify(t);case"string":return JSON.stringify(t);case"object":{if(Array.isArray(t))return"[".concat(t.map(t=>e(t)).join(","),"]");let n=Object.keys(t).sort(),r=[];for(let a of n){let n=t[a];if(void 0===n)throw TypeError('canonicalize: property "'.concat(a,'" is undefined and cannot be signed'));r.push("".concat(JSON.stringify(a),":").concat(e(n)))}return"{".concat(r.join(","),"}")}default:throw TypeError("canonicalize: cannot canonicalize value of type ".concat(typeof t))}}(u)),a,function(e){if(!e.startsWith(l))throw TypeError('publicKeyFromString: missing "'.concat(l,'" prefix'));let t=s.Jq.decode(e.slice(l.length));if(32!==t.length)throw TypeError("publicKeyFromString: expected 32-byte key, got ".concat(t.length));return t}(r.exchange_public_key))?"invalid":"valid")}return(0,r.jsxs)("main",{className:"space-y-6",children:[(0,r.jsxs)("section",{className:"panel",children:[(0,r.jsx)("h1",{className:"label mb-2",children:"disclosure inspector"}),(0,r.jsx)("p",{className:"mb-4 text-xs text-terminal-dim",children:"paste any disclosure_id: the full signed who-paid-what record is fetched and its ed25519 signature verified in your browser against the exchange's published key."}),(0,r.jsxs)("form",{onSubmit:p,className:"flex gap-2",children:[(0,r.jsx)("input",{value:e,onChange:e=>t(e.target.value),placeholder:"disclosure_id (uuid)",className:"flex-1 rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs outline-none focus:border-terminal-green"}),(0,r.jsx)("button",{type:"submit",className:"rounded border border-terminal-green px-3 py-1 text-xs text-terminal-green hover:bg-terminal-green hover:text-terminal-bg",children:"inspect"})]}),h&&(0,r.jsx)("p",{className:"mt-3 text-xs text-terminal-red",children:h})]}),n&&(0,r.jsxs)("section",{className:"panel",children:[(0,r.jsxs)("div",{className:"mb-3 flex items-center justify-between",children:[(0,r.jsx)("h2",{className:"label",children:"record"}),"valid"===u&&(0,r.jsx)("span",{className:"text-xs text-terminal-green",children:"✓ signature verified in-browser"}),"invalid"===u&&(0,r.jsx)("span",{className:"text-xs text-terminal-red",children:"✗ SIGNATURE INVALID"}),"no-key"===u&&(0,r.jsx)("span",{className:"text-xs text-terminal-amber",children:"exchange key unavailable"})]}),(0,r.jsx)("dl",{className:"space-y-1 text-xs",children:Object.entries(n).map(e=>{let[t,n]=e;return(0,r.jsxs)("div",{className:"flex gap-4",children:[(0,r.jsx)("dt",{className:"w-40 shrink-0 text-terminal-dim",children:t}),(0,r.jsx)("dd",{className:"break-all",children:"provider_id"===t?(0,r.jsx)("a",{href:"/agents/".concat(encodeURIComponent(String(n))),className:"hover:text-terminal-green",children:String(n)}):String(n)})]},t)})})]})]})}},7800:function(e,t,n){"use strict";n.d(t,{L:function(){return o},b:function(){return l}});var r,a,i,c,s=n(3206);let l={registry:null!==(r=s.env.NEXT_PUBLIC_ERABI_REGISTRY_URL)&&void 0!==r?r:"http://localhost:4001",exchange:null!==(a=s.env.NEXT_PUBLIC_ERABI_EXCHANGE_URL)&&void 0!==a?a:"http://localhost:4002",attribution:null!==(i=s.env.NEXT_PUBLIC_ERABI_ATTRIBUTION_URL)&&void 0!==i?i:"http://localhost:4003",reputation:null!==(c=s.env.NEXT_PUBLIC_ERABI_REPUTATION_URL)&&void 0!==c?c:"http://localhost:4004"};async function o(e){try{let t=await fetch(e,{cache:"no-store"});if(!t.ok)return null;return await t.json()}catch(e){return null}}}},function(e){e.O(0,[582,285,749,744],function(){return e(e.s=364)}),_N_E=e.O()}]);
+(self.webpackChunk_N_E = self.webpackChunk_N_E || []).push([
+  [739],
+  {
+    364: function (e, t, n) {
+      Promise.resolve().then(n.bind(n, 1740));
+    },
+    1740: function (e, t, n) {
+      "use strict";
+      (n.r(t),
+        n.d(t, {
+          default: function () {
+            return u;
+          },
+        }));
+      var r = n(5853),
+        a = n(4254),
+        i = n(300),
+        c = n(2715),
+        s = n(711);
+      (Object.values({
+        data: ["data.financial", "data.news", "data.registry", "data.geo", "data.market"],
+        api: [
+          "api.fraud-scoring",
+          "api.identity",
+          "api.shipping",
+          "api.tax",
+          "api.pricing",
+          "api.search",
+        ],
+        agent: [
+          "agent.research",
+          "agent.analysis",
+          "agent.coding",
+          "agent.content",
+          "agent.negotiation",
+        ],
+        compute: ["compute.inference", "compute.gpu", "compute.storage"],
+        commerce: ["commerce.retail", "commerce.travel", "commerce.local"],
+      }).flat(),
+        (i.UG.sha512Sync = function () {
+          for (var e = arguments.length, t = Array(e), n = 0; n < e; n++) t[n] = arguments[n];
+          return (0, c.o)(i.UG.concatBytes(...t));
+        }));
+      let l = "ed25519:";
+      (new TextEncoder(), new TextEncoder());
+      var o = n(7800);
+      function u() {
+        let [e, t] = (0, a.useState)(""),
+          [n, c] = (0, a.useState)(null),
+          [u, d] = (0, a.useState)("idle"),
+          [h, m] = (0, a.useState)(null);
+        async function p(t) {
+          (t.preventDefault(), m(null), c(null), d("idle"));
+          let n = await (0, o.L)(
+            "".concat(o.b.exchange, "/v1/disclosures/").concat(encodeURIComponent(e.trim())),
+          );
+          if (!n) {
+            m("no disclosure with that id on this node");
+            return;
+          }
+          c(n);
+          let r = await (0, o.L)("".concat(o.b.exchange, "/.well-known/erabi.json"));
+          if (!(null == r ? void 0 : r.exchange_public_key)) {
+            d("no-key");
+            return;
+          }
+          let { exchange_sig: a, ...u } = n;
+          d(
+            !(function (e, t, n) {
+              let r;
+              try {
+                r = (function (e) {
+                  if (!e.startsWith(l))
+                    throw TypeError('signatureFromString: missing "'.concat(l, '" prefix'));
+                  let t = s.Jq.decode(e.slice(l.length));
+                  if (64 !== t.length)
+                    throw TypeError(
+                      "signatureFromString: expected 64-byte signature, got ".concat(t.length),
+                    );
+                  return t;
+                })(t);
+              } catch (e) {
+                return !1;
+              }
+              return i.T(r, e, n);
+            })(
+              new TextEncoder().encode(
+                (function e(t) {
+                  if (null === t) return "null";
+                  switch (typeof t) {
+                    case "boolean":
+                      return t ? "true" : "false";
+                    case "number":
+                      if (!Number.isFinite(t))
+                        throw TypeError(
+                          "canonicalize: non-finite number ".concat(t, " is not valid JSON"),
+                        );
+                      return JSON.stringify(t);
+                    case "string":
+                      return JSON.stringify(t);
+                    case "object": {
+                      if (Array.isArray(t)) return "[".concat(t.map((t) => e(t)).join(","), "]");
+                      let n = Object.keys(t).sort(),
+                        r = [];
+                      for (let a of n) {
+                        let n = t[a];
+                        if (void 0 === n)
+                          throw TypeError(
+                            'canonicalize: property "'.concat(
+                              a,
+                              '" is undefined and cannot be signed',
+                            ),
+                          );
+                        r.push("".concat(JSON.stringify(a), ":").concat(e(n)));
+                      }
+                      return "{".concat(r.join(","), "}");
+                    }
+                    default:
+                      throw TypeError(
+                        "canonicalize: cannot canonicalize value of type ".concat(typeof t),
+                      );
+                  }
+                })(u),
+              ),
+              a,
+              (function (e) {
+                if (!e.startsWith(l))
+                  throw TypeError('publicKeyFromString: missing "'.concat(l, '" prefix'));
+                let t = s.Jq.decode(e.slice(l.length));
+                if (32 !== t.length)
+                  throw TypeError(
+                    "publicKeyFromString: expected 32-byte key, got ".concat(t.length),
+                  );
+                return t;
+              })(r.exchange_public_key),
+            )
+              ? "invalid"
+              : "valid",
+          );
+        }
+        return (0, r.jsxs)("main", {
+          className: "space-y-6",
+          children: [
+            (0, r.jsxs)("section", {
+              className: "panel",
+              children: [
+                (0, r.jsx)("h1", { className: "label mb-2", children: "disclosure inspector" }),
+                (0, r.jsx)("p", {
+                  className: "mb-4 text-xs text-terminal-dim",
+                  children:
+                    "paste any disclosure_id: the full signed who-paid-what record is fetched and its ed25519 signature verified in your browser against the exchange's published key.",
+                }),
+                (0, r.jsxs)("form", {
+                  onSubmit: p,
+                  className: "flex gap-2",
+                  children: [
+                    (0, r.jsx)("input", {
+                      value: e,
+                      onChange: (e) => t(e.target.value),
+                      placeholder: "disclosure_id (uuid)",
+                      className:
+                        "flex-1 rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs outline-none focus:border-terminal-green",
+                    }),
+                    (0, r.jsx)("button", {
+                      type: "submit",
+                      className:
+                        "rounded border border-terminal-green px-3 py-1 text-xs text-terminal-green hover:bg-terminal-green hover:text-terminal-bg",
+                      children: "inspect",
+                    }),
+                  ],
+                }),
+                h && (0, r.jsx)("p", { className: "mt-3 text-xs text-terminal-red", children: h }),
+              ],
+            }),
+            n &&
+              (0, r.jsxs)("section", {
+                className: "panel",
+                children: [
+                  (0, r.jsxs)("div", {
+                    className: "mb-3 flex items-center justify-between",
+                    children: [
+                      (0, r.jsx)("h2", { className: "label", children: "record" }),
+                      "valid" === u &&
+                        (0, r.jsx)("span", {
+                          className: "text-xs text-terminal-green",
+                          children: "✓ signature verified in-browser",
+                        }),
+                      "invalid" === u &&
+                        (0, r.jsx)("span", {
+                          className: "text-xs text-terminal-red",
+                          children: "✗ SIGNATURE INVALID",
+                        }),
+                      "no-key" === u &&
+                        (0, r.jsx)("span", {
+                          className: "text-xs text-terminal-amber",
+                          children: "exchange key unavailable",
+                        }),
+                    ],
+                  }),
+                  (0, r.jsx)("dl", {
+                    className: "space-y-1 text-xs",
+                    children: Object.entries(n).map((e) => {
+                      let [t, n] = e;
+                      return (0, r.jsxs)(
+                        "div",
+                        {
+                          className: "flex gap-4",
+                          children: [
+                            (0, r.jsx)("dt", {
+                              className: "w-40 shrink-0 text-terminal-dim",
+                              children: t,
+                            }),
+                            (0, r.jsx)("dd", {
+                              className: "break-all",
+                              children:
+                                "provider_id" === t
+                                  ? (0, r.jsx)("a", {
+                                      href: "/agents/".concat(encodeURIComponent(String(n))),
+                                      className: "hover:text-terminal-green",
+                                      children: String(n),
+                                    })
+                                  : String(n),
+                            }),
+                          ],
+                        },
+                        t,
+                      );
+                    }),
+                  }),
+                ],
+              }),
+          ],
+        });
+      }
+    },
+    7800: function (e, t, n) {
+      "use strict";
+      n.d(t, {
+        L: function () {
+          return o;
+        },
+        b: function () {
+          return l;
+        },
+      });
+      var r,
+        a,
+        i,
+        c,
+        s = n(3206);
+      let l = {
+        registry:
+          null !== (r = s.env.NEXT_PUBLIC_ERABI_REGISTRY_URL) && void 0 !== r
+            ? r
+            : "http://localhost:4001",
+        exchange:
+          null !== (a = s.env.NEXT_PUBLIC_ERABI_EXCHANGE_URL) && void 0 !== a
+            ? a
+            : "http://localhost:4002",
+        attribution:
+          null !== (i = s.env.NEXT_PUBLIC_ERABI_ATTRIBUTION_URL) && void 0 !== i
+            ? i
+            : "http://localhost:4003",
+        reputation:
+          null !== (c = s.env.NEXT_PUBLIC_ERABI_REPUTATION_URL) && void 0 !== c
+            ? c
+            : "http://localhost:4004",
+      };
+      async function o(e) {
+        try {
+          let t = await fetch(e, { cache: "no-store" });
+          if (!t.ok) return null;
+          return await t.json();
+        } catch (e) {
+          return null;
+        }
+      }
+    },
+  },
+  function (e) {
+    (e.O(0, [582, 285, 749, 744], function () {
+      return e((e.s = 364));
+    }),
+      (_N_E = e.O()));
+  },
+]);

@@ -2,6 +2,26 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0019 — Production identity and replay protection are file-backed by default
+
+The node signing key loads from `ERABI_NODE_SEED` or a 0600 key file under
+`ERABI_DATA_DIR` (created on first boot); ephemeral keys are dev-only and warn loudly,
+because disclosures signed by a lost key stop verifying against the well-known
+document. Nonces persist in a dedicated SQLite store with a TTL of 2× the envelope
+skew window, closing the replay-across-restart gap; `RedisNonceStore` (atomic
+`SET NX PX`) is the multi-node drop-in behind the same `NonceStore` interface.
+
+## 0018 — Single-node SQLite is the supported production posture for 0.1
+
+The Postgres port is real work, not configuration: every service is written against
+Drizzle's synchronous better-sqlite3 API, and going async ripples through every
+service method, the cross-service interfaces (AgentDirectory, AuctionSource,
+LedgerSource…), and all consumers. The designated path is a single-dialect refactor —
+pg-core schemas everywhere, with PGlite (embedded Postgres) replacing SQLite for
+dev/tests and node-postgres in prod — done as its own focused change. Until then:
+WAL-mode SQLite, Litestream/volume snapshots for backup (docs/DEPLOY.md), and an
+append-only hash-chained ledger that makes restored backups independently verifiable.
+
 ## 0017 — @erabi/node composes the reference node; holdbacks are overridable
 
 `startReferenceNode()` wires registry + exchange + attribution + reputation with an

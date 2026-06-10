@@ -1,11 +1,14 @@
 import { createServer } from "node:net";
+import path from "node:path";
 import type { FastifyInstance } from "fastify";
+import { InMemoryNonceStore, publicKeyToString, type NonceStore } from "@erabi/crypto";
 import {
   buildServer as buildRegistryServer,
   createDb as createRegistryDb,
   MockDnsVerifier,
   MockGithubVerifier,
   RegistryService,
+  type VerifierSet,
 } from "@erabi/registry";
 import {
   buildServer as buildExchangeServer,
@@ -22,16 +25,27 @@ import {
   X402Rail,
 } from "@erabi/attribution";
 import { buildServer as buildReputationServer, ReputationService } from "@erabi/reputation";
+import { loadOrCreateNodeKeys, SqliteNonceStore } from "./durability.js";
+
+export * from "./durability.js";
 
 export interface ReferenceNodeOptions {
   nodeId?: string;
   host?: string;
   /** Fixed ports; omit (or 0) for ephemeral. Order: registry, exchange, attribution, reputation. */
   ports?: [number, number, number, number];
-  /** Persist databases at these paths; default in-memory. */
+  /** Persist databases, the node key, and nonces here; default in-memory/ephemeral. */
   dataDir?: string;
   /** Override holdback windows (demo/e2e use { default: 0 }). */
   holdbackHours?: Record<string, number>;
+  /** Node signing seed (hex, 32 bytes); takes precedence over the dataDir key file. */
+  nodeSeedHex?: string;
+  /** Owner verifiers; defaults to mocks (dev/test). Production passes realVerifiers(). */
+  verifiers?: VerifierSet;
+  /** Shared replay protection; defaults to SQLite under dataDir, else in-memory. */
+  nonceStore?: NonceStore;
+  /** Enable fastify logging (production). */
+  logger?: boolean;
 }
 
 export interface ReferenceNode {
@@ -42,9 +56,13 @@ export interface ReferenceNode {
   attribution: AttributionService;
   reputation: ReputationService;
   bus: EventBus;
+  /** Present when the default mock verifiers are in use (dev/test). */
   dns: MockDnsVerifier;
   github: MockGithubVerifier;
   mockRail: MockRail;
+  /** Where the node signing key came from: env seed, key file, or ephemeral. */
+  keySource: "env" | "file" | "ephemeral";
+  publicKey: string;
   apps: FastifyInstance[];
   stop(): Promise<void>;
 }
@@ -88,14 +106,28 @@ export async function startReferenceNode(
   const github = new MockGithubVerifier();
   const bus = new EventBus();
 
+  // Identity and replay protection survive restarts when dataDir is set.
+  const { keys, source: keySource } = loadOrCreateNodeKeys({
+    seedHex: options.nodeSeedHex,
+    dataDir: options.dataDir,
+  });
+  const nonceStore: NonceStore =
+    options.nonceStore ??
+    (options.dataDir
+      ? new SqliteNonceStore(path.join(options.dataDir, "nonces.sqlite"))
+      : new InMemoryNonceStore());
+
   const registry = new RegistryService({
     db: createRegistryDb(db("registry")),
-    verifiers: new Map<string, MockDnsVerifier | MockGithubVerifier>([
-      ["dns", dns],
-      ["github", github],
-    ]),
+    verifiers:
+      options.verifiers ??
+      new Map<string, MockDnsVerifier | MockGithubVerifier>([
+        ["dns", dns],
+        ["github", github],
+      ]),
     nodeId,
     baseUrl: urls.registry,
+    nonceStore,
   });
   const directory = registryDirectory(registry);
 
@@ -106,6 +138,8 @@ export async function startReferenceNode(
     baseUrl: urls.exchange,
     registryBaseUrl: urls.registry,
     bus,
+    keys,
+    nonceStore,
   });
 
   const mockRail = new MockRail();
@@ -117,6 +151,7 @@ export async function startReferenceNode(
     bus,
     rails: [mockRail, new X402Rail("http://x402-facilitator.invalid")],
     holdbackHours: options.holdbackHours,
+    nonceStore,
   });
 
   const reputation = new ReputationService({
@@ -125,11 +160,12 @@ export async function startReferenceNode(
     sink: registry,
   });
 
+  const serverOptions = { logger: options.logger ?? false };
   const apps = [
-    buildRegistryServer(registry),
-    buildExchangeServer(exchange),
-    buildAttributionServer(attribution),
-    buildReputationServer(reputation),
+    buildRegistryServer(registry, serverOptions),
+    buildExchangeServer(exchange, serverOptions),
+    buildAttributionServer(attribution, serverOptions),
+    buildReputationServer(reputation, serverOptions),
   ];
   await Promise.all(apps.map((app, i) => app.listen({ port: ports[i]!, host })));
 
@@ -144,6 +180,8 @@ export async function startReferenceNode(
     dns,
     github,
     mockRail,
+    keySource,
+    publicKey: publicKeyToString(keys.publicKey),
     apps,
     async stop() {
       await Promise.all(apps.map((app) => app.close()));

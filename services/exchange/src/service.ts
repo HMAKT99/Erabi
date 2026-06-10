@@ -244,6 +244,14 @@ export class ExchangeService {
         `category ${intent.category} is not in the taxonomy`,
       );
     }
+    // TTL: an intent whose answer deadline already passed (queued, retried,
+    // or delayed in transit) must not clear an auction.
+    if (this.now() - Date.parse(envelope.ts) > intent.ttl_ms) {
+      throw new ExchangeError(
+        "intent_expired",
+        `intent ttl_ms (${intent.ttl_ms}) elapsed before processing`,
+      );
+    }
     rejectPii(intent.query);
 
     this.bus.emit("intent.received", {

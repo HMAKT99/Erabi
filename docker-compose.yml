@@ -1,0 +1,68 @@
+# Production-shaped deployment: the reference node, both web apps, and a
+# Caddy reverse proxy terminating TLS on subdomains of $ERABI_DOMAIN.
+# See docs/DEPLOY.md.
+services:
+  node:
+    build:
+      context: .
+      args:
+        PKG: "@erabi/node"
+    environment:
+      NODE_ENV: production
+      ERABI_DATA_DIR: /data
+      ERABI_HOST: 0.0.0.0
+      ERABI_NODE_ID: ${ERABI_NODE_ID:-erabi-node-1}
+      ERABI_NODE_SEED: ${ERABI_NODE_SEED:-}
+      ERABI_GITHUB_TOKEN: ${ERABI_GITHUB_TOKEN:-}
+    volumes:
+      - erabi-data:/data
+    expose:
+      - "4001"
+      - "4002"
+      - "4003"
+      - "4004"
+    restart: unless-stopped
+
+  explorer:
+    build:
+      context: .
+      args:
+        PKG: "@erabi/explorer"
+        NEXT_PUBLIC_ERABI_REGISTRY_URL: https://registry.${ERABI_DOMAIN:?set ERABI_DOMAIN}
+        NEXT_PUBLIC_ERABI_EXCHANGE_URL: https://exchange.${ERABI_DOMAIN}
+        NEXT_PUBLIC_ERABI_ATTRIBUTION_URL: https://attribution.${ERABI_DOMAIN}
+        NEXT_PUBLIC_ERABI_REPUTATION_URL: https://reputation.${ERABI_DOMAIN}
+    expose:
+      - "4100"
+    restart: unless-stopped
+
+  landing:
+    build:
+      context: .
+      args:
+        PKG: "@erabi/landing"
+        NEXT_PUBLIC_ERABI_REGISTRY_URL: https://registry.${ERABI_DOMAIN}
+        NEXT_PUBLIC_ERABI_EXCHANGE_URL: https://exchange.${ERABI_DOMAIN}
+        NEXT_PUBLIC_ERABI_ATTRIBUTION_URL: https://attribution.${ERABI_DOMAIN}
+        NEXT_PUBLIC_ERABI_EXPLORER_URL: https://explorer.${ERABI_DOMAIN}
+    expose:
+      - "4200"
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ERABI_DOMAIN: ${ERABI_DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  erabi-data:
+  caddy-data:
+  caddy-config:

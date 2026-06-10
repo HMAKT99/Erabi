@@ -38,21 +38,49 @@ export class MockRail implements PayoutRail {
 }
 
 /**
- * x402 settlement rail adapter. v0.1 ships the interface and a facilitator
- * stub; production wiring lands with the x402 bridge.
- * TODO(phase-4): call the configured x402 facilitator to execute transfer
- * against the bound destination, mapping its receipt into PayoutReceipt.
+ * x402 settlement rail: asks the configured facilitator to execute the
+ * transfer to the bound destination. The facilitator's settle response
+ * (transaction reference) becomes the payout receipt — attribution owns
+ * the truth, the rail owns the money.
+ *
+ * Until a facilitator URL is configured the rail fails closed; dev nodes
+ * use MockRail.
  */
 export class X402Rail implements PayoutRail {
   readonly name = "x402";
 
-  constructor(private readonly facilitatorUrl: string) {}
+  constructor(
+    private readonly facilitatorUrl: string,
+    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly options: { timeoutMs?: number; apiKey?: string } = {},
+  ) {}
 
   async execute(request: PayoutRequest): Promise<PayoutReceipt> {
-    void this.facilitatorUrl;
+    const headers: Record<string, string> = { "content-type": "application/json" };
+    if (this.options.apiKey) headers.authorization = `Bearer ${this.options.apiKey}`;
+
+    const response = await this.fetchImpl(`${this.facilitatorUrl.replace(/\/$/, "")}/settle`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        reference: request.payout_id,
+        amount_usd: request.amount_usd,
+        // The verified owner's destination commitment; the facilitator
+        // resolves it to the actual payout address it has on file.
+        destination_binding: request.payout_binding,
+      }),
+      signal: AbortSignal.timeout(this.options.timeoutMs ?? 30_000),
+    });
+    if (!response.ok) {
+      throw new Error(`x402 facilitator settle failed: HTTP ${response.status}`);
+    }
+    const settled = (await response.json()) as { success?: boolean; transaction?: string };
+    if (!settled.success || !settled.transaction) {
+      throw new Error("x402 facilitator settle failed: no transaction in response");
+    }
     return {
       rail: this.name,
-      ref: `x402:stub:${request.payout_id}`,
+      ref: `x402:${settled.transaction}`,
       executed_at: new Date().toISOString(),
     };
   }

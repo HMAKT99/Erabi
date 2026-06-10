@@ -1,1 +1,30 @@
-{"version":4,"routes":{"/disclosures":{"experimentalBypassFor":[{"type":"header","key":"Next-Action"},{"type":"header","key":"content-type","value":"multipart/form-data;.*"}],"initialRevalidateSeconds":false,"srcRoute":"/disclosures","dataRoute":"/disclosures.rsc"},"/":{"experimentalBypassFor":[{"type":"header","key":"Next-Action"},{"type":"header","key":"content-type","value":"multipart/form-data;.*"}],"initialRevalidateSeconds":false,"srcRoute":"/","dataRoute":"/index.rsc"}},"dynamicRoutes":{},"notFoundRoutes":[],"preview":{"previewModeId":"e628f011225b40526f7b1321ad627eb9","previewModeSigningKey":"e8652ca5fd7c3886db22a2a830a3a0b423603abbb710eca7fee02b174958c55f","previewModeEncryptionKey":"8b9a40b3b70ec40a264526e7c9c62d60dc772d6209dbbdfc9ab0ac2a3d40c933"}}
+{
+  "version": 4,
+  "routes": {
+    "/": {
+      "experimentalBypassFor": [
+        { "type": "header", "key": "Next-Action" },
+        { "type": "header", "key": "content-type", "value": "multipart/form-data;.*" }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc"
+    },
+    "/disclosures": {
+      "experimentalBypassFor": [
+        { "type": "header", "key": "Next-Action" },
+        { "type": "header", "key": "content-type", "value": "multipart/form-data;.*" }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/disclosures",
+      "dataRoute": "/disclosures.rsc"
+    }
+  },
+  "dynamicRoutes": {},
+  "notFoundRoutes": [],
+  "preview": {
+    "previewModeId": "a29ad041cbc5e425f7a87c3c7bd575b5",
+    "previewModeSigningKey": "b3d569e0c1dd7532719f5013d853df622b0c02df018f6833eace45f237993849",
+    "previewModeEncryptionKey": "c2ead2e04fb73d39365203ad7caffd4d20ceaa62ba057741a5f9214a7d89976c"
+  }
+}

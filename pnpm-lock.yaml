@@ -203,6 +203,18 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@20.19.42)
 
+  packages/ratelimit:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.19.42
+        version: 20.19.42
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@20.19.42)
+
   packages/schemas:
     dependencies:
       zod:
@@ -285,6 +297,9 @@ importers:
       '@erabi/exchange':
         specifier: workspace:*
         version: link:../exchange
+      '@erabi/ratelimit':
+        specifier: workspace:*
+        version: link:../../packages/ratelimit
       '@erabi/registry':
         specifier: workspace:*
         version: link:../registry
@@ -411,6 +426,9 @@ importers:
       '@erabi/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
+      '@erabi/ratelimit':
+        specifier: workspace:*
+        version: link:../../packages/ratelimit
       '@erabi/registry':
         specifier: workspace:*
         version: link:../registry
@@ -469,10 +487,16 @@ importers:
       '@erabi/reputation':
         specifier: workspace:*
         version: link:../reputation
+      better-sqlite3:
+        specifier: ^11.10.0
+        version: 11.10.0
       fastify:
         specifier: ^4.29.1
         version: 4.29.1
     devDependencies:
+      '@types/better-sqlite3':
+        specifier: ^7.6.13
+        version: 7.6.13
       '@types/node':
         specifier: ^20.19.42
         version: 20.19.42
@@ -497,6 +521,9 @@ importers:
       '@erabi/crypto':
         specifier: workspace:*
         version: link:../../packages/crypto
+      '@erabi/ratelimit':
+        specifier: workspace:*
+        version: link:../../packages/ratelimit
       '@erabi/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas

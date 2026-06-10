@@ -1,0 +1,5 @@
+// AUTO-GENERATED from packages/schemas/json — do not edit. Run `pnpm codegen`.
+import { z } from "zod"
+
+export const disclosureRecordZod = z.object({ "disclosure_id": z.string().uuid(), "auction_id": z.string().uuid(), "intent_id": z.string().uuid(), "provider_id": z.string().regex(new RegExp("^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$")), "payment_model": z.enum(["cpa","cpc","rev_share"]), "clearing_price_usd": z.number().gte(0), "label": z.string().regex(new RegExp("Sponsored")).min(9).max(200).describe("Human- and agent-readable label; must contain the word 'Sponsored'."), "issued_at": z.string().datetime({ offset: true }), "exchange_sig": z.string().regex(new RegExp("^ed25519:[1-9A-HJ-NP-Za-km-z]{64,96}$")) }).strict().describe("THE protocol invariant: the signed who-paid-what artifact on every sponsored result. Issued inside the same transaction as auction clearing; no code path returns a sponsored result before its disclosure is persisted and signed. Publicly verifiable at GET /v1/disclosures/:id.")
+export type DisclosureRecord = z.infer<typeof disclosureRecordZod>

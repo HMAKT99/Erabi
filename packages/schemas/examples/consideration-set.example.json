@@ -1,0 +1,45 @@
+{
+  "intent_id": "3f2c1b4a-8d5e-4f6a-9b7c-2e1d3c4b5a6f",
+  "organic": [
+    {
+      "provider_id": "erabi:agent:5TzKwHnRqYxLcPvGmJdSeBfUaWtCrNhEyMzQsXuVbAcD",
+      "reputation": 92,
+      "evidence_url": "https://exchange.erabi.example/v1/reputation/erabi:agent:5TzKwHnRqYxLcPvGmJdSeBfUaWtCrNhEyMzQsXuVbAcD",
+      "reason": "capability_match"
+    },
+    {
+      "provider_id": "erabi:agent:4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d",
+      "reputation": 71,
+      "evidence_url": "https://exchange.erabi.example/v1/reputation/erabi:agent:4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d",
+      "reason": "capability_match"
+    }
+  ],
+  "sponsored": [
+    {
+      "provider_id": "erabi:agent:9hFnQrLcTzWxYvKmPdGeSbJaUcHtRnEwMyQzXsVuAbCd",
+      "creative": {
+        "title": "DeepDive Research Agent",
+        "claim": "Audited financial research with cited primary sources.",
+        "endpoint": "https://deepdive.example.com/agent"
+      },
+      "disclosure": {
+        "disclosure_id": "5f0c9d2e-7a31-4b8c-9d4e-2f6a8b0c1d3e",
+        "auction_id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+        "intent_id": "3f2c1b4a-8d5e-4f6a-9b7c-2e1d3c4b5a6f",
+        "provider_id": "erabi:agent:9hFnQrLcTzWxYvKmPdGeSbJaUcHtRnEwMyQzXsVuAbCd",
+        "payment_model": "cpa",
+        "clearing_price_usd": 1.4,
+        "label": "Sponsored — provider paid for placement",
+        "issued_at": "2026-06-10T12:00:01.000Z",
+        "exchange_sig": "ed25519:8RkTmWnYqZxJvLcPdGhSeBaUfWtNrCmEyHzQsXuVbAdF5TzKwHnRqYxLcPvGmJdSeBfUaWtCrNhEyMzQsXuVbAcD"
+      }
+    }
+  ],
+  "auction_id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+  "join": {
+    "spec": "erabi/0.1",
+    "register": "https://exchange.erabi.example/v1/agents",
+    "well_known": "/.well-known/erabi.json"
+  },
+  "exchange_sig": "ed25519:8RkTmWnYqZxJvLcPdGhSeBaUfWtNrCmEyHzQsXuVbAdF5TzKwHnRqYxLcPvGmJdSeBfUaWtCrNhEyMzQsXuVbAcD"
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:erabi:schema:disclosure-record:0.1",
+  "title": "DisclosureRecord",
+  "description": "THE protocol invariant: the signed who-paid-what artifact on every sponsored result. Issued inside the same transaction as auction clearing; no code path returns a sponsored result before its disclosure is persisted and signed. Publicly verifiable at GET /v1/disclosures/:id.",
+  "type": "object",
+  "properties": {
+    "disclosure_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "auction_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "intent_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "provider_id": {
+      "type": "string",
+      "pattern": "^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$"
+    },
+    "payment_model": {
+      "type": "string",
+      "enum": ["cpa", "cpc", "rev_share"]
+    },
+    "clearing_price_usd": {
+      "type": "number",
+      "minimum": 0
+    },
+    "label": {
+      "type": "string",
+      "pattern": "Sponsored",
+      "minLength": 9,
+      "maxLength": 200,
+      "description": "Human- and agent-readable label; must contain the word 'Sponsored'."
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "exchange_sig": {
+      "type": "string",
+      "pattern": "^ed25519:[1-9A-HJ-NP-Za-km-z]{64,96}$"
+    }
+  },
+  "required": [
+    "disclosure_id",
+    "auction_id",
+    "intent_id",
+    "provider_id",
+    "payment_model",
+    "clearing_price_usd",
+    "label",
+    "issued_at",
+    "exchange_sig"
+  ],
+  "additionalProperties": false
+}

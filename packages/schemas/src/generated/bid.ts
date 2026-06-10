@@ -1,0 +1,5 @@
+// AUTO-GENERATED from packages/schemas/json — do not edit. Run `pnpm codegen`.
+import { z } from "zod"
+
+export const bidZod = z.object({ "bid_id": z.string().uuid(), "provider_id": z.string().regex(new RegExp("^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$")), "targeting": z.object({ "categories": z.array(z.string().regex(new RegExp("^(data|api|agent|compute|commerce)\\.[a-z0-9-]+$"))).min(1).max(20), "constraints_filter": z.string().max(1024).describe("Optional CEL expression evaluated against the intent's constraints.").optional() }).strict(), "offer": z.object({ "type": z.enum(["cpa","cpc","rev_share"]), "amount_usd": z.number().gt(0) }).strict(), "creative": z.object({ "title": z.string().min(1).max(80), "claim": z.string().min(1).max(200), "endpoint": z.string().url().max(2048) }).strict(), "budget": z.object({ "daily_usd": z.number().gt(0) }).strict(), "settlement_rail": z.enum(["x402","ap2","affiliate","ledger_only"]), "stake_tier": z.enum(["unverified","verified","staked","bridge"]) }).strict().describe("A signed standing offer targeting intent categories.")
+export type Bid = z.infer<typeof bidZod>

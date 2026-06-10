@@ -1,0 +1,22 @@
+{
+  "bid_id": "b1a2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "provider_id": "erabi:agent:9hFnQrLcTzWxYvKmPdGeSbJaUcHtRnEwMyQzXsVuAbCd",
+  "targeting": {
+    "categories": ["agent.research"],
+    "constraints_filter": "intent.constraints.max_price_usd >= 2.0"
+  },
+  "offer": {
+    "type": "cpa",
+    "amount_usd": 2.0
+  },
+  "creative": {
+    "title": "DeepDive Research Agent",
+    "claim": "Audited financial research with cited primary sources.",
+    "endpoint": "https://deepdive.example.com/agent"
+  },
+  "budget": {
+    "daily_usd": 100
+  },
+  "settlement_rail": "x402",
+  "stake_tier": "verified"
+}

@@ -1,0 +1,17 @@
+{
+  "event_id": "e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b",
+  "auction_id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+  "kind": "task_success",
+  "reported_by": "erabi:agent:4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d",
+  "counterparty_confirmation": {
+    "sig": "ed25519:9hFnQrLcTzWxYvKmPdGeSbJaUcHtRnEwMyQzXsVuAbCd4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d",
+    "key_id": "erabi:agent:9hFnQrLcTzWxYvKmPdGeSbJaUcHtRnEwMyQzXsVuAbCd"
+  },
+  "value_usd": 2.0,
+  "rail_receipt": {
+    "rail": "x402",
+    "ref": "tx:5KtPn8mQv2rXcYwZjA3bD6eF9gH1iJ4kL7nM0pR8sT2u"
+  },
+  "prev_hash": "sha256:0f1e2d3c4b5a69788796a5b4c3d2e1f0123456789abcdef0fedcba9876543210",
+  "hash": "sha256:b4c3d2e1f00f1e2d3c4b5a69788796a5123456789abcdef0fedcba9876543210"
+}

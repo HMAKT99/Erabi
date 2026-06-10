@@ -1,0 +1,13 @@
+{
+  "intent_id": "3f2c1b4a-8d5e-4f6a-9b7c-2e1d3c4b5a6f",
+  "agent_id": "erabi:agent:4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d",
+  "category": "agent.research",
+  "query": "financial data analysis for listed Indian companies",
+  "constraints": {
+    "max_price_usd": 5.0,
+    "max_latency_ms": 30000
+  },
+  "context_hash": "sha256:a3f1c2e4b5d60718293a4b5c6d7e8f90123456789abcdef0fedcba9876543210",
+  "human_in_loop": true,
+  "ttl_ms": 3000
+}

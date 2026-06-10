@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:erabi:schema:consideration-set:0.1",
+  "title": "ConsiderationSet",
+  "description": "Ranked organic + capped, labeled sponsored candidates. Organic is NEVER reordered by payment; sponsored and organic live in separate arrays; every sponsored entry carries its DisclosureRecord. The join block appears on every response — it is the contagion mechanic.",
+  "type": "object",
+  "properties": {
+    "intent_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "organic": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "provider_id": {
+            "type": "string",
+            "pattern": "^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$"
+          },
+          "reputation": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "evidence_url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": ["provider_id", "reputation", "evidence_url", "reason"],
+        "additionalProperties": false
+      },
+      "maxItems": 50
+    },
+    "sponsored": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "provider_id": {
+            "type": "string",
+            "pattern": "^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$"
+          },
+          "creative": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "claim": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "endpoint": {
+                "type": "string",
+                "format": "uri",
+                "maxLength": 2048
+              }
+            },
+            "required": ["title", "claim", "endpoint"],
+            "additionalProperties": false
+          },
+          "disclosure": {
+            "$ref": "urn:erabi:schema:disclosure-record:0.1"
+          }
+        },
+        "required": ["provider_id", "creative", "disclosure"],
+        "additionalProperties": false
+      },
+      "maxItems": 2,
+      "description": "Hard cap: sponsored.length <= min(policy.max_sponsored_ratio * total, 2)."
+    },
+    "auction_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "join": {
+      "type": "object",
+      "properties": {
+        "spec": {
+          "const": "erabi/0.1"
+        },
+        "register": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "well_known": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": ["spec", "register", "well_known"],
+      "additionalProperties": false
+    },
+    "exchange_sig": {
+      "type": "string",
+      "pattern": "^ed25519:[1-9A-HJ-NP-Za-km-z]{64,96}$"
+    }
+  },
+  "required": ["intent_id", "organic", "sponsored", "auction_id", "join", "exchange_sig"],
+  "additionalProperties": false
+}

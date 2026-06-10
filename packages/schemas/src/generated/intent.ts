@@ -1,0 +1,5 @@
+// AUTO-GENERATED from packages/schemas/json — do not edit. Run `pnpm codegen`.
+import { z } from "zod"
+
+export const intentZod = z.object({ "intent_id": z.string().uuid(), "agent_id": z.string().regex(new RegExp("^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$")), "category": z.string().regex(new RegExp("^(data|api|agent|compute|commerce)\\.[a-z0-9-]+$")), "query": z.string().min(1).max(2000), "constraints": z.object({ "max_price_usd": z.number().gte(0).optional(), "max_latency_ms": z.number().int().gte(1).optional() }).strict(), "context_hash": z.string().regex(new RegExp("^sha256:[0-9a-f]{64}$")).describe("Commitment to off-exchange context; the context itself never leaves the agent."), "human_in_loop": z.boolean().describe("Mandatory. Sponsored results are disabled when false (scope policy) unless the owner has explicitly consented."), "ttl_ms": z.number().int().gte(1).lte(600000) }).strict().describe("A structured, PII-free moment of choice. No user identifiers exist anywhere in this schema — only agent identifiers. The query passes a PII rejector at the exchange boundary (loud failure, no silent sanitizing).")
+export type Intent = z.infer<typeof intentZod>

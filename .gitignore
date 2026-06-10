@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+*.log
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.env.*
+CLAUDE.md

@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:erabi:schema:envelope:0.1",
+  "title": "Envelope",
+  "description": "Signed wrapper for every protocol object. sig = ed25519(canonical_json(payload) || ts || nonce). Reject |now - ts| > 120s or reused nonce.",
+  "type": "object",
+  "properties": {
+    "payload": {
+      "type": "object",
+      "description": "The protocol object being signed; validated against its own schema."
+    },
+    "sig": {
+      "type": "string",
+      "pattern": "^ed25519:[1-9A-HJ-NP-Za-km-z]{64,96}$"
+    },
+    "key_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "nonce": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "node_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    }
+  },
+  "required": ["payload", "sig", "key_id", "ts", "nonce", "node_id"],
+  "additionalProperties": false
+}

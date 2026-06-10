@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:erabi:schema:agent-manifest:0.1",
+  "title": "AgentManifest",
+  "description": "erabi.json — an agent's identity manifest. Identity IS the keypair: id derives from the public key.",
+  "type": "object",
+  "properties": {
+    "spec_version": {
+      "const": "0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "public_key": {
+      "type": "string",
+      "pattern": "^ed25519:[1-9A-HJ-NP-Za-km-z]{32,50}$"
+    },
+    "owner": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["org", "individual", "unbound"]
+        },
+        "verification": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "payout_binding": {
+          "anyOf": [{ "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }, { "type": "null" }],
+          "description": "Hash of the verified payout destination. Payout execution requires a non-null binding on a verified owner (the owner-binding invariant)."
+        }
+      },
+      "required": ["type", "verification", "payout_binding"],
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(data|api|agent|compute|commerce)\\.[a-z0-9-]+$"
+      },
+      "minItems": 1,
+      "maxItems": 50
+    },
+    "endpoint": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["consumer", "provider"]
+      },
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "accepts_sponsored": {
+          "type": "boolean",
+          "description": "Defaults false at registration — monetization is opt-in, never a dark pattern."
+        },
+        "max_sponsored_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "human_in_loop": {
+          "type": "boolean"
+        }
+      },
+      "required": ["accepts_sponsored", "max_sponsored_ratio", "human_in_loop"],
+      "additionalProperties": false
+    },
+    "referrer": {
+      "anyOf": [
+        { "type": "string", "pattern": "^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$" },
+        { "type": "null" }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "spec_version",
+    "id",
+    "name",
+    "public_key",
+    "owner",
+    "capabilities",
+    "endpoint",
+    "roles",
+    "policy",
+    "referrer",
+    "created_at"
+  ],
+  "additionalProperties": false
+}

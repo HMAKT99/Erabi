@@ -1,0 +1,11 @@
+{
+  "payload": {
+    "category": "agent.research",
+    "query": "financial data analysis for listed Indian companies"
+  },
+  "sig": "ed25519:4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d9hFnQrLcTzWxYvKmPdGeSbJaUcHtRnEwMyQzXsVuAbCd",
+  "key_id": "erabi:agent:4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d",
+  "ts": "2026-06-10T12:00:00.000Z",
+  "nonce": "5f0c9d2e-7a31-4b8c-9d4e-2f6a8b0c1d3e",
+  "node_id": "erabi-node-dev-1"
+}

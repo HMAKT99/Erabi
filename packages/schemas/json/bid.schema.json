@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:erabi:schema:bid:0.1",
+  "title": "Bid",
+  "description": "A signed standing offer targeting intent categories.",
+  "type": "object",
+  "properties": {
+    "bid_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "provider_id": {
+      "type": "string",
+      "pattern": "^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$"
+    },
+    "targeting": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(data|api|agent|compute|commerce)\\.[a-z0-9-]+$"
+          },
+          "minItems": 1,
+          "maxItems": 20
+        },
+        "constraints_filter": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "Optional CEL expression evaluated against the intent's constraints."
+        }
+      },
+      "required": ["categories"],
+      "additionalProperties": false
+    },
+    "offer": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["cpa", "cpc", "rev_share"]
+        },
+        "amount_usd": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": ["type", "amount_usd"],
+      "additionalProperties": false
+    },
+    "creative": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "claim": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        }
+      },
+      "required": ["title", "claim", "endpoint"],
+      "additionalProperties": false
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "daily_usd": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": ["daily_usd"],
+      "additionalProperties": false
+    },
+    "settlement_rail": {
+      "type": "string",
+      "enum": ["x402", "ap2", "affiliate", "ledger_only"]
+    },
+    "stake_tier": {
+      "type": "string",
+      "enum": ["unverified", "verified", "staked", "bridge"]
+    }
+  },
+  "required": [
+    "bid_id",
+    "provider_id",
+    "targeting",
+    "offer",
+    "creative",
+    "budget",
+    "settlement_rail",
+    "stake_tier"
+  ],
+  "additionalProperties": false
+}

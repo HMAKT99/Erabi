@@ -1,0 +1,37 @@
+{
+  "name": "@erabi/schemas",
+  "version": "0.1.0",
+  "description": "Erabi Protocol JSON Schemas — the single source of truth — with generated Zod/TS types and Pydantic models.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "json"
+  ],
+  "scripts": {
+    "codegen": "node scripts/generate.mjs",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@erabi/constants": "workspace:*",
+    "@types/node": "^20.19.42",
+    "ajv": "^8.17.0",
+    "ajv-formats": "^3.0.1",
+    "json-schema-to-zod": "^2.4.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

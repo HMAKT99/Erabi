@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:erabi:schema:outcome-event:0.1",
+  "title": "OutcomeEvent",
+  "description": "Append-only, hash-chained ledger entry. Events are pending until counterparty-signed AND the holdback window passes; only confirmed events bear reputation or payout. rail_receipt links to the external payment proof — attribution owns the truth, the rail owns the money.",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "auction_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["selection", "click", "conversion", "task_success", "assisted", "dispute"]
+    },
+    "reported_by": {
+      "type": "string",
+      "pattern": "^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$"
+    },
+    "counterparty_confirmation": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "sig": {
+              "type": "string",
+              "pattern": "^ed25519:[1-9A-HJ-NP-Za-km-z]{64,96}$"
+            },
+            "key_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "required": ["sig", "key_id"],
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ],
+      "description": "Null while pending; no single-sided event ever confirms."
+    },
+    "value_usd": {
+      "type": "number",
+      "minimum": 0
+    },
+    "rail_receipt": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "rail": {
+              "type": "string",
+              "enum": ["x402", "ap2", "affiliate", "ledger_only"]
+            },
+            "ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": ["rail", "ref"],
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ]
+    },
+    "prev_hash": {
+      "anyOf": [{ "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }, { "type": "null" }],
+      "description": "Null only for the genesis entry of an agent's chain."
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "event_id",
+    "auction_id",
+    "kind",
+    "reported_by",
+    "counterparty_confirmation",
+    "value_usd",
+    "rail_receipt",
+    "prev_hash",
+    "hash"
+  ],
+  "additionalProperties": false
+}

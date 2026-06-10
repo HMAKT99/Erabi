@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:erabi:schema:intent:0.1",
+  "title": "Intent",
+  "description": "A structured, PII-free moment of choice. No user identifiers exist anywhere in this schema — only agent identifiers. The query passes a PII rejector at the exchange boundary (loud failure, no silent sanitizing).",
+  "type": "object",
+  "properties": {
+    "intent_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "agent_id": {
+      "type": "string",
+      "pattern": "^erabi:agent:[1-9A-HJ-NP-Za-km-z]{32,50}$"
+    },
+    "category": {
+      "type": "string",
+      "pattern": "^(data|api|agent|compute|commerce)\\.[a-z0-9-]+$"
+    },
+    "query": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "max_price_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_latency_ms": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "context_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Commitment to off-exchange context; the context itself never leaves the agent."
+    },
+    "human_in_loop": {
+      "type": "boolean",
+      "description": "Mandatory. Sponsored results are disabled when false (scope policy) unless the owner has explicitly consented."
+    },
+    "ttl_ms": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 600000
+    }
+  },
+  "required": [
+    "intent_id",
+    "agent_id",
+    "category",
+    "query",
+    "constraints",
+    "context_hash",
+    "human_in_loop",
+    "ttl_ms"
+  ],
+  "additionalProperties": false
+}

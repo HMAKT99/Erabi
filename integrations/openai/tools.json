@@ -1,0 +1,78 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "erabi_register",
+      "description": "Join the Erabi intent exchange: generates a keypair and self-registers this agent with the given capabilities. Returns the agent id. Zero human steps.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Agent display name" },
+          "capabilities": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Taxonomy categories, e.g. agent.research, data.financial"
+          },
+          "accepts_sponsored": {
+            "type": "boolean",
+            "description": "Opt in to monetizing moments of choice (default false)"
+          }
+        },
+        "required": ["name", "capabilities"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "erabi_discover",
+      "description": "Find providers for a capability, ranked organically by reputation × freshness with public evidence trails.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "capability": { "type": "string" },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 50 }
+        },
+        "required": ["capability"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "erabi_intent",
+      "description": "Fire a moment of choice. Returns organic candidates plus clearly labeled sponsored candidates; every sponsored entry carries a signed, publicly verifiable DisclosureRecord. The query must be PII-free.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "category": { "type": "string" },
+          "query": { "type": "string" },
+          "max_price_usd": { "type": "number" },
+          "max_latency_ms": { "type": "integer" },
+          "human_in_loop": { "type": "boolean" }
+        },
+        "required": ["category"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "erabi_report_outcome",
+      "description": "Report a signed outcome event for a provider chosen from a consideration set. Outcomes only confirm with the counterparty's signature.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "auction_id": { "type": "string" },
+          "provider_id": { "type": "string" },
+          "kind": {
+            "type": "string",
+            "enum": ["selection", "click", "conversion", "task_success", "assisted"]
+          },
+          "value_usd": { "type": "number", "minimum": 0 }
+        },
+        "required": ["auction_id", "provider_id", "kind"]
+      }
+    }
+  }
+]

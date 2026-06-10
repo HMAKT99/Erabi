@@ -510,6 +510,27 @@ export class ExchangeService {
     return rows.filter((row) => row.active).map((row) => row.payload as Bid);
   }
 
+  stats() {
+    const tuples = this.db.select().from(decisionTuples).all();
+    const disclosureRows = this.db.select().from(disclosures).all();
+    const activeBids = this.db
+      .select()
+      .from(bids)
+      .all()
+      .filter((row) => row.active).length;
+    const clearedUsd = disclosureRows.reduce(
+      (sum, row) => sum + ((row.record as DisclosureRecord).clearing_price_usd ?? 0),
+      0,
+    );
+    return {
+      intents: tuples.length,
+      auctions: tuples.length,
+      sponsored_served: disclosureRows.length,
+      active_bids: activeBids,
+      cleared_usd: Number(clearedUsd.toFixed(6)),
+    };
+  }
+
   joinBlock() {
     return {
       spec: SPEC_TAG,

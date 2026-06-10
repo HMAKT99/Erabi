@@ -4,6 +4,12 @@ import type { ReputationService } from "./service.js";
 export function buildServer(service: ReputationService): FastifyInstance {
   const app = Fastify({ logger: false });
 
+  // The explorer reads this API from the browser.
+  app.addHook("onSend", (_request, reply, payload, done) => {
+    reply.header("access-control-allow-origin", "*");
+    done(null, payload);
+  });
+
   app.get("/healthz", async () => ({ ok: true }));
 
   app.get<{ Params: { agentId: string } }>("/v1/reputation/:agentId", async (request) =>

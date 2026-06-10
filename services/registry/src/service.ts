@@ -457,6 +457,13 @@ export class RegistryService {
       .run();
   }
 
+  stats() {
+    const rows = this.db.select().from(agents).all();
+    const byTier: Record<string, number> = {};
+    for (const row of rows) byTier[row.tier] = (byTier[row.tier] ?? 0) + 1;
+    return { agents: rows.length, by_tier: byTier };
+  }
+
   // ---- machine-readable front door ----
 
   joinBlock(): Record<string, string> {

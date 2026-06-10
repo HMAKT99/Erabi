@@ -18,4 +18,32 @@ describe("reference node", () => {
       await node.stop();
     }
   });
+
+  it("serves the explorer's data endpoints with CORS", async () => {
+    const node = await startReferenceNode();
+    try {
+      const stats = await fetch(`${node.urls.registry}/v1/stats`);
+      expect(stats.headers.get("access-control-allow-origin")).toBe("*");
+      expect(await stats.json()).toEqual({ agents: 0, by_tier: {} });
+
+      const exchangeStats = (await fetch(`${node.urls.exchange}/v1/stats`).then((r) =>
+        r.json(),
+      )) as { intents: number; active_bids: number };
+      expect(exchangeStats.intents).toBe(0);
+
+      const beacon = (await fetch(`${node.urls.attribution}/v1/stats/earnings`).then((r) =>
+        r.json(),
+      )) as { confirmed_events: number; top_earners: unknown[] };
+      expect(beacon.confirmed_events).toBe(0);
+      expect(beacon.top_earners).toEqual([]);
+
+      const badge = await fetch(
+        `${node.urls.attribution}/v1/badge/erabi:agent:4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d.svg`,
+      );
+      expect(badge.headers.get("content-type")).toContain("image/svg+xml");
+      expect(await badge.text()).toContain("not on ERABI");
+    } finally {
+      await node.stop();
+    }
+  });
 });

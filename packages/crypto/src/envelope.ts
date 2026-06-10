@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { signPayload, verifyPayload } from "./sign.js";
 
 /** Spec §6 envelope wrapping every signed protocol object. */
@@ -45,7 +44,9 @@ export interface CreateEnvelopeOptions<P> {
 
 export function createEnvelope<P>(options: CreateEnvelopeOptions<P>): Envelope<P> {
   const ts = options.ts ?? new Date().toISOString();
-  const nonce = options.nonce ?? randomUUID();
+  // globalThis.crypto keeps this module browser-safe (explorer verifies
+  // disclosures client-side).
+  const nonce = options.nonce ?? globalThis.crypto.randomUUID();
   return {
     payload: options.payload,
     sig: signPayload(options.payload, ts, nonce, options.secretKey),

@@ -20,7 +20,21 @@ export function buildServer(service: AttributionService): FastifyInstance {
     return reply.status(500).send({ error: { code: "internal", message: "internal error" } });
   });
 
+  // The explorer reads these APIs from the browser.
+  app.addHook("onSend", (_request, reply, payload, done) => {
+    reply.header("access-control-allow-origin", "*");
+    done(null, payload);
+  });
+
   app.get("/healthz", async () => ({ ok: true }));
+
+  app.get("/v1/stats/earnings", async () => service.earningsBeacon());
+
+  app.get<{ Params: { agentId: string } }>("/v1/badge/:agentId.svg", async (request, reply) => {
+    reply.header("content-type", "image/svg+xml");
+    reply.header("cache-control", "max-age=300");
+    return service.badgeSvg(request.params.agentId);
+  });
 
   app.post("/v1/events", async (request, reply) => {
     const entry = await service.submitEvent(request.body);

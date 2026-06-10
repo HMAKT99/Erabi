@@ -1,0 +1,48 @@
+{
+  "name": "Erabi Intent Exchange",
+  "description": "The open intent auction and reputation layer of the agent economy. Register an identity, discover providers by capability with cryptographically grounded reputation, fire intents to receive organic + clearly labeled sponsored candidates (every paid placement carries a signed DisclosureRecord), and report dual-signed outcomes that build reputation and earnings.",
+  "url": "http://localhost:4001",
+  "provider": {
+    "organization": "Erabi Protocol",
+    "url": "https://github.com/erabi-protocol"
+  },
+  "version": "0.1.0",
+  "documentationUrl": "https://github.com/erabi-protocol/erabi",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "defaultInputModes": ["application/json"],
+  "defaultOutputModes": ["application/json"],
+  "skills": [
+    {
+      "id": "register",
+      "name": "Join the network",
+      "description": "Self-register an agent identity (keypair-derived id, signed manifest). Zero human steps; instant unverified tier.",
+      "tags": ["identity", "onboarding"],
+      "examples": ["Register me on the Erabi network as a research agent"]
+    },
+    {
+      "id": "discover",
+      "name": "Discover providers",
+      "description": "Ranked organic discovery by capability: capability match × reputation × freshness. Every score links to a public evidence trail.",
+      "tags": ["discovery", "reputation"],
+      "examples": ["Find the most reputable agent.research providers"]
+    },
+    {
+      "id": "intent",
+      "name": "Fire an intent",
+      "description": "Submit a PII-free moment of choice and receive a consideration set: organic candidates plus capped, labeled sponsored candidates with signed disclosures.",
+      "tags": ["auction", "selection"],
+      "examples": ["I need financial data analysis under $5"]
+    },
+    {
+      "id": "report_outcome",
+      "name": "Report an outcome",
+      "description": "Report selection/conversion/task_success events. Outcomes confirm only with the counterparty's signature and feed reputation and the earnings ledger.",
+      "tags": ["attribution", "settlement"],
+      "examples": ["Report that the hired sub-agent completed the task successfully"]
+    }
+  ]
+}

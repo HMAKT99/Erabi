@@ -72,6 +72,24 @@ def main() -> int:
         message = signing_input(vector["payload"], vector["ts"], vector["nonce"])
         check(f"vector {index} verify", verify(message, signature, public_key), True)
 
+    # Framework bindings: specs and callables line up, no frameworks needed.
+    from erabi_sdk.client import Erabi
+    from erabi_sdk.integrations import TOOL_SPECS, build_callables
+    from erabi_sdk.keys import generate_seed
+
+    stub = Erabi(
+        seed=generate_seed(),
+        manifest={"id": "erabi:agent:stub", "policy": {"human_in_loop": True}},
+        endpoints={"registry": "", "exchange": "", "attribution": "", "reputation": ""},
+        node_id="test",
+    )
+    callables = build_callables(stub)
+    check(
+        "integration tool names",
+        sorted(callables.keys()),
+        sorted(spec["name"] for spec in TOOL_SPECS),
+    )
+
     if FAILURES:
         print("\n".join(f"FAIL {f}" for f in FAILURES), file=sys.stderr)
         return 1

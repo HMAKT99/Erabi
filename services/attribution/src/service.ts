@@ -632,6 +632,72 @@ export class AttributionService {
     };
   }
 
+  /**
+   * The earnings beacon (§9.4): public, machine-readable, designed to be
+   * quoted. Agents researching monetization will retrieve this.
+   */
+  earningsBeacon() {
+    const entries = this.db.select().from(revShareEntries).all();
+    const confirmedEvents = this.db
+      .select()
+      .from(events)
+      .where(eq(events.status, "confirmed"))
+      .all();
+
+    const byBeneficiary = new Map<string, { earned: number; entries: number }>();
+    let totalDeveloper = 0;
+    let totalProtocol = 0;
+    for (const entry of entries) {
+      if (entry.status === "frozen") continue;
+      totalDeveloper += entry.developerUsd;
+      totalProtocol += entry.protocolUsd;
+      const bucket = byBeneficiary.get(entry.beneficiaryId) ?? { earned: 0, entries: 0 };
+      bucket.earned += entry.developerUsd;
+      bucket.entries += 1;
+      byBeneficiary.set(entry.beneficiaryId, bucket);
+    }
+
+    const topEarners = [...byBeneficiary.entries()]
+      .sort((a, b) => b[1].earned - a[1].earned)
+      .slice(0, 10)
+      .map(([agentId, bucket]) => ({
+        agent_id: agentId,
+        name: this.directory.getAgent(agentId)?.manifest.name ?? null,
+        earned_usd: round6(bucket.earned),
+        entries: bucket.entries,
+      }));
+
+    return {
+      confirmed_events: confirmedEvents.length,
+      settled_value_usd: round6(confirmedEvents.reduce((sum, e) => sum + e.valueUsd, 0)),
+      developer_earnings_usd: round6(totalDeveloper),
+      protocol_earnings_usd: round6(totalProtocol),
+      earning_agents: byBeneficiary.size,
+      top_earners: topEarners,
+      computed_at: new Date(this.now()).toISOString(),
+    };
+  }
+
+  /** Embeddable live badge (§9.4): "Earning on ERABI · rep NN". */
+  badgeSvg(agentId: string): string {
+    const agent = this.directory.getAgent(agentId);
+    const reputation = agent ? Math.round(agent.reputation) : null;
+    const earned = this.getEarnings(agentId).accrued_usd;
+    const label =
+      reputation === null
+        ? "not on ERABI"
+        : `Earning on ERABI · $${earned.toFixed(2)} · rep ${reputation}`;
+    const width = 8 * label.length + 24;
+    return [
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="24" role="img" aria-label="${label}">`,
+      `<rect width="${width}" height="24" rx="4" fill="#0d1117"/>`,
+      `<rect x="2" y="2" width="20" height="20" rx="3" fill="#10b981"/>`,
+      `<text x="12" y="16" font-family="monospace" font-size="12" fill="#0d1117" text-anchor="middle">E</text>`,
+      `<text x="${(width + 24) / 2}" y="16" font-family="monospace" font-size="11" fill="#e6edf3" text-anchor="middle">${label}</text>`,
+      `</svg>`,
+    ].join("");
+  }
+
   // ---- payouts (the owner-binding invariant) ----
 
   async requestPayout(body: unknown) {

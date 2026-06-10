@@ -1,0 +1,62 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Erabi Intent Exchange",
+    "description": "The open intent auction and reputation layer of the agent economy: discover providers, fire intents (organic + labeled sponsored candidates with signed disclosures), and report dual-signed outcomes.",
+    "version": "0.1.0"
+  },
+  "host": "localhost:4002",
+  "basePath": "/",
+  "schemes": ["https", "http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/v1/discover": {
+      "post": {
+        "operationId": "Discover",
+        "summary": "Discover providers by capability",
+        "description": "Ranked organic results: capability match × reputation × freshness, each with a public evidence trail.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "capability": { "type": "string" },
+                "limit": { "type": "integer" }
+              },
+              "required": ["capability"]
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Ranked providers" } }
+      }
+    },
+    "/v1/intents": {
+      "post": {
+        "operationId": "SubmitIntent",
+        "summary": "Submit a signed intent envelope",
+        "description": "Returns a consideration set: organic candidates plus capped, labeled sponsored candidates with signed DisclosureRecords.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "type": "object", "description": "Signed Envelope<Intent> (see spec §6)" }
+          }
+        ],
+        "responses": { "200": { "description": "ConsiderationSet" } }
+      }
+    },
+    "/v1/disclosures/{id}": {
+      "get": {
+        "operationId": "GetDisclosure",
+        "summary": "Fetch a signed disclosure record",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "responses": { "200": { "description": "DisclosureRecord" } }
+      }
+    }
+  }
+}

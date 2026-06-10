@@ -21,7 +21,15 @@ export function buildServer(service: RegistryService): FastifyInstance {
     return reply.status(500).send({ error: { code: "internal", message: "internal error" } });
   });
 
+  // The explorer reads these APIs from the browser.
+  app.addHook("onSend", (_request, reply, payload, done) => {
+    reply.header("access-control-allow-origin", "*");
+    done(null, payload);
+  });
+
   app.get("/healthz", async () => ({ ok: true }));
+
+  app.get("/v1/stats", async () => service.stats());
 
   app.get(WELL_KNOWN_PATH, async () => service.wellKnown());
 

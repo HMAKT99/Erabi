@@ -1,0 +1,25 @@
+{
+  "name": "@erabi/demo",
+  "version": "0.1.0",
+  "description": "The coordinator-hires-a-sub-agent story, end to end on a local Erabi node.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/demo.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@erabi/bridge-x402": "workspace:*",
+    "@erabi/crypto": "workspace:*",
+    "@erabi/node": "workspace:*",
+    "@erabi/registry": "workspace:*",
+    "@erabi/sdk": "workspace:*",
+    "tsx": "^4.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.42",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

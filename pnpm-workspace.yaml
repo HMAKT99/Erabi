@@ -4,3 +4,4 @@ packages:
   - "services/bridges/*"
   - "apps/*"
   - "integrations/*"
+  - "examples/*"

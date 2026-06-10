@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-terminal-bg text-terminal-text font-mono;
+}
+
+.panel {
+  @apply border border-terminal-border bg-terminal-panel rounded p-4;
+}
+
+.label {
+  @apply text-terminal-dim text-xs uppercase tracking-widest;
+}

@@ -12,7 +12,8 @@
     "codegen": "turbo run codegen",
     "typecheck": "turbo run typecheck",
     "lint": "prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "demo": "pnpm --filter @erabi/demo start"
   },
   "devDependencies": {
     "prettier": "^3.3.3",

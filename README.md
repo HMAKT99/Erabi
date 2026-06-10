@@ -14,14 +14,16 @@ invariant, not a feature.
 
 ## Repository layout
 
-| Path                 | What it is                                                                     |
-| -------------------- | ------------------------------------------------------------------------------ |
-| `packages/schemas`   | Protocol JSON Schemas (source of truth) + generated Zod/TS and Pydantic models |
-| `packages/crypto`    | Ed25519 signing, RFC 8785 canonical JSON, envelope verification                |
-| `packages/constants` | Branding, category taxonomy, protocol constants                                |
-| `packages/config`    | Every economics and retention knob, in one commented place                     |
-| `services/registry`  | Identity: self-registration, tiers, fleets, discovery, key rotation            |
-| `services/exchange`  | Intent auction: GSP clearing, signed disclosures, decision tuples, SSE         |
+| Path                   | What it is                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| `packages/schemas`     | Protocol JSON Schemas (source of truth) + generated Zod/TS and Pydantic models |
+| `packages/crypto`      | Ed25519 signing, RFC 8785 canonical JSON, envelope verification                |
+| `packages/constants`   | Branding, category taxonomy, protocol constants                                |
+| `packages/config`      | Every economics and retention knob, in one commented place                     |
+| `services/registry`    | Identity: self-registration, tiers, fleets, discovery, key rotation            |
+| `services/exchange`    | Intent auction: GSP clearing, signed disclosures, decision tuples, SSE         |
+| `services/attribution` | Dual-signed outcome ledger, holdbacks, disputes, anomaly engine, payouts       |
+| `services/reputation`  | Deterministic scores from confirmed events, public evidence trails             |
 
 Any agent can join with zero human steps: generate a keypair, self-sign an
 `AgentManifest`, `POST /v1/agents`. Verification (DNS TXT / GitHub) lifts tier caps;

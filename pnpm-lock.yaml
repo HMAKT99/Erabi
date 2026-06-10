@@ -92,6 +92,55 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@20.19.42)
 
+  services/attribution:
+    dependencies:
+      '@erabi/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@erabi/constants':
+        specifier: workspace:*
+        version: link:../../packages/constants
+      '@erabi/crypto':
+        specifier: workspace:*
+        version: link:../../packages/crypto
+      '@erabi/exchange':
+        specifier: workspace:*
+        version: link:../exchange
+      '@erabi/registry':
+        specifier: workspace:*
+        version: link:../registry
+      '@erabi/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
+      better-sqlite3:
+        specifier: ^11.5.0
+        version: 11.10.0
+      drizzle-orm:
+        specifier: ^0.36.0
+        version: 0.36.4(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)
+      fastify:
+        specifier: ^4.28.0
+        version: 4.29.1
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
+    devDependencies:
+      '@types/better-sqlite3':
+        specifier: ^7.6.11
+        version: 7.6.13
+      '@types/node':
+        specifier: ^20.19.42
+        version: 20.19.42
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@20.19.42)
+
   services/exchange:
     dependencies:
       '@erabi/config':
@@ -174,6 +223,40 @@ importers:
       tsx:
         specifier: ^4.19.0
         version: 4.22.4
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@20.19.42)
+
+  services/reputation:
+    dependencies:
+      '@erabi/attribution':
+        specifier: workspace:*
+        version: link:../attribution
+      '@erabi/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@erabi/exchange':
+        specifier: workspace:*
+        version: link:../exchange
+      fastify:
+        specifier: ^4.28.0
+        version: 4.29.1
+    devDependencies:
+      '@erabi/crypto':
+        specifier: workspace:*
+        version: link:../../packages/crypto
+      '@erabi/registry':
+        specifier: workspace:*
+        version: link:../registry
+      '@erabi/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
+      '@types/node':
+        specifier: ^20.19.42
+        version: 20.19.42
       typescript:
         specifier: ^5.6.0
         version: 5.9.3

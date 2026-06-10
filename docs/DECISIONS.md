@@ -2,6 +2,28 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0015 — Disputes are recorded as already-confirmed chain events
+
+A dispute is a single-sided attestation by a party; it freezes the disputed entry (and
+its rev-share) and is appended to the provider's chain with no counterparty signature.
+"Only confirmed events bear reputation" applies to _positive_ evidence; disputes feed
+reputation directly per the spec ("disputes freeze entries and feed reputation").
+
+## 0014 — Latency component is neutral in reputation v0.1
+
+The 0.1 OutcomeEvent schema carries no latency attestations, so the 15% latency
+component scores a neutral 0.5 for everyone. Attestations are a spec addition (0.2);
+the weight stays reserved so scores don't reshuffle when they land.
+
+## 0013 — Ledger hash chain covers the immutable core
+
+`hash = sha256(canonical({event_id, auction_id, kind, reported_by, value_usd,
+rail_receipt, prev_hash}))`, chained per provider. The counterparty confirmation is an
+attestation _over_ that core (its envelope payload includes the hash) rather than part
+of the hashed content — otherwise confirming an event would mutate its own hash and
+break the chain. Rev-share splits clear the sponsored clearing price 70/20/10 to the
+consumer-side developer / protocol / reserved; the `assisted` kind pays 50%.
+
 ## 0012 — Exchange signatures are detached over canonical JSON
 
 `exchange_sig` on DisclosureRecords and ConsiderationSets is

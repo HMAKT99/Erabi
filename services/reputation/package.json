@@ -1,0 +1,35 @@
+{
+  "name": "@erabi/reputation",
+  "version": "0.1.0",
+  "description": "Erabi Protocol reputation: deterministic scores from confirmed dual-signed events, with public evidence trails. Don't trust the number, verify the events.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@erabi/attribution": "workspace:*",
+    "@erabi/config": "workspace:*",
+    "@erabi/exchange": "workspace:*",
+    "fastify": "^4.28.0"
+  },
+  "devDependencies": {
+    "@erabi/crypto": "workspace:*",
+    "@erabi/registry": "workspace:*",
+    "@erabi/schemas": "workspace:*",
+    "@types/node": "^20.19.42",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

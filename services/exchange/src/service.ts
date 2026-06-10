@@ -42,6 +42,20 @@ const utf8 = new TextEncoder();
 
 const deleteBidZod = z.object({ bid_id: z.string().uuid() }).strict();
 
+export interface AuctionSummary {
+  auction_id: string;
+  intent_id: string;
+  consumer_id: string;
+  category: string;
+  organic_provider_ids: string[];
+  sponsored: Array<{
+    provider_id: string;
+    disclosure_id: string;
+    clearing_price_usd: number;
+    payment_model: "cpa" | "cpc" | "rev_share";
+  }>;
+}
+
 export interface ExchangeServiceOptions {
   db: ExchangeDb;
   directory: AgentDirectory;
@@ -390,6 +404,7 @@ export class ExchangeService {
           auctionId,
           tuple: {
             intent_features: {
+              agent_id: intent.agent_id,
               category: intent.category,
               constraints: intent.constraints,
               human_in_loop: intent.human_in_loop,
@@ -439,6 +454,53 @@ export class ExchangeService {
       .get();
     if (!row) throw new ExchangeError("not_found", `no decision tuple for intent ${intentId}`);
     return row;
+  }
+
+  /** Party + clearing context for an auction — what attribution needs. */
+  getAuctionSummary(auctionId: string): AuctionSummary | null {
+    const row = this.db
+      .select()
+      .from(decisionTuples)
+      .where(eq(decisionTuples.auctionId, auctionId))
+      .get();
+    if (!row) return null;
+    const tuple = row.tuple as {
+      intent_features: { agent_id: string; category: string };
+      candidate_set: { organic: Array<{ provider_id: string }> };
+    };
+    const disclosureRows = this.db
+      .select()
+      .from(disclosures)
+      .where(eq(disclosures.auctionId, auctionId))
+      .all();
+    return {
+      auction_id: auctionId,
+      intent_id: row.intentId,
+      consumer_id: tuple.intent_features.agent_id,
+      category: tuple.intent_features.category,
+      organic_provider_ids: tuple.candidate_set.organic.map((o) => o.provider_id),
+      sponsored: disclosureRows.map((d) => {
+        const record = d.record as DisclosureRecord;
+        return {
+          provider_id: record.provider_id,
+          disclosure_id: record.disclosure_id,
+          clearing_price_usd: record.clearing_price_usd,
+          payment_model: record.payment_model,
+        };
+      }),
+    };
+  }
+
+  /** Attribution writes outcomes back into the decision tuple (spec §10). */
+  recordOutcome(
+    auctionId: string,
+    update: { selection: unknown; outcome: unknown; valueUsd: number | null },
+  ): void {
+    this.db
+      .update(decisionTuples)
+      .set({ selection: update.selection, outcome: update.outcome, valueUsd: update.valueUsd })
+      .where(eq(decisionTuples.auctionId, auctionId))
+      .run();
   }
 
   listBids(providerId?: string) {

@@ -53,8 +53,16 @@ account, credential, or naming decision.
       (`integrations/ide/README.md` + the explorer `/integrations` page + homepage
       roster). NOTE: every `npx -y erabi-mcp` snippet goes live the moment npm publish
       happens (step 3) — that's the gate.
-- [ ] Submit `erabi-mcp` to the MCP registries (modelcontextprotocol/servers, Smithery,
-      mcp.so) — manifest: `integrations/mcp`.
+- [x] **Official MCP Registry** (registry.modelcontextprotocol.io): published
+      2026-06-11 as `io.github.HMAKT99/erabi` v0.1.2 — namespace is case-sensitive
+      and `mcpName` in the published npm package must match exactly. Republish on
+      version bumps: `mcp-publisher login github && mcp-publisher publish` from
+      `integrations/mcp` (tokens are short-lived; login right before publishing).
+- [ ] **Smithery** (smithery.ai): `smithery.yaml` is at the repo root — sign in with
+      GitHub on smithery.ai and add/claim the HMAKT99/Erabi repo (one click).
+- [ ] **mcp.so**: submit via the site's form (browser; their submit page blocks
+      non-browser clients). Listing data: npm `erabi-mcp`, repo
+      https://github.com/HMAKT99/Erabi.
 - [ ] IDE-community outreach (post-npm-publish): awesome-mcp-servers lists, ClawHub /
       OpenClaw skills, Cursor & OpenCode community forums — link the `/integrations`
       page, lead with the live network.

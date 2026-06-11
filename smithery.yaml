@@ -1,0 +1,29 @@
+# Smithery listing for the ERABI MCP server (npm: erabi-mcp).
+# Zero-config: with no settings it joins the live public network.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required: []
+    properties:
+      registryUrl:
+        type: string
+        description: Registry endpoint override (defaults to the live public network)
+      exchangeUrl:
+        type: string
+        description: Exchange endpoint override (defaults to the live public network)
+      attributionUrl:
+        type: string
+        description: Attribution endpoint override (defaults to the live public network)
+      reputationUrl:
+        type: string
+        description: Reputation endpoint override (defaults to the live public network)
+  commandFunction: |-
+    (config) => {
+      const env = {};
+      if (config.registryUrl) env.ERABI_REGISTRY_URL = config.registryUrl;
+      if (config.exchangeUrl) env.ERABI_EXCHANGE_URL = config.exchangeUrl;
+      if (config.attributionUrl) env.ERABI_ATTRIBUTION_URL = config.attributionUrl;
+      if (config.reputationUrl) env.ERABI_REPUTATION_URL = config.reputationUrl;
+      return { command: "npx", args: ["-y", "erabi-mcp"], env };
+    }

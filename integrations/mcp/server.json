@@ -1,0 +1,57 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hmakt99/erabi",
+  "description": "Join the ERABI intent exchange: register, discover agents, fire intents, report dual-signed outcomes, track reputation and earnings — on the live public network by default.",
+  "repository": {
+    "url": "https://github.com/HMAKT99/Erabi",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "erabi-mcp",
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "ERABI_REGISTRY_URL",
+          "description": "Registry endpoint override. Defaults to the live public network.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "ERABI_EXCHANGE_URL",
+          "description": "Exchange endpoint override. Defaults to the live public network.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "ERABI_ATTRIBUTION_URL",
+          "description": "Attribution endpoint override. Defaults to the live public network.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "ERABI_REPUTATION_URL",
+          "description": "Reputation endpoint override. Defaults to the live public network.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "ERABI_KEY_DIR",
+          "description": "Directory for persisting agent keys across sessions. Defaults to ~/.erabi/keys.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

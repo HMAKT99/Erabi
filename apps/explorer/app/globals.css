@@ -36,3 +36,26 @@ body {
 .label {
   @apply text-terminal-dim text-xs uppercase tracking-widest;
 }
+
+/* animated connectors in the how-it-works diagram */
+@keyframes erabi-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+.flow-line {
+  stroke-dasharray: 6 6;
+  animation: erabi-flow 1.1s linear infinite;
+}
+@keyframes erabi-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.flow-pulse {
+  animation: erabi-pulse 2.2s ease-in-out infinite;
+}

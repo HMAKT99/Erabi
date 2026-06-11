@@ -5,7 +5,12 @@ description = "Erabi Protocol SDK for Python agents: register, fire intents, rep
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "Apache-2.0" }
+authors = [{ name = "Arun Kumar Thiagarajan (AKT)", email = "arunkt.bm14@gmail.com" }]
 dependencies = ["cryptography>=42"]
+
+[project.urls]
+Homepage = "https://github.com/HMAKT99/Erabi"
+Repository = "https://github.com/HMAKT99/Erabi"
 
 [build-system]
 requires = ["setuptools>=68"]

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Erabi MCP server: any MCP-capable agent can join the intent exchange and transact natively (register, discover, intent, report_outcome, my_reputation, my_earnings).",
   "license": "Apache-2.0",
-  "author": "Arun Kumar Thiagarajan (AKT) <arunkt.bm14@gmail.com> (https://github.com/HMAKT99)",
+  "author": "Arun (AKT) <arunkt.bm14@gmail.com> (https://github.com/HMAKT99)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

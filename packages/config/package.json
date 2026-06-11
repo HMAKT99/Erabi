@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Every economics and retention knob for the Erabi Protocol reference node, in one place.",
   "license": "Apache-2.0",
-  "author": "Arun Kumar Thiagarajan (AKT) <arunkt.bm14@gmail.com> (https://github.com/HMAKT99)",
+  "author": "Arun (AKT) <arunkt.bm14@gmail.com> (https://github.com/HMAKT99)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

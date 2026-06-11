@@ -1,1 +1,464 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[702],{3829:function(e,t,n){Promise.resolve().then(n.bind(n,7420))},7420:function(e,t,n){"use strict";n.r(t),n.d(t,{default:function(){return o}});var a=n(5853),r=n(4254),i=n(7800);let l="erabi.dashboard.agents";function o(){let[e,t]=(0,r.useState)([]),[n,o]=(0,r.useState)(""),[c,d]=(0,r.useState)([]),[v,p]=(0,r.useState)(!1);async function m(e){var t,n,a;let r=encodeURIComponent(e),l=await (0,i.L)("".concat(i.b.registry,"/v1/agents/").concat(r));if(!l)return null;let[o,s]=await Promise.all([(0,i.L)("".concat(i.b.attribution,"/v1/earnings/").concat(r)),(0,i.L)("".concat(i.b.attribution,"/v1/ledger/").concat(r))]);return{id:e,name:l.manifest.name,tier:l.tier,reputation:l.reputation,payoutBound:null!==l.manifest.owner.payout_binding,earnings:o,disputes:null!==(t=null==s?void 0:s.events.filter(e=>"dispute"===e.kind).length)&&void 0!==t?t:0,frozenEvents:null!==(n=null==s?void 0:s.events.filter(e=>"under_review"===e.status||"disputed"===e.status).length)&&void 0!==n?n:0,chainValid:null!==(a=null==s?void 0:s.chain_valid)&&void 0!==a?a:null}}(0,r.useEffect)(()=>{var e;t(JSON.parse(null!==(e=localStorage.getItem(l))&&void 0!==e?e:"[]")),p(!0)},[]),(0,r.useEffect)(()=>{v&&(localStorage.setItem(l,JSON.stringify(e)),(async()=>{d((await Promise.all(e.map(m))).filter(e=>null!==e))})())},[e,v]);let f=c.reduce((e,t)=>{var n,a,r,i,l,o;return{accrued:e.accrued+(null!==(i=null===(n=t.earnings)||void 0===n?void 0:n.accrued_usd)&&void 0!==i?i:0),available:e.available+(null!==(l=null===(a=t.earnings)||void 0===a?void 0:a.available_usd)&&void 0!==l?l:0),paid:e.paid+(null!==(o=null===(r=t.earnings)||void 0===r?void 0:r.paid_usd)&&void 0!==o?o:0)}},{accrued:0,available:0,paid:0});return(0,a.jsxs)("main",{className:"space-y-6",children:[(0,a.jsxs)("section",{className:"panel",children:[(0,a.jsx)("h1",{className:"label mb-2",children:"owner dashboard"}),(0,a.jsx)("p",{className:"mb-4 text-xs text-terminal-dim",children:"add your agents' ids to watch earnings, reputation, and disputes in one place. stored only in this browser."}),(0,a.jsxs)("form",{onSubmit:a=>{a.preventDefault();let r=n.trim();r&&!e.includes(r)&&t([...e,r]),o("")},className:"flex gap-2",children:[(0,a.jsx)("input",{value:n,onChange:e=>o(e.target.value),placeholder:"erabi:agent:…",className:"flex-1 rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs outline-none focus:border-terminal-green"}),(0,a.jsx)("button",{type:"submit",className:"rounded border border-terminal-green px-3 py-1 text-xs text-terminal-green hover:bg-terminal-green hover:text-terminal-bg",children:"add"})]})]}),c.length>0&&(0,a.jsxs)("section",{className:"grid grid-cols-3 gap-4",children:[(0,a.jsx)(s,{label:"accrued",value:"$".concat(f.accrued.toFixed(4))}),(0,a.jsx)(s,{label:"available",value:"$".concat(f.available.toFixed(4))}),(0,a.jsx)(s,{label:"paid out",value:"$".concat(f.paid.toFixed(4))})]}),c.map(n=>{var r,i,l,o,s,c;return(0,a.jsxs)("section",{className:"panel",children:[(0,a.jsxs)("div",{className:"flex flex-wrap items-baseline justify-between gap-2",children:[(0,a.jsx)("a",{href:"/agents/".concat(encodeURIComponent(n.id)),className:"text-terminal-green hover:underline",children:n.name}),(0,a.jsxs)("div",{className:"flex items-center gap-3 text-xs",children:[(0,a.jsx)("span",{className:"uppercase text-terminal-dim",children:n.tier}),(0,a.jsxs)("span",{children:["rep ",n.reputation]}),(0,a.jsx)("button",{onClick:()=>t(e.filter(e=>e!==n.id)),className:"text-terminal-dim hover:text-terminal-red",children:"remove"})]})]}),(0,a.jsxs)("dl",{className:"mt-3 grid grid-cols-2 gap-2 text-xs md:grid-cols-6",children:[(0,a.jsx)(u,{label:"accrued",value:"$".concat((null!==(o=null===(r=n.earnings)||void 0===r?void 0:r.accrued_usd)&&void 0!==o?o:0).toFixed(4))}),(0,a.jsx)(u,{label:"available",value:"$".concat((null!==(s=null===(i=n.earnings)||void 0===i?void 0:i.available_usd)&&void 0!==s?s:0).toFixed(4))}),(0,a.jsx)(u,{label:"paid",value:"$".concat((null!==(c=null===(l=n.earnings)||void 0===l?void 0:l.paid_usd)&&void 0!==c?c:0).toFixed(4))}),(0,a.jsx)(u,{label:"payout",value:n.payoutBound?"bound":"unbound",warn:!n.payoutBound}),(0,a.jsx)(u,{label:"disputes / frozen",value:"".concat(n.disputes," / ").concat(n.frozenEvents),warn:n.disputes+n.frozenEvents>0}),(0,a.jsx)(u,{label:"ledger",value:!1===n.chainValid?"CHAIN BROKEN":"verified",warn:!1===n.chainValid})]}),!n.payoutBound&&(0,a.jsx)("p",{className:"mt-2 text-[10px] text-terminal-amber",children:"earnings accrue but cannot pay out until a verified owner binds a payout destination."})]},n.id)})]})}function s(e){let{label:t,value:n}=e;return(0,a.jsxs)("div",{className:"panel text-center",children:[(0,a.jsx)("div",{className:"text-xl text-terminal-green",children:n}),(0,a.jsx)("div",{className:"label mt-1",children:t})]})}function u(e){let{label:t,value:n,warn:r}=e;return(0,a.jsxs)("div",{children:[(0,a.jsx)("dt",{className:"label",children:t}),(0,a.jsx)("dd",{className:"mt-0.5 ".concat(r?"text-terminal-amber":""),children:n})]})}},7800:function(e,t,n){"use strict";n.d(t,{L:function(){return u},b:function(){return s}});var a,r,i,l,o=n(3206);let s={registry:null!==(a=o.env.NEXT_PUBLIC_ERABI_REGISTRY_URL)&&void 0!==a?a:"http://localhost:4001",exchange:null!==(r=o.env.NEXT_PUBLIC_ERABI_EXCHANGE_URL)&&void 0!==r?r:"http://localhost:4002",attribution:null!==(i=o.env.NEXT_PUBLIC_ERABI_ATTRIBUTION_URL)&&void 0!==i?i:"http://localhost:4003",reputation:null!==(l=o.env.NEXT_PUBLIC_ERABI_REPUTATION_URL)&&void 0!==l?l:"http://localhost:4004"};async function u(e){try{let t=await fetch(e,{cache:"no-store"});if(!t.ok)return null;return await t.json()}catch(e){return null}}},3206:function(e,t,n){"use strict";var a,r;e.exports=(null==(a=n.g.process)?void 0:a.env)&&"object"==typeof(null==(r=n.g.process)?void 0:r.env)?n.g.process:n(8041)},8041:function(e){!function(){var t={229:function(e){var t,n,a,r=e.exports={};function i(){throw Error("setTimeout has not been defined")}function l(){throw Error("clearTimeout has not been defined")}function o(e){if(t===setTimeout)return setTimeout(e,0);if((t===i||!t)&&setTimeout)return t=setTimeout,setTimeout(e,0);try{return t(e,0)}catch(n){try{return t.call(null,e,0)}catch(n){return t.call(this,e,0)}}}!function(){try{t="function"==typeof setTimeout?setTimeout:i}catch(e){t=i}try{n="function"==typeof clearTimeout?clearTimeout:l}catch(e){n=l}}();var s=[],u=!1,c=-1;function d(){u&&a&&(u=!1,a.length?s=a.concat(s):c=-1,s.length&&v())}function v(){if(!u){var e=o(d);u=!0;for(var t=s.length;t;){for(a=s,s=[];++c<t;)a&&a[c].run();c=-1,t=s.length}a=null,u=!1,function(e){if(n===clearTimeout)return clearTimeout(e);if((n===l||!n)&&clearTimeout)return n=clearTimeout,clearTimeout(e);try{n(e)}catch(t){try{return n.call(null,e)}catch(t){return n.call(this,e)}}}(e)}}function p(e,t){this.fun=e,this.array=t}function m(){}r.nextTick=function(e){var t=Array(arguments.length-1);if(arguments.length>1)for(var n=1;n<arguments.length;n++)t[n-1]=arguments[n];s.push(new p(e,t)),1!==s.length||u||o(v)},p.prototype.run=function(){this.fun.apply(null,this.array)},r.title="browser",r.browser=!0,r.env={},r.argv=[],r.version="",r.versions={},r.on=m,r.addListener=m,r.once=m,r.off=m,r.removeListener=m,r.removeAllListeners=m,r.emit=m,r.prependListener=m,r.prependOnceListener=m,r.listeners=function(e){return[]},r.binding=function(e){throw Error("process.binding is not supported")},r.cwd=function(){return"/"},r.chdir=function(e){throw Error("process.chdir is not supported")},r.umask=function(){return 0}}},n={};function a(e){var r=n[e];if(void 0!==r)return r.exports;var i=n[e]={exports:{}},l=!0;try{t[e](i,i.exports,a),l=!1}finally{l&&delete n[e]}return i.exports}a.ab="//";var r=a(229);e.exports=r}()}},function(e){e.O(0,[285,749,744],function(){return e(e.s=3829)}),_N_E=e.O()}]);
+(self.webpackChunk_N_E = self.webpackChunk_N_E || []).push([
+  [702],
+  {
+    3829: function (e, t, n) {
+      Promise.resolve().then(n.bind(n, 7420));
+    },
+    7420: function (e, t, n) {
+      "use strict";
+      (n.r(t),
+        n.d(t, {
+          default: function () {
+            return o;
+          },
+        }));
+      var a = n(5853),
+        r = n(4254),
+        i = n(7800);
+      let l = "erabi.dashboard.agents";
+      function o() {
+        let [e, t] = (0, r.useState)([]),
+          [n, o] = (0, r.useState)(""),
+          [c, d] = (0, r.useState)([]),
+          [v, p] = (0, r.useState)(!1);
+        async function m(e) {
+          var t, n, a;
+          let r = encodeURIComponent(e),
+            l = await (0, i.L)("".concat(i.b.registry, "/v1/agents/").concat(r));
+          if (!l) return null;
+          let [o, s] = await Promise.all([
+            (0, i.L)("".concat(i.b.attribution, "/v1/earnings/").concat(r)),
+            (0, i.L)("".concat(i.b.attribution, "/v1/ledger/").concat(r)),
+          ]);
+          return {
+            id: e,
+            name: l.manifest.name,
+            tier: l.tier,
+            reputation: l.reputation,
+            payoutBound: null !== l.manifest.owner.payout_binding,
+            earnings: o,
+            disputes:
+              null !==
+                (t = null == s ? void 0 : s.events.filter((e) => "dispute" === e.kind).length) &&
+              void 0 !== t
+                ? t
+                : 0,
+            frozenEvents:
+              null !==
+                (n =
+                  null == s
+                    ? void 0
+                    : s.events.filter((e) => "under_review" === e.status || "disputed" === e.status)
+                        .length) && void 0 !== n
+                ? n
+                : 0,
+            chainValid:
+              null !== (a = null == s ? void 0 : s.chain_valid) && void 0 !== a ? a : null,
+          };
+        }
+        ((0, r.useEffect)(() => {
+          var e;
+          (t(JSON.parse(null !== (e = localStorage.getItem(l)) && void 0 !== e ? e : "[]")), p(!0));
+        }, []),
+          (0, r.useEffect)(() => {
+            v &&
+              (localStorage.setItem(l, JSON.stringify(e)),
+              (async () => {
+                d((await Promise.all(e.map(m))).filter((e) => null !== e));
+              })());
+          }, [e, v]));
+        let f = c.reduce(
+          (e, t) => {
+            var n, a, r, i, l, o;
+            return {
+              accrued:
+                e.accrued +
+                (null !==
+                  (i = null === (n = t.earnings) || void 0 === n ? void 0 : n.accrued_usd) &&
+                void 0 !== i
+                  ? i
+                  : 0),
+              available:
+                e.available +
+                (null !==
+                  (l = null === (a = t.earnings) || void 0 === a ? void 0 : a.available_usd) &&
+                void 0 !== l
+                  ? l
+                  : 0),
+              paid:
+                e.paid +
+                (null !== (o = null === (r = t.earnings) || void 0 === r ? void 0 : r.paid_usd) &&
+                void 0 !== o
+                  ? o
+                  : 0),
+            };
+          },
+          { accrued: 0, available: 0, paid: 0 },
+        );
+        return (0, a.jsxs)("main", {
+          className: "space-y-6",
+          children: [
+            (0, a.jsxs)("section", {
+              className: "panel",
+              children: [
+                (0, a.jsx)("h1", { className: "label mb-2", children: "owner dashboard" }),
+                (0, a.jsx)("p", {
+                  className: "mb-4 text-xs text-terminal-dim",
+                  children:
+                    "add your agents' ids to watch earnings, reputation, and disputes in one place. stored only in this browser.",
+                }),
+                (0, a.jsxs)("form", {
+                  onSubmit: (a) => {
+                    a.preventDefault();
+                    let r = n.trim();
+                    (r && !e.includes(r) && t([...e, r]), o(""));
+                  },
+                  className: "flex gap-2",
+                  children: [
+                    (0, a.jsx)("input", {
+                      value: n,
+                      onChange: (e) => o(e.target.value),
+                      placeholder: "erabi:agent:…",
+                      className:
+                        "flex-1 rounded border border-terminal-border bg-terminal-bg px-2 py-1 text-xs outline-none focus:border-terminal-green",
+                    }),
+                    (0, a.jsx)("button", {
+                      type: "submit",
+                      className:
+                        "rounded border border-terminal-green px-3 py-1 text-xs text-terminal-green hover:bg-terminal-green hover:text-terminal-bg",
+                      children: "add",
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            c.length > 0 &&
+              (0, a.jsxs)("section", {
+                className: "grid grid-cols-3 gap-4",
+                children: [
+                  (0, a.jsx)(s, { label: "accrued", value: "$".concat(f.accrued.toFixed(4)) }),
+                  (0, a.jsx)(s, { label: "available", value: "$".concat(f.available.toFixed(4)) }),
+                  (0, a.jsx)(s, { label: "paid out", value: "$".concat(f.paid.toFixed(4)) }),
+                ],
+              }),
+            c.map((n) => {
+              var r, i, l, o, s, c;
+              return (0, a.jsxs)(
+                "section",
+                {
+                  className: "panel",
+                  children: [
+                    (0, a.jsxs)("div", {
+                      className: "flex flex-wrap items-baseline justify-between gap-2",
+                      children: [
+                        (0, a.jsx)("a", {
+                          href: "/agents/".concat(encodeURIComponent(n.id)),
+                          className: "text-terminal-green hover:underline",
+                          children: n.name,
+                        }),
+                        (0, a.jsxs)("div", {
+                          className: "flex items-center gap-3 text-xs",
+                          children: [
+                            (0, a.jsx)("span", {
+                              className: "uppercase text-terminal-dim",
+                              children: n.tier,
+                            }),
+                            (0, a.jsxs)("span", { children: ["rep ", n.reputation] }),
+                            (0, a.jsx)("button", {
+                              onClick: () => t(e.filter((e) => e !== n.id)),
+                              className: "text-terminal-dim hover:text-terminal-red",
+                              children: "remove",
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                    (0, a.jsxs)("dl", {
+                      className: "mt-3 grid grid-cols-2 gap-2 text-xs md:grid-cols-6",
+                      children: [
+                        (0, a.jsx)(u, {
+                          label: "accrued",
+                          value: "$".concat(
+                            (null !==
+                              (o =
+                                null === (r = n.earnings) || void 0 === r
+                                  ? void 0
+                                  : r.accrued_usd) && void 0 !== o
+                              ? o
+                              : 0
+                            ).toFixed(4),
+                          ),
+                        }),
+                        (0, a.jsx)(u, {
+                          label: "available",
+                          value: "$".concat(
+                            (null !==
+                              (s =
+                                null === (i = n.earnings) || void 0 === i
+                                  ? void 0
+                                  : i.available_usd) && void 0 !== s
+                              ? s
+                              : 0
+                            ).toFixed(4),
+                          ),
+                        }),
+                        (0, a.jsx)(u, {
+                          label: "paid",
+                          value: "$".concat(
+                            (null !==
+                              (c =
+                                null === (l = n.earnings) || void 0 === l ? void 0 : l.paid_usd) &&
+                            void 0 !== c
+                              ? c
+                              : 0
+                            ).toFixed(4),
+                          ),
+                        }),
+                        (0, a.jsx)(u, {
+                          label: "payout",
+                          value: n.payoutBound ? "bound" : "unbound",
+                          warn: !n.payoutBound,
+                        }),
+                        (0, a.jsx)(u, {
+                          label: "disputes / frozen",
+                          value: "".concat(n.disputes, " / ").concat(n.frozenEvents),
+                          warn: n.disputes + n.frozenEvents > 0,
+                        }),
+                        (0, a.jsx)(u, {
+                          label: "ledger",
+                          value: !1 === n.chainValid ? "CHAIN BROKEN" : "verified",
+                          warn: !1 === n.chainValid,
+                        }),
+                      ],
+                    }),
+                    !n.payoutBound &&
+                      (0, a.jsx)("p", {
+                        className: "mt-2 text-[10px] text-terminal-amber",
+                        children:
+                          "earnings accrue but cannot pay out until a verified owner binds a payout destination.",
+                      }),
+                  ],
+                },
+                n.id,
+              );
+            }),
+          ],
+        });
+      }
+      function s(e) {
+        let { label: t, value: n } = e;
+        return (0, a.jsxs)("div", {
+          className: "panel text-center",
+          children: [
+            (0, a.jsx)("div", { className: "text-xl text-terminal-green", children: n }),
+            (0, a.jsx)("div", { className: "label mt-1", children: t }),
+          ],
+        });
+      }
+      function u(e) {
+        let { label: t, value: n, warn: r } = e;
+        return (0, a.jsxs)("div", {
+          children: [
+            (0, a.jsx)("dt", { className: "label", children: t }),
+            (0, a.jsx)("dd", {
+              className: "mt-0.5 ".concat(r ? "text-terminal-amber" : ""),
+              children: n,
+            }),
+          ],
+        });
+      }
+    },
+    7800: function (e, t, n) {
+      "use strict";
+      n.d(t, {
+        L: function () {
+          return u;
+        },
+        b: function () {
+          return s;
+        },
+      });
+      var a,
+        r,
+        i,
+        l,
+        o = n(3206);
+      let s = {
+        registry:
+          null !== (a = o.env.NEXT_PUBLIC_ERABI_REGISTRY_URL) && void 0 !== a
+            ? a
+            : "http://localhost:4001",
+        exchange:
+          null !== (r = o.env.NEXT_PUBLIC_ERABI_EXCHANGE_URL) && void 0 !== r
+            ? r
+            : "http://localhost:4002",
+        attribution:
+          null !== (i = o.env.NEXT_PUBLIC_ERABI_ATTRIBUTION_URL) && void 0 !== i
+            ? i
+            : "http://localhost:4003",
+        reputation:
+          null !== (l = o.env.NEXT_PUBLIC_ERABI_REPUTATION_URL) && void 0 !== l
+            ? l
+            : "http://localhost:4004",
+      };
+      async function u(e) {
+        try {
+          let t = await fetch(e, { cache: "no-store" });
+          if (!t.ok) return null;
+          return await t.json();
+        } catch (e) {
+          return null;
+        }
+      }
+    },
+    3206: function (e, t, n) {
+      "use strict";
+      var a, r;
+      e.exports =
+        (null == (a = n.g.process) ? void 0 : a.env) &&
+        "object" == typeof (null == (r = n.g.process) ? void 0 : r.env)
+          ? n.g.process
+          : n(8041);
+    },
+    8041: function (e) {
+      !(function () {
+        var t = {
+            229: function (e) {
+              var t,
+                n,
+                a,
+                r = (e.exports = {});
+              function i() {
+                throw Error("setTimeout has not been defined");
+              }
+              function l() {
+                throw Error("clearTimeout has not been defined");
+              }
+              function o(e) {
+                if (t === setTimeout) return setTimeout(e, 0);
+                if ((t === i || !t) && setTimeout) return ((t = setTimeout), setTimeout(e, 0));
+                try {
+                  return t(e, 0);
+                } catch (n) {
+                  try {
+                    return t.call(null, e, 0);
+                  } catch (n) {
+                    return t.call(this, e, 0);
+                  }
+                }
+              }
+              !(function () {
+                try {
+                  t = "function" == typeof setTimeout ? setTimeout : i;
+                } catch (e) {
+                  t = i;
+                }
+                try {
+                  n = "function" == typeof clearTimeout ? clearTimeout : l;
+                } catch (e) {
+                  n = l;
+                }
+              })();
+              var s = [],
+                u = !1,
+                c = -1;
+              function d() {
+                u && a && ((u = !1), a.length ? (s = a.concat(s)) : (c = -1), s.length && v());
+              }
+              function v() {
+                if (!u) {
+                  var e = o(d);
+                  u = !0;
+                  for (var t = s.length; t; ) {
+                    for (a = s, s = []; ++c < t; ) a && a[c].run();
+                    ((c = -1), (t = s.length));
+                  }
+                  ((a = null),
+                    (u = !1),
+                    (function (e) {
+                      if (n === clearTimeout) return clearTimeout(e);
+                      if ((n === l || !n) && clearTimeout)
+                        return ((n = clearTimeout), clearTimeout(e));
+                      try {
+                        n(e);
+                      } catch (t) {
+                        try {
+                          return n.call(null, e);
+                        } catch (t) {
+                          return n.call(this, e);
+                        }
+                      }
+                    })(e));
+                }
+              }
+              function p(e, t) {
+                ((this.fun = e), (this.array = t));
+              }
+              function m() {}
+              ((r.nextTick = function (e) {
+                var t = Array(arguments.length - 1);
+                if (arguments.length > 1)
+                  for (var n = 1; n < arguments.length; n++) t[n - 1] = arguments[n];
+                (s.push(new p(e, t)), 1 !== s.length || u || o(v));
+              }),
+                (p.prototype.run = function () {
+                  this.fun.apply(null, this.array);
+                }),
+                (r.title = "browser"),
+                (r.browser = !0),
+                (r.env = {}),
+                (r.argv = []),
+                (r.version = ""),
+                (r.versions = {}),
+                (r.on = m),
+                (r.addListener = m),
+                (r.once = m),
+                (r.off = m),
+                (r.removeListener = m),
+                (r.removeAllListeners = m),
+                (r.emit = m),
+                (r.prependListener = m),
+                (r.prependOnceListener = m),
+                (r.listeners = function (e) {
+                  return [];
+                }),
+                (r.binding = function (e) {
+                  throw Error("process.binding is not supported");
+                }),
+                (r.cwd = function () {
+                  return "/";
+                }),
+                (r.chdir = function (e) {
+                  throw Error("process.chdir is not supported");
+                }),
+                (r.umask = function () {
+                  return 0;
+                }));
+            },
+          },
+          n = {};
+        function a(e) {
+          var r = n[e];
+          if (void 0 !== r) return r.exports;
+          var i = (n[e] = { exports: {} }),
+            l = !0;
+          try {
+            (t[e](i, i.exports, a), (l = !1));
+          } finally {
+            l && delete n[e];
+          }
+          return i.exports;
+        }
+        a.ab = "//";
+        var r = a(229);
+        e.exports = r;
+      })();
+    },
+  },
+  function (e) {
+    (e.O(0, [285, 749, 744], function () {
+      return e((e.s = 3829));
+    }),
+      (_N_E = e.O()));
+  },
+]);

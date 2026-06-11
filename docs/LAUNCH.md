@@ -13,8 +13,8 @@ account, credential, or naming decision.
 
 ## 1. Identity decisions (you)
 
-- [ ] **GitHub home**: keep `HMAKT99/Erabi` or create the `erabi-protocol` org and
-      transfer (repo links in package metadata/READMEs update with one search-replace).
+- [x] **GitHub home**: decided 2026-06-11 — stays on `HMAKT99/Erabi`. All public
+      artifacts (package metadata, branding constants, AgentCard, landing) point there.
 - [ ] **Domain**: register one (e.g. `erabi.dev` / `erabi.network`). DNS A records for
       `@, explorer, registry, exchange, attribution, reputation`.
 - [ ] **npm scope**: claim the `@erabi` org on npmjs.com; create an automation token.

@@ -1,1 +1,21 @@
-{"version":4,"routes":{"/":{"experimentalBypassFor":[{"type":"header","key":"Next-Action"},{"type":"header","key":"content-type","value":"multipart/form-data;.*"}],"initialRevalidateSeconds":false,"srcRoute":"/","dataRoute":"/index.rsc"}},"dynamicRoutes":{},"notFoundRoutes":[],"preview":{"previewModeId":"d833e96b653f756286ecff670f37851d","previewModeSigningKey":"9396b741b116e814484d038a5814c537276b9a4a2163fabd7798e9e4793f99a6","previewModeEncryptionKey":"ff54871b6a18f55171125084cd4fcea3cacc7817fb726a6d65b2ba09bc35527d"}}
+{
+  "version": 4,
+  "routes": {
+    "/": {
+      "experimentalBypassFor": [
+        { "type": "header", "key": "Next-Action" },
+        { "type": "header", "key": "content-type", "value": "multipart/form-data;.*" }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc"
+    }
+  },
+  "dynamicRoutes": {},
+  "notFoundRoutes": [],
+  "preview": {
+    "previewModeId": "7d8d21f486f7807729a5f53863b98c2c",
+    "previewModeSigningKey": "6a8f54e3de1b0832204a5ba3aee27f68f4d196ac34460fcc41e9e28402f44c53",
+    "previewModeEncryptionKey": "0fd4692505dbfa0803ade5697355b345c49d147316cc3e0c08d7a2869679f753"
+  }
+}

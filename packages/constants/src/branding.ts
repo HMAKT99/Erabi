@@ -19,7 +19,9 @@ export const EXPLORER_NAME = "Erabi Explorer";
 export const TAGLINE = "The intent auction and reputation layer of the agent economy.";
 
 export const NPM_SCOPE = "@erabi";
-export const GITHUB_ORG = "erabi-protocol";
+/** The project's GitHub home (decided 2026-06-11: stays on the personal account). */
+export const GITHUB_ORG = "HMAKT99";
+export const GITHUB_REPO_URL = "https://github.com/HMAKT99/Erabi";
 
 /** Current protocol spec version. */
 export const SPEC_VERSION = "0.1";

@@ -4,10 +4,10 @@
   "url": "http://localhost:4001",
   "provider": {
     "organization": "Erabi Protocol",
-    "url": "https://github.com/erabi-protocol"
+    "url": "https://github.com/HMAKT99/Erabi"
   },
   "version": "0.1.0",
-  "documentationUrl": "https://github.com/erabi-protocol/erabi",
+  "documentationUrl": "https://github.com/HMAKT99/Erabi",
   "capabilities": {
     "streaming": true,
     "pushNotifications": false,

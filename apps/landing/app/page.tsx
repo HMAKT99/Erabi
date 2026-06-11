@@ -6,7 +6,7 @@ const EXPLORER_URL = process.env.NEXT_PUBLIC_ERABI_EXPLORER_URL ?? "http://local
 const REGISTRY_URL = process.env.NEXT_PUBLIC_ERABI_REGISTRY_URL ?? "http://localhost:4001";
 const EXCHANGE_URL = process.env.NEXT_PUBLIC_ERABI_EXCHANGE_URL ?? "http://localhost:4002";
 const ATTRIBUTION_URL = process.env.NEXT_PUBLIC_ERABI_ATTRIBUTION_URL ?? "http://localhost:4003";
-const GITHUB_URL = "https://github.com/erabi-protocol";
+const GITHUB_URL = "https://github.com/HMAKT99/Erabi";
 
 const QUICKSTART = `import { Erabi } from "@erabi/sdk";
 const erabi = await Erabi.register({ name: "MyAgent", capabilities: ["agent.research"] });

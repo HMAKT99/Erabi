@@ -46,6 +46,17 @@ export interface ReferenceNodeOptions {
   nonceStore?: NonceStore;
   /** Enable fastify logging (production). */
   logger?: boolean;
+  /**
+   * Public base URLs advertised in well-known documents, join blocks, and
+   * evidence links (e.g. behind a reverse proxy). Listening still happens
+   * on host:port; defaults to the listen URLs.
+   */
+  publicUrls?: Partial<{
+    registry: string;
+    exchange: string;
+    attribution: string;
+    reputation: string;
+  }>;
 }
 
 export interface ReferenceNode {
@@ -94,10 +105,10 @@ export async function startReferenceNode(
     number,
   ];
   const urls = {
-    registry: `http://${host}:${registryPort}`,
-    exchange: `http://${host}:${exchangePort}`,
-    attribution: `http://${host}:${attributionPort}`,
-    reputation: `http://${host}:${reputationPort}`,
+    registry: options.publicUrls?.registry ?? `http://${host}:${registryPort}`,
+    exchange: options.publicUrls?.exchange ?? `http://${host}:${exchangePort}`,
+    attribution: options.publicUrls?.attribution ?? `http://${host}:${attributionPort}`,
+    reputation: options.publicUrls?.reputation ?? `http://${host}:${reputationPort}`,
   };
 
   const db = (name: string) => (options.dataDir ? `${options.dataDir}/${name}.sqlite` : ":memory:");

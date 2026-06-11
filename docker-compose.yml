@@ -11,6 +11,7 @@ services:
       NODE_ENV: production
       ERABI_DATA_DIR: /data
       ERABI_HOST: 0.0.0.0
+      ERABI_DOMAIN: ${ERABI_DOMAIN:-}
       ERABI_NODE_ID: ${ERABI_NODE_ID:-erabi-node-1}
       ERABI_NODE_SEED: ${ERABI_NODE_SEED:-}
       ERABI_GITHUB_TOKEN: ${ERABI_GITHUB_TOKEN:-}

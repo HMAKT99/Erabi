@@ -19,6 +19,26 @@ describe("reference node", () => {
     }
   });
 
+  it("advertises public URLs in front doors when behind a reverse proxy", async () => {
+    const node = await startReferenceNode({
+      publicUrls: {
+        registry: "https://registry.example.com",
+        exchange: "https://exchange.example.com",
+      },
+    });
+    try {
+      // Listening stays on a local ephemeral port; advertised URLs are public.
+      const listenPort = (node.apps[0]!.server.address() as { port: number }).port;
+      const wellKnown = (await fetch(`http://127.0.0.1:${listenPort}/.well-known/erabi.json`).then(
+        (r) => r.json(),
+      )) as { join: { register: string } };
+      expect(wellKnown.join.register).toBe("https://registry.example.com/v1/agents");
+      expect(node.urls.exchange).toBe("https://exchange.example.com");
+    } finally {
+      await node.stop();
+    }
+  });
+
   it("serves the explorer's data endpoints with CORS", async () => {
     const node = await startReferenceNode();
     try {

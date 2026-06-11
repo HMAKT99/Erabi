@@ -22,11 +22,13 @@ RUN pnpm install --frozen-lockfile --filter "${PKG}..."
 # Schemas codegen normally runs through turbo's task graph.
 RUN pnpm --filter @erabi/schemas codegen || true
 RUN pnpm --filter "${PKG}..." build
-RUN pnpm deploy --filter "${PKG}" --prod /out
+# --legacy: deploy without injected workspace packages (pnpm v10 default change)
+RUN pnpm deploy --legacy --filter "${PKG}" --prod /out
 
 FROM node:20-bookworm-slim
-RUN corepack enable
 WORKDIR /app
 COPY --from=build /out /app
 ENV NODE_ENV=production
-CMD ["pnpm", "start"]
+# npm ships with the base image; the deployed bundle is self-contained, so
+# `npm start` just runs each package's start script (no pnpm at runtime).
+CMD ["npm", "start"]

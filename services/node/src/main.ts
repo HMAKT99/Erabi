@@ -17,6 +17,18 @@ if (production && !process.env.ERABI_DATA_DIR) {
   process.exit(1);
 }
 
+// Behind a reverse proxy, advertise the public subdomain URLs
+// (ERABI_DOMAIN follows the deploy/Caddyfile convention); explicit
+// ERABI_PUBLIC_*_URL variables override individually.
+const domain = process.env.ERABI_DOMAIN;
+const publicUrls = {
+  registry: process.env.ERABI_PUBLIC_REGISTRY_URL ?? (domain && `https://registry.${domain}`),
+  exchange: process.env.ERABI_PUBLIC_EXCHANGE_URL ?? (domain && `https://exchange.${domain}`),
+  attribution:
+    process.env.ERABI_PUBLIC_ATTRIBUTION_URL ?? (domain && `https://attribution.${domain}`),
+  reputation: process.env.ERABI_PUBLIC_REPUTATION_URL ?? (domain && `https://reputation.${domain}`),
+};
+
 const node = await startReferenceNode({
   ports: [
     Number(process.env.REGISTRY_PORT ?? 4001),
@@ -32,6 +44,12 @@ const node = await startReferenceNode({
     ? realVerifiers({ githubToken: process.env.ERABI_GITHUB_TOKEN })
     : undefined,
   logger: production,
+  publicUrls: {
+    ...(publicUrls.registry ? { registry: publicUrls.registry } : {}),
+    ...(publicUrls.exchange ? { exchange: publicUrls.exchange } : {}),
+    ...(publicUrls.attribution ? { attribution: publicUrls.attribution } : {}),
+    ...(publicUrls.reputation ? { reputation: publicUrls.reputation } : {}),
+  },
 });
 
 console.log(`Erabi reference node up (key: ${node.keySource}, verifiers: ${

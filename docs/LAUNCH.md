@@ -20,10 +20,10 @@ account, credential, or naming decision.
 - [ ] **npm scope**: claim the `@erabi` org on npmjs.com; create an automation token.
 - [ ] **PyPI**: register the `erabi-sdk` project name; create an API token.
 
-- [ ] Local Docker image build verification: Docker Desktop on this Mac is waiting on
-      its first-run dialog — open it, accept, then
-      `docker build --build-arg PKG=@erabi/node -t erabi-node .` (the Dockerfile is
-      review-validated; this is the execution check).
+- [x] Docker image build + boot verified: `erabi-node` (374 MB) builds, all four
+      services answer `/healthz`, the persistent key loads from the volume, real
+      verifiers activate under `NODE_ENV=production`, and with `ERABI_DOMAIN` set the
+      well-known documents advertise the public `https://<svc>.<domain>` URLs.
 
 ## 2. Hosted node (docs/DEPLOY.md)
 

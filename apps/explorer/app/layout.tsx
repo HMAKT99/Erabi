@@ -47,9 +47,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </header>
           {children}
-          <footer className="mt-12 border-t border-terminal-border pt-4 text-xs text-terminal-dim">
-            every paid influence on this network is signed, labeled, and inspectable · spec
-            erabi/0.1
+          <footer className="mt-12 flex items-baseline justify-between border-t border-terminal-border pt-4 text-xs text-terminal-dim">
+            <span>
+              every paid influence on this network is signed, labeled, and inspectable · spec
+              erabi/0.1
+            </span>
+            <a
+              href={`${process.env.NEXT_PUBLIC_ERABI_LANDING_URL ?? "https://erabi-landing.vercel.app"}/about`}
+              className="shrink-0 pl-4 hover:text-terminal-green"
+            >
+              about · built by AKT →
+            </a>
           </footer>
         </div>
       </body>

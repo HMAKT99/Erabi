@@ -42,6 +42,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/dashboard" className="hover:text-terminal-green">
                   dashboard
                 </Link>
+                <Link href="/about" className="hover:text-terminal-green">
+                  about
+                </Link>
               </nav>
               <ThemeToggle />
             </div>
@@ -52,12 +55,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               every paid influence on this network is signed, labeled, and inspectable · spec
               erabi/0.1
             </span>
-            <a
-              href={`${process.env.NEXT_PUBLIC_ERABI_LANDING_URL ?? "https://erabi-landing.vercel.app"}/about`}
-              className="shrink-0 pl-4 hover:text-terminal-green"
-            >
-              about · built by AKT →
-            </a>
+            <Link href="/builder" className="shrink-0 pl-4 hover:text-terminal-green">
+              built by AKT →
+            </Link>
           </footer>
         </div>
       </body>

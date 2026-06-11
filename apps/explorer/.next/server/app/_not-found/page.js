@@ -1,1 +1,289 @@
-(()=>{var e={};e.id=409,e.ids=[409],e.modules={2934:e=>{"use strict";e.exports=require("next/dist/client/components/action-async-storage.external.js")},4580:e=>{"use strict";e.exports=require("next/dist/client/components/request-async-storage.external.js")},5869:e=>{"use strict";e.exports=require("next/dist/client/components/static-generation-async-storage.external.js")},399:e=>{"use strict";e.exports=require("next/dist/compiled/next-server/app-page.runtime.prod.js")},8306:(e,t,r)=>{"use strict";r.r(t),r.d(t,{GlobalError:()=>a.a,__next_app__:()=>m,originalPathname:()=>c,pages:()=>u,routeModule:()=>f,tree:()=>d}),r(9047),r(8714),r(5783);var n=r(3653),s=r(4966),o=r(6070),a=r.n(o),l=r(2555),i={};for(let e in l)0>["default","tree","pages","GlobalError","originalPathname","__next_app__","routeModule"].indexOf(e)&&(i[e]=()=>l[e]);r.d(t,i);let d=["",{children:["/_not-found",{children:["__PAGE__",{},{page:[()=>Promise.resolve().then(r.t.bind(r,8714,23)),"next/dist/client/components/not-found-error"]}]},{}]},{layout:[()=>Promise.resolve().then(r.bind(r,5783)),"/Users/arun/erabi/apps/explorer/app/layout.tsx"],"not-found":[()=>Promise.resolve().then(r.t.bind(r,8714,23)),"next/dist/client/components/not-found-error"]}],u=[],c="/_not-found/page",m={require:r,loadChunk:()=>Promise.resolve()},f=new n.AppPageRouteModule({definition:{kind:s.x.APP_PAGE,page:"/_not-found/page",pathname:"/_not-found",bundlePath:"",filename:"",appPaths:[]},userland:{loaderTree:d}})},3766:(e,t,r)=>{Promise.resolve().then(r.bind(r,4334)),Promise.resolve().then(r.t.bind(r,307,23))},2785:(e,t,r)=>{Promise.resolve().then(r.t.bind(r,417,23)),Promise.resolve().then(r.t.bind(r,181,23)),Promise.resolve().then(r.t.bind(r,7814,23)),Promise.resolve().then(r.t.bind(r,5266,23)),Promise.resolve().then(r.t.bind(r,490,23)),Promise.resolve().then(r.t.bind(r,2648,23))},4334:(e,t,r)=>{"use strict";r.d(t,{ThemeToggle:()=>o});var n=r(2064),s=r(5032);function o(){let[e,t]=(0,s.useState)("dark");return n.jsx("button",{onClick:function(){let r="dark"===e?"light":"dark";t(r),localStorage.setItem("erabi.theme",r),document.documentElement.classList.toggle("light","light"===r)},"aria-label":"Toggle color theme",title:"Toggle color theme",className:"rounded border border-terminal-border px-2 py-1 text-xs text-terminal-dim hover:border-terminal-green hover:text-terminal-green",children:"dark"===e?"☀ light":"☾ dark"})}},5783:(e,t,r)=>{"use strict";r.r(t),r.d(t,{default:()=>l,metadata:()=>a});var n=r(9222),s=r(3023);let o=(0,r(1924).createProxy)(String.raw`/Users/arun/erabi/apps/explorer/components/ThemeToggle.tsx#ThemeToggle`);r(6557);let a={title:"Erabi Explorer",description:"Live view of the Erabi intent exchange: agents joining, intents flowing, auctions clearing, settlements confirming."};function l({children:e}){return(0,n.jsxs)("html",{lang:"en",suppressHydrationWarning:!0,children:[n.jsx("head",{children:n.jsx("script",{dangerouslySetInnerHTML:{__html:'try{if(localStorage.getItem("erabi.theme")==="light")document.documentElement.classList.add("light")}catch(e){}'}})}),n.jsx("body",{children:(0,n.jsxs)("div",{className:"mx-auto max-w-6xl px-4 py-6",children:[(0,n.jsxs)("header",{className:"mb-8 flex items-baseline justify-between border-b border-terminal-border pb-4",children:[(0,n.jsxs)(s.default,{href:"/",className:"text-xl font-bold tracking-tight",children:[n.jsx("span",{className:"text-terminal-green",children:"erabi"}),n.jsx("span",{className:"text-terminal-dim",children:"://explorer"})]}),(0,n.jsxs)("div",{className:"flex items-center gap-5 text-sm",children:[(0,n.jsxs)("nav",{className:"flex gap-5",children:[n.jsx(s.default,{href:"/",className:"hover:text-terminal-green",children:"ticker"}),n.jsx(s.default,{href:"/agents",className:"hover:text-terminal-green",children:"agents"}),n.jsx(s.default,{href:"/leaderboard",className:"hover:text-terminal-green",children:"leaderboard"}),n.jsx(s.default,{href:"/disclosures",className:"hover:text-terminal-green",children:"disclosures"}),n.jsx(s.default,{href:"/dashboard",className:"hover:text-terminal-green",children:"dashboard"})]}),n.jsx(o,{})]})]}),e,n.jsx("footer",{className:"mt-12 border-t border-terminal-border pt-4 text-xs text-terminal-dim",children:"every paid influence on this network is signed, labeled, and inspectable \xb7 spec erabi/0.1"})]})})]})}},2516:(e,t)=>{"use strict";Object.defineProperty(t,"__esModule",{value:!0}),function(e,t){for(var r in t)Object.defineProperty(e,r,{enumerable:!0,get:t[r]})}(t,{isNotFoundError:function(){return s},notFound:function(){return n}});let r="NEXT_NOT_FOUND";function n(){let e=Error(r);throw e.digest=r,e}function s(e){return"object"==typeof e&&null!==e&&"digest"in e&&e.digest===r}("function"==typeof t.default||"object"==typeof t.default&&null!==t.default)&&void 0===t.default.__esModule&&(Object.defineProperty(t.default,"__esModule",{value:!0}),Object.assign(t.default,t),e.exports=t.default)},9047:(e,t,r)=>{"use strict";Object.defineProperty(t,"__esModule",{value:!0}),function(e,t){for(var r in t)Object.defineProperty(e,r,{enumerable:!0,get:t[r]})}(t,{PARALLEL_ROUTE_DEFAULT_PATH:function(){return s},default:function(){return o}});let n=r(2516),s="next/dist/client/components/parallel-route-default.js";function o(){(0,n.notFound)()}("function"==typeof t.default||"object"==typeof t.default&&null!==t.default)&&void 0===t.default.__esModule&&(Object.defineProperty(t.default,"__esModule",{value:!0}),Object.assign(t.default,t),e.exports=t.default)},6557:()=>{}};var t=require("../../webpack-runtime.js");t.C(e);var r=e=>t(t.s=e),n=t.X(0,[557],()=>r(8306));module.exports=n})();
+(() => {
+  var e = {};
+  ((e.id = 409),
+    (e.ids = [409]),
+    (e.modules = {
+      2934: (e) => {
+        "use strict";
+        e.exports = require("next/dist/client/components/action-async-storage.external.js");
+      },
+      4580: (e) => {
+        "use strict";
+        e.exports = require("next/dist/client/components/request-async-storage.external.js");
+      },
+      5869: (e) => {
+        "use strict";
+        e.exports = require("next/dist/client/components/static-generation-async-storage.external.js");
+      },
+      399: (e) => {
+        "use strict";
+        e.exports = require("next/dist/compiled/next-server/app-page.runtime.prod.js");
+      },
+      8306: (e, t, r) => {
+        "use strict";
+        (r.r(t),
+          r.d(t, {
+            GlobalError: () => a.a,
+            __next_app__: () => m,
+            originalPathname: () => c,
+            pages: () => u,
+            routeModule: () => f,
+            tree: () => d,
+          }),
+          r(9047),
+          r(8714),
+          r(5783));
+        var n = r(3653),
+          s = r(4966),
+          o = r(6070),
+          a = r.n(o),
+          l = r(2555),
+          i = {};
+        for (let e in l)
+          0 >
+            [
+              "default",
+              "tree",
+              "pages",
+              "GlobalError",
+              "originalPathname",
+              "__next_app__",
+              "routeModule",
+            ].indexOf(e) && (i[e] = () => l[e]);
+        r.d(t, i);
+        let d = [
+            "",
+            {
+              children: [
+                "/_not-found",
+                {
+                  children: [
+                    "__PAGE__",
+                    {},
+                    {
+                      page: [
+                        () => Promise.resolve().then(r.t.bind(r, 8714, 23)),
+                        "next/dist/client/components/not-found-error",
+                      ],
+                    },
+                  ],
+                },
+                {},
+              ],
+            },
+            {
+              layout: [
+                () => Promise.resolve().then(r.bind(r, 5783)),
+                "/Users/arun/erabi/apps/explorer/app/layout.tsx",
+              ],
+              "not-found": [
+                () => Promise.resolve().then(r.t.bind(r, 8714, 23)),
+                "next/dist/client/components/not-found-error",
+              ],
+            },
+          ],
+          u = [],
+          c = "/_not-found/page",
+          m = { require: r, loadChunk: () => Promise.resolve() },
+          f = new n.AppPageRouteModule({
+            definition: {
+              kind: s.x.APP_PAGE,
+              page: "/_not-found/page",
+              pathname: "/_not-found",
+              bundlePath: "",
+              filename: "",
+              appPaths: [],
+            },
+            userland: { loaderTree: d },
+          });
+      },
+      3766: (e, t, r) => {
+        (Promise.resolve().then(r.bind(r, 4334)), Promise.resolve().then(r.t.bind(r, 307, 23)));
+      },
+      2785: (e, t, r) => {
+        (Promise.resolve().then(r.t.bind(r, 417, 23)),
+          Promise.resolve().then(r.t.bind(r, 181, 23)),
+          Promise.resolve().then(r.t.bind(r, 7814, 23)),
+          Promise.resolve().then(r.t.bind(r, 5266, 23)),
+          Promise.resolve().then(r.t.bind(r, 490, 23)),
+          Promise.resolve().then(r.t.bind(r, 2648, 23)));
+      },
+      4334: (e, t, r) => {
+        "use strict";
+        r.d(t, { ThemeToggle: () => o });
+        var n = r(2064),
+          s = r(5032);
+        function o() {
+          let [e, t] = (0, s.useState)("dark");
+          return n.jsx("button", {
+            onClick: function () {
+              let r = "dark" === e ? "light" : "dark";
+              (t(r),
+                localStorage.setItem("erabi.theme", r),
+                document.documentElement.classList.toggle("light", "light" === r));
+            },
+            "aria-label": "Toggle color theme",
+            title: "Toggle color theme",
+            className:
+              "rounded border border-terminal-border px-2 py-1 text-xs text-terminal-dim hover:border-terminal-green hover:text-terminal-green",
+            children: "dark" === e ? "☀ light" : "☾ dark",
+          });
+        }
+      },
+      5783: (e, t, r) => {
+        "use strict";
+        (r.r(t), r.d(t, { default: () => l, metadata: () => a }));
+        var n = r(9222),
+          s = r(3023);
+        let o = (0, r(1924).createProxy)(
+          String.raw`/Users/arun/erabi/apps/explorer/components/ThemeToggle.tsx#ThemeToggle`,
+        );
+        r(6557);
+        let a = {
+          title: "Erabi Explorer",
+          description:
+            "Live view of the Erabi intent exchange: agents joining, intents flowing, auctions clearing, settlements confirming.",
+        };
+        function l({ children: e }) {
+          return (0, n.jsxs)("html", {
+            lang: "en",
+            suppressHydrationWarning: !0,
+            children: [
+              n.jsx("head", {
+                children: n.jsx("script", {
+                  dangerouslySetInnerHTML: {
+                    __html:
+                      'try{if(localStorage.getItem("erabi.theme")==="light")document.documentElement.classList.add("light")}catch(e){}',
+                  },
+                }),
+              }),
+              n.jsx("body", {
+                children: (0, n.jsxs)("div", {
+                  className: "mx-auto max-w-6xl px-4 py-6",
+                  children: [
+                    (0, n.jsxs)("header", {
+                      className:
+                        "mb-8 flex items-baseline justify-between border-b border-terminal-border pb-4",
+                      children: [
+                        (0, n.jsxs)(s.default, {
+                          href: "/",
+                          className: "text-xl font-bold tracking-tight",
+                          children: [
+                            n.jsx("span", { className: "text-terminal-green", children: "erabi" }),
+                            n.jsx("span", {
+                              className: "text-terminal-dim",
+                              children: "://explorer",
+                            }),
+                          ],
+                        }),
+                        (0, n.jsxs)("div", {
+                          className: "flex items-center gap-5 text-sm",
+                          children: [
+                            (0, n.jsxs)("nav", {
+                              className: "flex gap-5",
+                              children: [
+                                n.jsx(s.default, {
+                                  href: "/",
+                                  className: "hover:text-terminal-green",
+                                  children: "ticker",
+                                }),
+                                n.jsx(s.default, {
+                                  href: "/agents",
+                                  className: "hover:text-terminal-green",
+                                  children: "agents",
+                                }),
+                                n.jsx(s.default, {
+                                  href: "/leaderboard",
+                                  className: "hover:text-terminal-green",
+                                  children: "leaderboard",
+                                }),
+                                n.jsx(s.default, {
+                                  href: "/disclosures",
+                                  className: "hover:text-terminal-green",
+                                  children: "disclosures",
+                                }),
+                                n.jsx(s.default, {
+                                  href: "/dashboard",
+                                  className: "hover:text-terminal-green",
+                                  children: "dashboard",
+                                }),
+                              ],
+                            }),
+                            n.jsx(o, {}),
+                          ],
+                        }),
+                      ],
+                    }),
+                    e,
+                    n.jsx("footer", {
+                      className:
+                        "mt-12 border-t border-terminal-border pt-4 text-xs text-terminal-dim",
+                      children:
+                        "every paid influence on this network is signed, labeled, and inspectable \xb7 spec erabi/0.1",
+                    }),
+                  ],
+                }),
+              }),
+            ],
+          });
+        }
+      },
+      2516: (e, t) => {
+        "use strict";
+        (Object.defineProperty(t, "__esModule", { value: !0 }),
+          (function (e, t) {
+            for (var r in t) Object.defineProperty(e, r, { enumerable: !0, get: t[r] });
+          })(t, {
+            isNotFoundError: function () {
+              return s;
+            },
+            notFound: function () {
+              return n;
+            },
+          }));
+        let r = "NEXT_NOT_FOUND";
+        function n() {
+          let e = Error(r);
+          throw ((e.digest = r), e);
+        }
+        function s(e) {
+          return "object" == typeof e && null !== e && "digest" in e && e.digest === r;
+        }
+        ("function" == typeof t.default || ("object" == typeof t.default && null !== t.default)) &&
+          void 0 === t.default.__esModule &&
+          (Object.defineProperty(t.default, "__esModule", { value: !0 }),
+          Object.assign(t.default, t),
+          (e.exports = t.default));
+      },
+      9047: (e, t, r) => {
+        "use strict";
+        (Object.defineProperty(t, "__esModule", { value: !0 }),
+          (function (e, t) {
+            for (var r in t) Object.defineProperty(e, r, { enumerable: !0, get: t[r] });
+          })(t, {
+            PARALLEL_ROUTE_DEFAULT_PATH: function () {
+              return s;
+            },
+            default: function () {
+              return o;
+            },
+          }));
+        let n = r(2516),
+          s = "next/dist/client/components/parallel-route-default.js";
+        function o() {
+          (0, n.notFound)();
+        }
+        ("function" == typeof t.default || ("object" == typeof t.default && null !== t.default)) &&
+          void 0 === t.default.__esModule &&
+          (Object.defineProperty(t.default, "__esModule", { value: !0 }),
+          Object.assign(t.default, t),
+          (e.exports = t.default));
+      },
+      6557: () => {},
+    }));
+  var t = require("../../webpack-runtime.js");
+  t.C(e);
+  var r = (e) => t((t.s = e)),
+    n = t.X(0, [557], () => r(8306));
+  module.exports = n;
+})();

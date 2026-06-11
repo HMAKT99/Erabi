@@ -1,1 +1,140 @@
-globalThis.__RSC_MANIFEST=(globalThis.__RSC_MANIFEST||{});globalThis.__RSC_MANIFEST["/disclosures/page"]={"moduleLoading":{"prefix":"/_next/","crossOrigin":null},"ssrModuleMapping":{"1740":{"*":{"id":"3245","name":"*","chunks":[],"async":false}},"2728":{"*":{"id":"5266","name":"*","chunks":[],"async":false}},"5016":{"*":{"id":"7685","name":"*","chunks":[],"async":false}},"5411":{"*":{"id":"307","name":"*","chunks":[],"async":false}},"5416":{"*":{"id":"181","name":"*","chunks":[],"async":false}},"6187":{"*":{"id":"9255","name":"*","chunks":[],"async":false}},"6608":{"*":{"id":"417","name":"*","chunks":[],"async":false}},"7420":{"*":{"id":"1541","name":"*","chunks":[],"async":false}},"8183":{"*":{"id":"3984","name":"*","chunks":[],"async":false}},"8666":{"*":{"id":"4334","name":"*","chunks":[],"async":false}},"8677":{"*":{"id":"6037","name":"*","chunks":[],"async":false}},"8907":{"*":{"id":"7814","name":"*","chunks":[],"async":false}},"9369":{"*":{"id":"490","name":"*","chunks":[],"async":false}},"9836":{"*":{"id":"2648","name":"*","chunks":[],"async":false}}},"edgeSSRModuleMapping":{},"clientModules":{"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/app-router.js":{"id":6608,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/app-router.js":{"id":6608,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/client-page.js":{"id":5416,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/client-page.js":{"id":5416,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/error-boundary.js":{"id":8907,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/error-boundary.js":{"id":8907,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/layout-router.js":{"id":2728,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/layout-router.js":{"id":2728,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/not-found-boundary.js":{"id":9369,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/not-found-boundary.js":{"id":9369,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/render-from-template-context.js":{"id":9836,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/render-from-template-context.js":{"id":9836,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/apps/explorer/app/globals.css":{"id":3366,"name":"*","chunks":["411","static/chunks/411-e38354027fbad59b.js","185","static/chunks/app/layout-9e186150ded9c448.js"],"async":false},"/Users/arun/erabi/apps/explorer/components/ThemeToggle.tsx":{"id":8666,"name":"*","chunks":["411","static/chunks/411-e38354027fbad59b.js","185","static/chunks/app/layout-9e186150ded9c448.js"],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/link.js":{"id":5411,"name":"*","chunks":["411","static/chunks/411-e38354027fbad59b.js","185","static/chunks/app/layout-9e186150ded9c448.js"],"async":false},"/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/link.js":{"id":5411,"name":"*","chunks":["411","static/chunks/411-e38354027fbad59b.js","185","static/chunks/app/layout-9e186150ded9c448.js"],"async":false},"/Users/arun/erabi/apps/explorer/app/dashboard/page.tsx":{"id":7420,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/apps/explorer/app/agents/page.tsx":{"id":8183,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/apps/explorer/app/leaderboard/page.tsx":{"id":5016,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/apps/explorer/app/agents/[id]/page.tsx":{"id":8677,"name":"*","chunks":[],"async":false},"/Users/arun/erabi/apps/explorer/app/disclosures/page.tsx":{"id":1740,"name":"*","chunks":["582","static/chunks/582-82cf260a1bf04d38.js","739","static/chunks/app/disclosures/page-a7b63b84352503e8.js"],"async":false},"/Users/arun/erabi/apps/explorer/app/page.tsx":{"id":6187,"name":"*","chunks":["931","static/chunks/app/page-872fed59d530f6cc.js"],"async":false}},"entryCSSFiles":{"/Users/arun/erabi/apps/explorer/":[],"/Users/arun/erabi/apps/explorer/app/layout":["static/css/77ae9ed97ad4087b.css"],"/Users/arun/erabi/apps/explorer/app/page":[],"/Users/arun/erabi/apps/explorer/app/disclosures/page":[]}}
+globalThis.__RSC_MANIFEST = globalThis.__RSC_MANIFEST || {};
+globalThis.__RSC_MANIFEST["/disclosures/page"] = {
+  moduleLoading: { prefix: "/_next/", crossOrigin: null },
+  ssrModuleMapping: {
+    1740: { "*": { id: "3245", name: "*", chunks: [], async: false } },
+    2728: { "*": { id: "5266", name: "*", chunks: [], async: false } },
+    5016: { "*": { id: "7685", name: "*", chunks: [], async: false } },
+    5411: { "*": { id: "307", name: "*", chunks: [], async: false } },
+    5416: { "*": { id: "181", name: "*", chunks: [], async: false } },
+    6187: { "*": { id: "9255", name: "*", chunks: [], async: false } },
+    6608: { "*": { id: "417", name: "*", chunks: [], async: false } },
+    7420: { "*": { id: "1541", name: "*", chunks: [], async: false } },
+    8183: { "*": { id: "3984", name: "*", chunks: [], async: false } },
+    8666: { "*": { id: "4334", name: "*", chunks: [], async: false } },
+    8677: { "*": { id: "6037", name: "*", chunks: [], async: false } },
+    8907: { "*": { id: "7814", name: "*", chunks: [], async: false } },
+    9369: { "*": { id: "490", name: "*", chunks: [], async: false } },
+    9836: { "*": { id: "2648", name: "*", chunks: [], async: false } },
+  },
+  edgeSSRModuleMapping: {},
+  clientModules: {
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/app-router.js":
+      { id: 6608, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/app-router.js":
+      { id: 6608, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/client-page.js":
+      { id: 5416, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/client-page.js":
+      { id: 5416, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/error-boundary.js":
+      { id: 8907, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/error-boundary.js":
+      { id: 8907, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/layout-router.js":
+      { id: 2728, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/layout-router.js":
+      { id: 2728, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/not-found-boundary.js":
+      { id: 9369, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/not-found-boundary.js":
+      { id: 9369, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/components/render-from-template-context.js":
+      { id: 9836, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/components/render-from-template-context.js":
+      { id: 9836, name: "*", chunks: [], async: false },
+    "/Users/arun/erabi/apps/explorer/app/globals.css": {
+      id: 3366,
+      name: "*",
+      chunks: [
+        "411",
+        "static/chunks/411-e38354027fbad59b.js",
+        "185",
+        "static/chunks/app/layout-9e186150ded9c448.js",
+      ],
+      async: false,
+    },
+    "/Users/arun/erabi/apps/explorer/components/ThemeToggle.tsx": {
+      id: 8666,
+      name: "*",
+      chunks: [
+        "411",
+        "static/chunks/411-e38354027fbad59b.js",
+        "185",
+        "static/chunks/app/layout-9e186150ded9c448.js",
+      ],
+      async: false,
+    },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/client/link.js":
+      {
+        id: 5411,
+        name: "*",
+        chunks: [
+          "411",
+          "static/chunks/411-e38354027fbad59b.js",
+          "185",
+          "static/chunks/app/layout-9e186150ded9c448.js",
+        ],
+        async: false,
+      },
+    "/Users/arun/erabi/node_modules/.pnpm/next@14.2.35_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/esm/client/link.js":
+      {
+        id: 5411,
+        name: "*",
+        chunks: [
+          "411",
+          "static/chunks/411-e38354027fbad59b.js",
+          "185",
+          "static/chunks/app/layout-9e186150ded9c448.js",
+        ],
+        async: false,
+      },
+    "/Users/arun/erabi/apps/explorer/app/dashboard/page.tsx": {
+      id: 7420,
+      name: "*",
+      chunks: [],
+      async: false,
+    },
+    "/Users/arun/erabi/apps/explorer/app/agents/page.tsx": {
+      id: 8183,
+      name: "*",
+      chunks: [],
+      async: false,
+    },
+    "/Users/arun/erabi/apps/explorer/app/leaderboard/page.tsx": {
+      id: 5016,
+      name: "*",
+      chunks: [],
+      async: false,
+    },
+    "/Users/arun/erabi/apps/explorer/app/agents/[id]/page.tsx": {
+      id: 8677,
+      name: "*",
+      chunks: [],
+      async: false,
+    },
+    "/Users/arun/erabi/apps/explorer/app/disclosures/page.tsx": {
+      id: 1740,
+      name: "*",
+      chunks: [
+        "582",
+        "static/chunks/582-82cf260a1bf04d38.js",
+        "739",
+        "static/chunks/app/disclosures/page-a7b63b84352503e8.js",
+      ],
+      async: false,
+    },
+    "/Users/arun/erabi/apps/explorer/app/page.tsx": {
+      id: 6187,
+      name: "*",
+      chunks: ["931", "static/chunks/app/page-872fed59d530f6cc.js"],
+      async: false,
+    },
+  },
+  entryCSSFiles: {
+    "/Users/arun/erabi/apps/explorer/": [],
+    "/Users/arun/erabi/apps/explorer/app/layout": ["static/css/77ae9ed97ad4087b.css"],
+    "/Users/arun/erabi/apps/explorer/app/page": [],
+    "/Users/arun/erabi/apps/explorer/app/disclosures/page": [],
+  },
+};

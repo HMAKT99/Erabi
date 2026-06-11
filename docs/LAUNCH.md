@@ -17,8 +17,9 @@ account, credential, or naming decision.
       artifacts (package metadata, branding constants, AgentCard, landing) point there.
 - [ ] **Domain**: register one (e.g. `erabi.dev` / `erabi.network`). DNS A records for
       `@, explorer, registry, exchange, attribution, reputation`.
-- [ ] **npm scope**: claim the `@erabi` org on npmjs.com; create an automation token.
-- [ ] **PyPI**: register the `erabi-sdk` project name; create an API token.
+- [x] **npm scope**: `@erabi` org claimed; granular token (All packages, Bypass 2FA)
+      stored as the `NPM_TOKEN` repo secret.
+- [x] **PyPI**: `erabi-sdk` registered; API token stored as `PYPI_TOKEN`.
 
 - [x] Docker image build + boot verified: `erabi-node` (374 MB) builds, all four
       services answer `/healthz`, the persistent key loads from the volume, real
@@ -36,11 +37,14 @@ account, credential, or naming decision.
 
 ## 3. Package releases
 
-- [ ] Add `NPM_TOKEN` and `PYPI_TOKEN` repository secrets.
-- [ ] Run the **Release** workflow (Actions → Release → run). It builds, runs the full
-      suite, then publishes `@erabi/{constants,crypto,schemas,config,ratelimit,sdk}` + `erabi-mcp`, and `erabi-sdk` to PyPI.
-- [ ] Smoke-test from a clean machine: the README 3-line quickstart against the
-      hosted node.
+- [x] Add `NPM_TOKEN` and `PYPI_TOKEN` repository secrets.
+- [x] Release workflow run 2026-06-11: all 7 npm packages
+      (`@erabi/{constants,crypto,schemas,config,ratelimit,sdk}` + `erabi-mcp`) and
+      `erabi-sdk` on PyPI are live. The workflow is idempotent — reruns skip
+      already-published versions.
+- [x] Clean-room smoke test passed 2026-06-11: fresh `npm install @erabi/sdk`,
+      `npx -y erabi-mcp` (6 tools over stdio), and `pip install erabi-sdk` each
+      registered a live agent against the hosted node and verified public lookup.
 
 ## 4. Distribution listings
 

@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.hmakt99/erabi",
+  "name": "io.github.HMAKT99/erabi",
   "description": "ERABI intent exchange: register, discover, transact, earn. Zero-config on the live network.",
   "repository": {
     "url": "https://github.com/HMAKT99/Erabi",
     "source": "github"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "erabi-mcp",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "transport": {
         "type": "stdio"
       },

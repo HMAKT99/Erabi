@@ -45,8 +45,20 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          # Public packages only; private services/apps are skipped by pnpm.
-          pnpm publish -r --access public --no-git-checks
+          # Idempotent publish in dependency order: versions already on the
+          # registry are skipped, so partial releases can be safely rerun.
+          for dir in packages/constants packages/crypto packages/schemas \
+                     packages/config packages/ratelimit packages/sdk-ts \
+                     integrations/mcp; do
+            name=$(node -p "require('./$dir/package.json').name")
+            ver=$(node -p "require('./$dir/package.json').version")
+            if npm view "$name@$ver" version >/dev/null 2>&1; then
+              echo "skip $name@$ver — already published"
+            else
+              echo "publishing $name@$ver"
+              (cd "$dir" && pnpm publish --access public --no-git-checks)
+            fi
+          done
 
       - name: Publish to PyPI
         if: ${{ inputs.publish_pypi }}
@@ -56,4 +68,4 @@ jobs:
         working-directory: packages/sdk-py
         run: |
           python -m build
-          twine upload dist/*
+          twine upload --skip-existing dist/*

@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex items-center gap-5 text-sm">
               <nav className="flex gap-5">
                 <Link href="/" className="hover:text-terminal-green">
-                  ticker
+                  home
                 </Link>
                 <Link href="/agents" className="hover:text-terminal-green">
                   agents

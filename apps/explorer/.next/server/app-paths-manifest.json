@@ -4,6 +4,6 @@
   "/agents/[id]/page": "app/agents/[id]/page.js",
   "/disclosures/page": "app/disclosures/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/leaderboard/page": "app/leaderboard/page.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/leaderboard/page": "app/leaderboard/page.js"
 }

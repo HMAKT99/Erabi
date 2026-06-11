@@ -1,5 +1,42 @@
 # Deploying an Erabi node
 
+Two supported shapes:
+
+- **Railway/Render (single port)** — the node starts a built-in gateway on `$PORT`
+  that routes to the four services by `/registry|/exchange|/attribution|/reputation`
+  path prefix (or by subdomain when you attach custom domains). Easiest start.
+- **VPS + Docker Compose (subdomains)** — Caddy terminates TLS on
+  `registry.*, exchange.*, attribution.*, reputation.*`. See below.
+
+## Railway (quickest path)
+
+1. railway.app → New Project → **Deploy from GitHub repo** → `HMAKT99/Erabi`
+   (`railway.json` selects the Dockerfile build and `/healthz` healthcheck).
+2. Service → **Variables**:
+   - `NODE_ENV=production`
+   - `ERABI_DATA_DIR=/data`
+   - `ERABI_NODE_SEED=<openssl rand -hex 32>` ← back this up; it is the signing key
+   - `ERABI_PUBLIC_BASE_URL=https://<your-service>.up.railway.app` (set after step 4)
+   - optional: `ERABI_GITHUB_TOKEN`
+3. Service → **Volume** → mount at `/data`.
+4. Service → Settings → **Networking → Generate Domain** (gives the public URL;
+   put it into `ERABI_PUBLIC_BASE_URL` and redeploy).
+5. Verify: `curl https://<url>/registry/.well-known/erabi.json` — the advertised
+   endpoints must be public `https://…/registry/...` URLs, not localhost.
+
+The service URLs to give SDKs / the explorer are then:
+
+```
+registry     https://<url>/registry
+exchange     https://<url>/exchange
+attribution  https://<url>/attribution
+reputation   https://<url>/reputation
+```
+
+With your own domain later: attach `registry.<domain>` etc. as custom domains on the
+same Railway service, set `ERABI_DOMAIN=<domain>` (instead of the base URL), and the
+gateway routes by subdomain.
+
 ## What you need
 
 - A Linux host with Docker + Compose

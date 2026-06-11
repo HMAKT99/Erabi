@@ -1,9 +1,1 @@
-{
-  "/_not-found/page": "/_not-found",
-  "/agents/page": "/agents",
-  "/agents/[id]/page": "/agents/[id]",
-  "/disclosures/page": "/disclosures",
-  "/dashboard/page": "/dashboard",
-  "/leaderboard/page": "/leaderboard",
-  "/page": "/"
-}
+{"/_not-found/page":"/_not-found","/agents/page":"/agents","/agents/[id]/page":"/agents/[id]","/disclosures/page":"/disclosures","/dashboard/page":"/dashboard","/page":"/","/leaderboard/page":"/leaderboard"}

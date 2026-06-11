@@ -28,6 +28,7 @@ import { buildServer as buildReputationServer, ReputationService } from "@erabi/
 import { loadOrCreateNodeKeys, SqliteNonceStore } from "./durability.js";
 
 export * from "./durability.js";
+export * from "./gateway.js";
 
 export interface ReferenceNodeOptions {
   nodeId?: string;

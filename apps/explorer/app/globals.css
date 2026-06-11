@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Terminal palette as variables so the theme can flip at runtime. */
+:root {
+  --t-bg: #0a0e14;
+  --t-panel: #0f1520;
+  --t-border: #1c2433;
+  --t-text: #c9d4e3;
+  --t-dim: #5c6a82;
+  --t-green: #34d399;
+  --t-amber: #fbbf24;
+  --t-red: #f87171;
+}
+
+html.light {
+  --t-bg: #f8fafc;
+  --t-panel: #ffffff;
+  --t-border: #e2e8f0;
+  --t-text: #1e293b;
+  --t-dim: #64748b;
+  --t-green: #059669;
+  --t-amber: #b45309;
+  --t-red: #dc2626;
+}
+
 body {
   @apply bg-terminal-bg text-terminal-text font-mono;
 }

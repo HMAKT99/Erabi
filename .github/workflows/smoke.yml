@@ -1,0 +1,64 @@
+name: Live smoke test
+
+# After every push to main, Vercel redeploys the explorer and Railway
+# redeploys the node automatically. This workflow waits for those deploys
+# and verifies the LIVE system end to end — a red X here means production
+# broke, even if CI was green.
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Daily heartbeat: catches the node dying for non-code reasons
+    # (billing, volume, platform incidents).
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for auto-deploys to settle
+        if: github.event_name == 'push'
+        run: sleep 180
+
+      - name: Node — all four services healthy
+        run: |
+          BASE=https://erabi-production.up.railway.app
+          for svc in registry exchange attribution reputation; do
+            curl -sf --max-time 15 "$BASE/$svc/healthz" | grep -q '"ok":true' \
+              || { echo "::error::$svc unhealthy"; exit 1; }
+            echo "$svc ok"
+          done
+
+      - name: Node — front door advertises public URLs
+        run: |
+          BASE=https://erabi-production.up.railway.app
+          BODY=$(curl -sf --max-time 15 "$BASE/registry/.well-known/erabi.json")
+          echo "$BODY" | grep -q '"spec":"erabi/0.1"' || { echo "::error::bad spec"; exit 1; }
+          echo "$BODY" | grep -q "$BASE/registry/v1/agents" || { echo "::error::well-known not advertising public URLs"; exit 1; }
+          echo "$BODY" | grep -vq "localhost" || true
+
+      - name: Node — exchange, beacon, and stats answer
+        run: |
+          BASE=https://erabi-production.up.railway.app
+          curl -sf --max-time 15 "$BASE/exchange/v1/stats" | grep -q '"intents"' || exit 1
+          curl -sf --max-time 15 "$BASE/attribution/v1/stats/earnings" | grep -q '"confirmed_events"' || exit 1
+          curl -sf --max-time 15 "$BASE/registry/v1/stats" | grep -q '"agents"' || exit 1
+
+      - name: Explorer — pages live and wired to the node
+        run: |
+          EXPLORER=https://erabi-explorer.vercel.app
+          curl -sf --max-time 15 "$EXPLORER" -o /tmp/home.html
+          for page in about builder integrations agents leaderboard disclosures dashboard; do
+            curl -sf --max-time 15 -o /dev/null "$EXPLORER/$page" \
+              || { echo "::error::/$page broken"; exit 1; }
+            echo "/$page ok"
+          done
+          # the deployed bundle must reference the live node, not localhost
+          CHUNKS=$(grep -o '/_next/static/chunks/[^"]*\.js' /tmp/home.html | sort -u)
+          FOUND=0
+          for chunk in $CHUNKS; do
+            if curl -sf --max-time 15 "$EXPLORER$chunk" | grep -q "erabi-production"; then FOUND=1; break; fi
+          done
+          [ "$FOUND" = "1" ] || { echo "::error::explorer bundle not pointing at the live node"; exit 1; }
+          echo "explorer wired to live node"

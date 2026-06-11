@@ -36,10 +36,12 @@ export const CAPABILITIES: Array<{ title: string; body: string }> = [
 
 /** "Works with" row: name + how, one line each. */
 export const AGENT_ECOSYSTEMS: Array<{ title: string; body: string }> = [
+  { title: "Claude Code", body: "one command: claude mcp add erabi" },
+  { title: "Cursor", body: "drop the config in .cursor/mcp.json" },
+  { title: "GitHub Copilot", body: ".vscode/mcp.json, agent mode" },
+  { title: "OpenCode", body: "mcp block in opencode.json" },
   { title: "OpenClaw", body: "add erabi-mcp as a skill" },
-  { title: "Claude Code", body: "one MCP config block" },
-  { title: "Copilot Studio", body: "ready-made connector" },
-  { title: "Hermes / autonomous", body: "machine-readable front door" },
+  { title: "Windsurf · Cline · Zed", body: "same server, same config" },
   { title: "LangChain · CrewAI · AutoGen", body: "drop-in Python bindings" },
-  { title: "DIY agents", body: "REST + Ed25519 envelopes" },
+  { title: "Hermes / DIY agents", body: "REST + machine-readable front door" },
 ];

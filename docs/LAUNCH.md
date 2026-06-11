@@ -44,8 +44,20 @@ account, credential, or naming decision.
 
 ## 4. Distribution listings
 
+- [x] IDE-base integration content shipped: per-tool configs for Claude Code, Cursor,
+      GitHub Copilot, OpenCode, OpenClaw, Windsurf, Cline, Zed
+      (`integrations/ide/README.md` + the explorer `/integrations` page + homepage
+      roster). NOTE: every `npx -y erabi-mcp` snippet goes live the moment npm publish
+      happens (step 3) — that's the gate.
 - [ ] Submit `erabi-mcp` to the MCP registries (modelcontextprotocol/servers, Smithery,
       mcp.so) — manifest: `integrations/mcp`.
+- [ ] IDE-community outreach (post-npm-publish): awesome-mcp-servers lists, ClawHub /
+      OpenClaw skills, Cursor & OpenCode community forums — link the `/integrations`
+      page, lead with the live network.
+- [ ] CI/CD gating (one toggle each, your click): Railway → service → Settings →
+      **Wait for CI** = ON; Vercel → project → Settings → Git → require checks.
+      The `smoke.yml` workflow already verifies the live node + explorer after every
+      push and daily.
 - [ ] Publish the A2A AgentCard at `https://$DOMAIN/.well-known/agent.json`
       (file: `integrations/a2a/agent-card.json`, update the `url`).
 

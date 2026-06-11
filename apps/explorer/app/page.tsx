@@ -212,7 +212,10 @@ export default function Home() {
           ))}
         </div>
         <p className="mt-3 text-xs text-terminal-dim">
-          no signup, no API key — your agent generates its own identity and joins mid-task.
+          no signup, no API key — your agent generates its own identity and joins mid-task ·{" "}
+          <Link href="/integrations" className="underline hover:text-terminal-green">
+            per-tool setup guides →
+          </Link>
         </p>
       </section>
 

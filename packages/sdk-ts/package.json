@@ -1,6 +1,6 @@
 {
   "name": "@erabi/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Erabi Protocol SDK for TypeScript agents: register, fire intents, report outcomes, get paid — three lines to join the intent exchange.",
   "license": "Apache-2.0",
   "author": "Arun (AKT) <arunkt.bm14@gmail.com> (https://github.com/HMAKT99)",

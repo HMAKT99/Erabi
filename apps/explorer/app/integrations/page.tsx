@@ -5,43 +5,28 @@ import { CopyButton } from "../../components/CopyButton";
 import { ENDPOINTS } from "../../lib/api";
 import { GITHUB_URL, QUICKSTART_PY, QUICKSTART_TS } from "../../lib/content";
 
-const ENV_JSON = `"env": {
-        "ERABI_REGISTRY_URL": "${ENDPOINTS.registry}",
-        "ERABI_EXCHANGE_URL": "${ENDPOINTS.exchange}",
-        "ERABI_ATTRIBUTION_URL": "${ENDPOINTS.attribution}",
-        "ERABI_REPUTATION_URL": "${ENDPOINTS.reputation}"
-      }`;
-
+// erabi-mcp is zero-config: it joins the live public network by default
+// (ERABI_*_URL env vars still override, e.g. for a self-hosted node).
 const MCP_SERVERS = `{
   "mcpServers": {
     "erabi": {
       "command": "npx",
-      "args": ["-y", "erabi-mcp"],
-      ${ENV_JSON}
+      "args": ["-y", "erabi-mcp"]
     }
   }
 }`;
 
 const VSCODE_SERVERS = MCP_SERVERS.replace('"mcpServers"', '"servers"');
 
-const CLAUDE_CLI = `claude mcp add erabi \\
-  --env ERABI_REGISTRY_URL=${ENDPOINTS.registry} \\
-  --env ERABI_EXCHANGE_URL=${ENDPOINTS.exchange} \\
-  --env ERABI_ATTRIBUTION_URL=${ENDPOINTS.attribution} \\
-  --env ERABI_REPUTATION_URL=${ENDPOINTS.reputation} \\
-  -- npx -y erabi-mcp`;
+const CLAUDE_CLI = `claude mcp add erabi -- npx -y erabi-mcp`;
+
+const OPENCLAW_SKILL = `openclaw mcp add erabi -- npx -y erabi-mcp`;
 
 const OPENCODE = `{
   "mcp": {
     "erabi": {
       "type": "local",
-      "command": ["npx", "-y", "erabi-mcp"],
-      "environment": {
-        "ERABI_REGISTRY_URL": "${ENDPOINTS.registry}",
-        "ERABI_EXCHANGE_URL": "${ENDPOINTS.exchange}",
-        "ERABI_ATTRIBUTION_URL": "${ENDPOINTS.attribution}",
-        "ERABI_REPUTATION_URL": "${ENDPOINTS.reputation}"
-      }
+      "command": ["npx", "-y", "erabi-mcp"]
     }
   }
 }`;
@@ -68,9 +53,9 @@ const TOOLS: Array<{ name: string; where: string; copy: string; copyLabel: strin
   { name: "OpenCode", where: "opencode.json", copy: OPENCODE, copyLabel: "copy config" },
   {
     name: "OpenClaw",
-    where: "add as an MCP server / skill",
-    copy: MCP_SERVERS,
-    copyLabel: "copy config",
+    where: "one command, or the ERABI skill",
+    copy: OPENCLAW_SKILL,
+    copyLabel: "copy command",
   },
   {
     name: "Windsurf",

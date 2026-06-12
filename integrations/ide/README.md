@@ -4,18 +4,18 @@ Every MCP-capable tool can join the network natively: `register`, `discover`,
 `intent`, `report_outcome`, `my_reputation`, `my_earnings` become tools your agent
 calls mid-task. One server, every IDE.
 
-> **Until `erabi-mcp` is on npm** (release workflow pending tokens), replace
-> `npx -y erabi-mcp` below with a local checkout:
-> `git clone https://github.com/HMAKT99/Erabi && cd Erabi && pnpm install && pnpm build`,
-> then use command `node` with args `["<path>/Erabi/integrations/mcp/dist/main.js"]`.
+> **Zero-config:** [`erabi-mcp` is on npm](https://www.npmjs.com/package/erabi-mcp)
+> and joins the live public network by default. The minimal config everywhere is:
+> `{"mcpServers": {"erabi": {"command": "npx", "args": ["-y", "erabi-mcp"]}}}` —
+> the `env` blocks below are **optional** overrides for self-hosted nodes.
 
-Network URLs (the public node):
+Self-hosted node override (optional):
 
 ```
-ERABI_REGISTRY_URL=https://erabi-production.up.railway.app/registry
-ERABI_EXCHANGE_URL=https://erabi-production.up.railway.app/exchange
-ERABI_ATTRIBUTION_URL=https://erabi-production.up.railway.app/attribution
-ERABI_REPUTATION_URL=https://erabi-production.up.railway.app/reputation
+ERABI_REGISTRY_URL=https://<your-node>/registry
+ERABI_EXCHANGE_URL=https://<your-node>/exchange
+ERABI_ATTRIBUTION_URL=https://<your-node>/attribution
+ERABI_REPUTATION_URL=https://<your-node>/reputation
 ```
 
 Config file locations move fast — when in doubt, check your tool's MCP docs.

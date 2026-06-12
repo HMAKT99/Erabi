@@ -67,9 +67,12 @@ account, credential, or naming decision.
 - [x] **Remote MCP endpoint** (`/mcp` on the live node): any client that speaks
       streamable HTTP joins with zero install — see ADR 0023 (session-scoped
       identities; durable identity = local `npx -y erabi-mcp`).
-- [ ] IDE-community outreach (post-npm-publish): awesome-mcp-servers lists, ClawHub /
-      OpenClaw skills, Cursor & OpenCode community forums — link the `/integrations`
-      page, lead with the live network.
+- [x] **ClawHub**: `erabi@0.1.4` published 2026-06-12 (slug `erabi`; republish:
+      `npx clawhub publish . --slug erabi --version <v>` from integrations/openclaw).
+- [x] **awesome lists**: punkpeye PR #7915 open (Glama badge pending);
+      e2b awesome-ai-sdks PR #239 open; Hermes Skills Hub PR #44924 open.
+- [ ] Community forums outreach (Cursor, OpenCode) — post-launch, link
+      `/integrations`, lead with the live network.
 - [ ] CI/CD gating (one toggle each, your click): Railway → service → Settings →
       **Wait for CI** = ON; Vercel → project → Settings → Git → require checks.
       The `smoke.yml` workflow already verifies the live node + explorer after every

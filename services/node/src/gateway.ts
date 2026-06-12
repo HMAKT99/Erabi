@@ -23,6 +23,8 @@ export interface GatewayOptions {
   targetHost?: string;
   /** Optional handler mounted at /mcp (remote MCP over streamable HTTP). */
   mcpHandler?: (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void>;
+  /** Optional A2A AgentCard served at /.well-known/agent.json. */
+  agentCard?: object;
 }
 
 function resolveService(req: http.IncomingMessage): { service: GatewayService; path: string } {
@@ -46,6 +48,14 @@ export function startGateway(options: GatewayOptions): Promise<http.Server> {
     const url = req.url ?? "/";
     if (options.mcpHandler && (url === "/mcp" || url.startsWith("/mcp?"))) {
       void options.mcpHandler(req, res);
+      return;
+    }
+    if (
+      options.agentCard &&
+      (url === "/.well-known/agent.json" || url === "/.well-known/agent-card.json")
+    ) {
+      res.writeHead(200, { "content-type": "application/json", "cache-control": "max-age=3600" });
+      res.end(JSON.stringify(options.agentCard, null, 2));
       return;
     }
     const { service, path } = resolveService(req);

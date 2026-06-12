@@ -38,6 +38,7 @@ beforeAll(async () => {
       reputation: ports[3]!,
     },
     mcpHandler: createMcpHttpHandler({ endpoints: node.urls }),
+    agentCard: { name: "Erabi Intent Exchange", url: "https://example.com" },
   });
   gatewayUrl = `http://127.0.0.1:${(gateway.address() as { port: number }).port}`;
 });
@@ -180,5 +181,14 @@ describe("remote MCP at /mcp", () => {
   it("rejects sessionless non-POST requests", async () => {
     const response = await fetch(`${gatewayUrl}/mcp`, { method: "GET" });
     expect(response.status).toBe(400);
+  });
+});
+
+describe("A2A agent card", () => {
+  it("serves the card at /.well-known/agent.json", async () => {
+    const response = await fetch(`${gatewayUrl}/.well-known/agent.json`);
+    expect(response.status).toBe(200);
+    const card = (await response.json()) as { name: string };
+    expect(card.name).toBe("Erabi Intent Exchange");
   });
 });

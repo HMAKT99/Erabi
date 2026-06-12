@@ -1,4 +1,5 @@
 import { createMcpHttpHandler } from "@erabi/mcp-core";
+import { buildAgentCard } from "./agent-card.js";
 import { realVerifiers } from "@erabi/registry";
 import { parseHoldbackHours } from "./env.js";
 import { startGateway } from "./gateway.js";
@@ -101,6 +102,8 @@ if (gatewayPort) {
       endpoints: node.urls,
       explorerUrl: process.env.ERABI_EXPLORER_URL ?? undefined,
     }),
+    // A2A discovery: registries auto-extract skills from the AgentCard.
+    ...(base ? { agentCard: buildAgentCard(base) } : {}),
   });
   console.log(
     `single-port gateway on :${gatewayPort} (subdomain or /service prefix routing; remote MCP at /mcp)`,

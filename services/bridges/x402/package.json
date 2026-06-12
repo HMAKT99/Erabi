@@ -28,8 +28,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@erabi/node": "workspace:*",
-    "@erabi/sdk": "workspace:*",
     "@types/node": "^20.19.42",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"

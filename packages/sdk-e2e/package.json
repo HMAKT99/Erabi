@@ -9,6 +9,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@erabi/bridge-x402": "workspace:*",
     "@erabi/node": "workspace:*",
     "@erabi/sdk": "workspace:*",
     "@types/node": "^20.19.42",

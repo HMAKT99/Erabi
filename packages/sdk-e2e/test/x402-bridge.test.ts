@@ -2,7 +2,7 @@ import { createHmac } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { startReferenceNode, type ReferenceNode } from "@erabi/node";
 import { Erabi } from "@erabi/sdk";
-import { MockX402Prober, X402Bridge } from "../src/index.js";
+import { MockX402Prober, X402Bridge } from "@erabi/bridge-x402";
 
 const SECRET = "test-hmac-secret";
 const API_URL = "https://api.fxdata.example/quotes";

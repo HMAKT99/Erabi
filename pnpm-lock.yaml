@@ -270,6 +270,9 @@ importers:
 
   packages/sdk-e2e:
     devDependencies:
+      '@erabi/bridge-x402':
+        specifier: workspace:*
+        version: link:../../services/bridges/x402
       '@erabi/node':
         specifier: workspace:*
         version: link:../../services/node
@@ -439,12 +442,6 @@ importers:
         specifier: ^3.23.8
         version: 3.25.76
     devDependencies:
-      '@erabi/node':
-        specifier: workspace:*
-        version: link:../../node
-      '@erabi/sdk':
-        specifier: workspace:*
-        version: link:../../../packages/sdk-ts
       '@types/node':
         specifier: ^20.19.42
         version: 20.19.42

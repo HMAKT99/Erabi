@@ -1,5 +1,6 @@
 import { createMcpHttpHandler } from "@erabi/mcp-core";
 import { realVerifiers } from "@erabi/registry";
+import { parseHoldbackHours } from "./env.js";
 import { startGateway } from "./gateway.js";
 import { startReferenceNode } from "./index.js";
 
@@ -15,6 +16,10 @@ import { startReferenceNode } from "./index.js";
  *                          services by subdomain or /service path prefix
  *   ERABI_PUBLIC_BASE_URL  public URL of the single port (prefix routing)
  *   ERABI_DOMAIN           public subdomains, Caddyfile/host routing
+ *   ERABI_HOLDBACK_HOURS   settlement holdback override: a number ("0.0833"
+ *                          = 5 min, ledger-only era) or a JSON record per
+ *                          category group. Unset → config defaults (24-72h).
+ *                          See ADR 0024; applies to NEW events only.
  */
 const production = process.env.NODE_ENV === "production";
 const useRealVerifiers = production || process.env.ERABI_REAL_VERIFIERS === "1";
@@ -50,6 +55,8 @@ const publicUrls = {
     (base && `${base}/reputation`),
 };
 
+const holdbackHours = parseHoldbackHours(process.env.ERABI_HOLDBACK_HOURS);
+
 const servicePorts: [number, number, number, number] = [
   Number(process.env.REGISTRY_PORT ?? 4001),
   Number(process.env.EXCHANGE_PORT ?? 4002),
@@ -68,6 +75,7 @@ const node = await startReferenceNode({
   verifiers: useRealVerifiers
     ? realVerifiers({ githubToken: process.env.ERABI_GITHUB_TOKEN })
     : undefined,
+  ...(holdbackHours ? { holdbackHours } : {}),
   logger: production,
   publicUrls: {
     ...(publicUrls.registry ? { registry: publicUrls.registry } : {}),
@@ -97,6 +105,10 @@ if (gatewayPort) {
   console.log(
     `single-port gateway on :${gatewayPort} (subdomain or /service prefix routing; remote MCP at /mcp)`,
   );
+}
+
+if (holdbackHours) {
+  console.log(`settlement holdback override active: ${JSON.stringify(holdbackHours)} hours`);
 }
 
 console.log(`Erabi reference node up (key: ${node.keySource}, verifiers: ${

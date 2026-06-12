@@ -2,6 +2,19 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0024 — Ledger-only era runs 5-minute holdbacks (env-set, auditable)
+
+`ERABI_HOLDBACK_HOURS` (new in main.ts) overrides settlement holdback windows;
+the live node sets `0.0833` (5 minutes) for the ledger-only era so settlements
+confirm near-real-time (5 min + the ≤60s maintenance tick). The spec's
+"holdback windows precede every payable confirmation" stays literally true:
+the window is nonzero, anomaly checks still run at confirmation, and nothing
+is payable in real money this era (ADR 0022). The active window is public in
+the earnings beacon (`holdback_hours`), so the era parameter is itself
+auditable. Already-pending events keep their baked `holdback_until`
+timestamps — config changes never rewrite history. When payment rails
+activate, the env var is removed and the 24-72h config defaults return.
+
 ## 0023 — Remote MCP at /mcp with session-scoped identities
 
 The gateway hosts the MCP server over streamable HTTP at `/mcp`

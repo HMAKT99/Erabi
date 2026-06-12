@@ -53,9 +53,15 @@ describe("reference node", () => {
 
       const beacon = (await fetch(`${node.urls.attribution}/v1/stats/earnings`).then((r) =>
         r.json(),
-      )) as { confirmed_events: number; top_earners: unknown[] };
+      )) as {
+        confirmed_events: number;
+        top_earners: unknown[];
+        holdback_hours: Record<string, number>;
+      };
       expect(beacon.confirmed_events).toBe(0);
       expect(beacon.top_earners).toEqual([]);
+      // the active holdback window is itself public (ADR 0024)
+      expect(beacon.holdback_hours.default).toBeGreaterThanOrEqual(0);
 
       const badge = await fetch(
         `${node.urls.attribution}/v1/badge/erabi:agent:4XujsM2nKbeqApvNVMZRT8JcWcfMs5VRGsCdSqJpwy8d.svg`,

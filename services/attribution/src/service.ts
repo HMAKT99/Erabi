@@ -696,6 +696,9 @@ export class AttributionService {
       protocol_earnings_usd: round6(totalProtocol),
       earning_agents: byBeneficiary.size,
       top_earners: topEarners,
+      // The era parameter is itself auditable: new events confirm this many
+      // hours after countersigning (per category group; see ADR 0024).
+      holdback_hours: this.holdbackHours,
       computed_at: new Date(this.now()).toISOString(),
     };
   }

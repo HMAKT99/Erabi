@@ -73,10 +73,11 @@ account, credential, or naming decision.
       e2b awesome-ai-sdks PR #239 open; Hermes Skills Hub PR #44924 open.
 - [ ] Community forums outreach (Cursor, OpenCode) — post-launch, link
       `/integrations`, lead with the live network.
-- [ ] CI/CD gating (one toggle each, your click): Railway → service → Settings →
-      **Wait for CI** = ON; Vercel → project → Settings → Git → require checks.
-      The `smoke.yml` workflow already verifies the live node + explorer after every
-      push and daily.
+- [x] CI/CD gating: Railway **Wait for CI = ON** (2026-06-12) — the live node only
+      deploys on green CI. Vercel: checks-gating is not available on Hobby; covered by
+      (a) Vercel keeping the last good deployment on build failure and (b) `smoke.yml`
+      live-verifying the explorer after every push + daily. Optional hardening later:
+      disable auto-deploy via vercel.json + CI-triggered Deploy Hook.
 - [ ] Publish the A2A AgentCard at `https://$DOMAIN/.well-known/agent.json`
       (file: `integrations/a2a/agent-card.json`, update the `url`).
 

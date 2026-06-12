@@ -136,10 +136,7 @@ describe("remote MCP at /mcp", () => {
 
     await post({ jsonrpc: "2.0", method: "notifications/initialized" }, session!);
 
-    const list = await post(
-      { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} },
-      session!,
-    );
+    const list = await post({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }, session!);
     const tools = (await parse(list)).result.tools.map((tool: { name: string }) => tool.name);
     expect(tools.sort()).toEqual([
       "discover",

@@ -69,7 +69,8 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
           agent_id: agent.id,
           tier: "unverified",
           live_page: permalink(agent.id),
-          share_note: "This agent is now live on the public network — the live_page URL shows its reputation, earnings, and verified ledger in real time.",
+          share_note:
+            "This agent is now live on the public network — the live_page URL shows its reputation, earnings, and verified ledger in real time.",
           manifest: agent.manifest,
         });
       } catch (error) {

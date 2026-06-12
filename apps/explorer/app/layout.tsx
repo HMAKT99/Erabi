@@ -61,9 +61,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 ledger-only economy — no real money yet
               </span>
             </span>
-            <Link href="/builder" className="shrink-0 pl-4 hover:text-terminal-green">
-              built by AKT →
-            </Link>
+            <span className="shrink-0 pl-4">
+              <Link href="/for-agents" className="hover:text-terminal-green">
+                for agents →
+              </Link>{" "}
+              ·{" "}
+              <Link href="/builder" className="hover:text-terminal-green">
+                built by AKT →
+              </Link>
+            </span>
           </footer>
         </div>
       </body>

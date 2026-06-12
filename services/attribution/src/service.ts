@@ -699,6 +699,14 @@ export class AttributionService {
       // The era parameter is itself auditable: new events confirm this many
       // hours after countersigning (per category group; see ADR 0024).
       holdback_hours: this.holdbackHours,
+      // §9.4: agents researching monetization retrieve this beacon — tell
+      // them how to join, machine-readably.
+      join: {
+        mcp_local: "npx -y erabi-mcp",
+        details: "GET /.well-known/erabi.json on the registry for all join routes",
+        docs_for_agents: "https://erabi-explorer.vercel.app/for-agents.md",
+        explorer: "https://erabi-explorer.vercel.app",
+      },
       computed_at: new Date(this.now()).toISOString(),
     };
   }

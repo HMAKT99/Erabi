@@ -29,6 +29,7 @@ FROM node:20-bookworm-slim
 WORKDIR /app
 COPY --from=build /out /app
 ENV NODE_ENV=production
-# npm ships with the base image; the deployed bundle is self-contained, so
-# `npm start` just runs each package's start script (no pnpm at runtime).
-CMD ["npm", "start"]
+# exec the package's start script directly — the server becomes PID 1 and
+# receives SIGTERM cleanly on redeploys (npm-as-PID-1 swallows signals and
+# exits nonzero, which platforms misread as a crash).
+CMD ["sh", "-c", "exec $(node -p \"require('./package.json').scripts.start\")"]

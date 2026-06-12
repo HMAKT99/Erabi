@@ -56,7 +56,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <footer className="mt-12 flex items-baseline justify-between border-t border-terminal-border pt-4 text-xs text-terminal-dim">
             <span>
               every paid influence on this network is signed, labeled, and inspectable · spec
-              erabi/0.1
+              erabi/0.1 ·{" "}
+              <span title="All auctions, outcomes, and signatures are real protocol events. Dollar amounts are units of account until payment rails are enabled — no real money moves, and ledger-only balances will never convert to real money.">
+                ledger-only economy — no real money yet
+              </span>
             </span>
             <Link href="/builder" className="shrink-0 pl-4 hover:text-terminal-green">
               built by AKT →

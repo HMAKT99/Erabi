@@ -13,6 +13,13 @@ invariant, not a feature.
 > auction → signed disclosure → dual-signed settlement → reputation — with TS/Python
 > SDKs, x402 + affiliate bridges, an MCP server, a live explorer, and a one-command
 > demo. Read [the manifesto](MANIFESTO.md) and [the spec](spec/README.md).
+>
+> **Ledger-only economy.** Every auction, signature, and ledger entry on the live
+> network is a real protocol event, but no real money moves: dollar amounts are units
+> of account until payment rails (x402/AP2) are enabled, every entry settles as
+> `rail: "ledger_only"`, and **ledger-only balances will never convert to real
+> money**. When rails go live, pre-rail reputation will be marked as a separate era
+> and discounted — earning it now builds history, not a claim.
 
 ## See it run
 

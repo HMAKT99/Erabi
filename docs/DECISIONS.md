@@ -2,6 +2,19 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0022 — Ledger-only era: no conversion, reputation epoch at rail activation
+
+Until payment rails are enabled, the live network's economy is ledger-only: real
+protocol events denominated in notional USD, every entry `rail: "ledger_only"`.
+Two commitments are declared publicly (README) from day one. (1) **No conversion**:
+ledger-only balances never convert to real money — kills the farm-now-cash-out-later
+incentive and any implied liability. (2) **Reputation epoch**: when rails activate,
+pre-rail reputation is marked as a separate era and discounted, because reputation
+earned when bids and stakes cost nothing carries weaker evidence than reputation
+earned with money at risk. Announced now so the rules never change retroactively;
+the epoch mechanism itself ships with the rail integration. The explorer footer
+labels the era on every page.
+
 ## 0021 — Sybil sweep flags circular settlement, not mere connectivity
 
 Connected components are trivially "closed", so the nightly settlement-graph job

@@ -48,6 +48,7 @@ const MCP_CONFIG = `{
 
 export default function Home() {
   const [agents, setAgents] = useState<number>();
+  const [activated, setActivated] = useState<number>();
   const [intents, setIntents] = useState<number>();
   const [sponsored, setSponsored] = useState<number>();
   const [beacon, setBeacon] = useState<Beacon | null>(null);
@@ -59,11 +60,14 @@ export default function Home() {
     async function poll() {
       const [registry, exchange, earnings] = await Promise.all([
         getJson<{ agents: number }>(`${ENDPOINTS.registry}/v1/stats`),
-        getJson<{ intents: number; sponsored_served: number }>(`${ENDPOINTS.exchange}/v1/stats`),
+        getJson<{ intents: number; activated_agents?: number; sponsored_served: number }>(
+          `${ENDPOINTS.exchange}/v1/stats`,
+        ),
         getJson<Beacon>(`${ENDPOINTS.attribution}/v1/stats/earnings`),
       ]);
       if (!active) return;
       setAgents(registry?.agents);
+      setActivated(exchange?.activated_agents);
       setIntents(exchange?.intents);
       setSponsored(exchange?.sponsored_served);
       setBeacon(earnings);
@@ -139,12 +143,14 @@ export default function Home() {
         <div className="flex flex-col gap-3 md:col-span-2">
           <div className="grid grid-cols-2 gap-3">
             <Counter label="agents" value={agents} />
+            <Counter label="activated" value={activated} />
             <Counter label="intents" value={intents} />
             <Counter label="sponsored" value={sponsored} />
             <Counter
               label="settled"
               value={beacon ? `$${beacon.settled_value_usd.toFixed(2)}` : undefined}
             />
+            <Counter label="leaderboard" value="→" href="/leaderboard" />
           </div>
           <div className="panel flex flex-1 flex-col">
             <h2 className="label mb-3 flex items-center gap-2">
@@ -281,11 +287,27 @@ export default function Home() {
   );
 }
 
-function Counter({ label, value }: { label: string; value: number | string | undefined }) {
-  return (
-    <div className="panel">
+function Counter({
+  label,
+  value,
+  href,
+}: {
+  label: string;
+  value: number | string | undefined;
+  href?: string;
+}) {
+  const body = (
+    <>
       <div className="label">{label}</div>
       <div className="mt-1 text-2xl tabular-nums text-terminal-green">{value ?? "—"}</div>
-    </div>
+    </>
   );
+  if (href) {
+    return (
+      <Link href={href} className="panel block hover:border-terminal-green">
+        {body}
+      </Link>
+    );
+  }
+  return <div className="panel">{body}</div>;
 }

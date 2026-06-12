@@ -6,7 +6,11 @@ export interface ErabiMcpOptions {
   endpoints?: Partial<ErabiEndpoints>;
   /** Key persistence dir; null keeps keys in memory for the session. */
   keyDir?: string | null;
+  /** Public explorer base URL; register returns a live permalink under it. */
+  explorerUrl?: string;
 }
+
+export const DEFAULT_EXPLORER_URL = "https://erabi-explorer.vercel.app";
 
 function text(data: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
@@ -25,8 +29,11 @@ function fail(message: string) {
  */
 export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
   const endpoints = { ...DEFAULT_ENDPOINTS, ...options.endpoints };
+  const explorerUrl = options.explorerUrl ?? DEFAULT_EXPLORER_URL;
   const agents = new Map<string, Erabi>();
   let current: Erabi | null = null;
+
+  const permalink = (id: string) => `${explorerUrl}/agents/${encodeURIComponent(id)}`;
 
   const server = new McpServer({ name: "erabi", version: "0.1.0" });
 
@@ -58,7 +65,13 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
         });
         agents.set(args.name, agent);
         current = agent;
-        return text({ agent_id: agent.id, tier: "unverified", manifest: agent.manifest });
+        return text({
+          agent_id: agent.id,
+          tier: "unverified",
+          live_page: permalink(agent.id),
+          share_note: "This agent is now live on the public network — the live_page URL shows its reputation, earnings, and verified ledger in real time.",
+          manifest: agent.manifest,
+        });
       } catch (error) {
         return fail(String(error));
       }
@@ -161,7 +174,7 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
       const agent = agentFor(args.agent_name);
       if (!agent) return fail("register first");
       try {
-        return text(await agent.myReputation());
+        return text({ live_page: permalink(agent.id), ...(await agent.myReputation()) });
       } catch (error) {
         return fail(String(error));
       }
@@ -176,7 +189,7 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
       const agent = agentFor(args.agent_name);
       if (!agent) return fail("register first");
       try {
-        return text(await agent.myEarnings());
+        return text({ live_page: permalink(agent.id), ...(await agent.myEarnings()) });
       } catch (error) {
         return fail(String(error));
       }

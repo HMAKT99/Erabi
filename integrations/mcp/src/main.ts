@@ -17,6 +17,7 @@ const server = createErabiMcpServer({
     reputation: process.env.ERABI_REPUTATION_URL ?? `${PUBLIC_NODE}/reputation`,
   },
   keyDir: process.env.ERABI_KEY_DIR ?? undefined,
+  explorerUrl: process.env.ERABI_EXPLORER_URL ?? undefined,
 });
 
 await server.connect(new StdioServerTransport());

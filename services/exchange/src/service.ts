@@ -698,9 +698,15 @@ export class ExchangeService {
       (sum, row) => sum + ((row.record as DisclosureRecord).clearing_price_usd ?? 0),
       0,
     );
+    const activatedAgents = new Set(
+      tuples.map(
+        (row) => (row.tuple as { intent_features: { agent_id: string } }).intent_features.agent_id,
+      ),
+    ).size;
     return {
       intents: tuples.length,
       auctions: tuples.length,
+      activated_agents: activatedAgents,
       sponsored_served: disclosureRows.length,
       active_bids: activeBids,
       cleared_usd: Number(clearedUsd.toFixed(6)),

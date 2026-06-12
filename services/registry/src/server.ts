@@ -67,9 +67,15 @@ export function buildServer(
     service.getAgent(request.params.id),
   );
 
-  app.get<{ Querystring: { capability?: string } }>("/v1/agents", async (request) => ({
-    agents: service.listAgents({ capability: request.query.capability }),
-  }));
+  app.get<{ Querystring: { capability?: string; referrer?: string } }>(
+    "/v1/agents",
+    async (request) => ({
+      agents: service.listAgents({
+        capability: request.query.capability,
+        referrer: request.query.referrer,
+      }),
+    }),
+  );
 
   app.get<{ Params: { id: string } }>("/v1/agents/:id/keys", async (request) => ({
     keys: service.getKeyHistory(request.params.id),

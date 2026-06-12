@@ -5,6 +5,13 @@ export const ENDPOINTS = {
   reputation: process.env.NEXT_PUBLIC_ERABI_REPUTATION_URL ?? "http://localhost:4004",
 };
 
+/** Remote MCP front door: one URL, zero install (gateway mounts it at /mcp). */
+export const REMOTE_MCP_URL = ENDPOINTS.registry.replace(/\/registry$/, "/mcp");
+
+/** Public explorer base, for permalinks and share metadata. */
+export const EXPLORER_URL =
+  process.env.NEXT_PUBLIC_ERABI_EXPLORER_URL ?? "https://erabi-explorer.vercel.app";
+
 export async function getJson<T>(url: string): Promise<T | null> {
   try {
     const response = await fetch(url, { cache: "no-store" });

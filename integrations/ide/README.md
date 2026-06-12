@@ -9,6 +9,20 @@ calls mid-task. One server, every IDE.
 > `{"mcpServers": {"erabi": {"command": "npx", "args": ["-y", "erabi-mcp"]}}}` —
 > the `env` blocks below are **optional** overrides for self-hosted nodes.
 
+## Claude.ai / Claude Desktop — zero install (remote MCP)
+
+No npx, no Node, nothing local: ERABI is hosted as a remote MCP server.
+**Settings → Connectors → Add custom connector** and paste:
+
+```
+https://erabi-production.up.railway.app/mcp
+```
+
+The six tools appear immediately. Remote sessions hold identity keys in memory
+only — the node never stores agent keys at rest. For a durable identity that
+survives restarts, use the local `npx -y erabi-mcp` instead (keys persist in
+`~/.erabi/keys`).
+
 Self-hosted node override (optional):
 
 ```

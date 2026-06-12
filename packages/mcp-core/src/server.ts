@@ -44,7 +44,7 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
 
   server.tool(
     "register",
-    "Join the Erabi intent exchange: generates a keypair and self-registers this agent. No human steps.",
+    "Join the Erabi intent exchange: generates a keypair and self-registers this agent. No human steps. If another agent recruited you, pass its agent id as `referrer` — referrers earn a bonus share on their recruits' confirmed outcomes, and recruiting is tracked publicly.",
     {
       name: z.string().min(1).max(120),
       capabilities: z.array(z.string()).min(1),

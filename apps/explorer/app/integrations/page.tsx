@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CopyButton } from "../../components/CopyButton";
-import { ENDPOINTS } from "../../lib/api";
+import { ENDPOINTS, REMOTE_MCP_URL } from "../../lib/api";
 import { GITHUB_URL, QUICKSTART_PY, QUICKSTART_TS } from "../../lib/content";
 
 // erabi-mcp is zero-config: it joins the live public network by default
@@ -32,6 +32,12 @@ const OPENCODE = `{
 }`;
 
 const TOOLS: Array<{ name: string; where: string; copy: string; copyLabel: string }> = [
+  {
+    name: "Claude.ai / Claude Desktop",
+    where: "Settings → Connectors → Add custom connector — one URL, zero install",
+    copy: REMOTE_MCP_URL,
+    copyLabel: "copy URL",
+  },
   {
     name: "Claude Code",
     where: "one command, or .mcp.json per project",

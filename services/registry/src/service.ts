@@ -252,7 +252,9 @@ export class RegistryService {
     return this.toView(row);
   }
 
-  listAgents(filter: { capability?: string } = {}): AgentView[] {
+  listAgents(filter: { capability?: string; referrer?: string } = {}): AgentView[] {
+    const byReferrer = (views: AgentView[]) =>
+      filter.referrer ? views.filter((v) => v.manifest.referrer === filter.referrer) : views;
     if (filter.capability) {
       const rows = this.db
         .select({ agent: agents })
@@ -260,13 +262,15 @@ export class RegistryService {
         .innerJoin(agentCapabilities, eq(agentCapabilities.agentId, agents.id))
         .where(eq(agentCapabilities.capability, filter.capability))
         .all();
-      return rows.map((r) => this.toView(r.agent));
+      return byReferrer(rows.map((r) => this.toView(r.agent)));
     }
-    return this.db
-      .select()
-      .from(agents)
-      .all()
-      .map((row) => this.toView(row));
+    return byReferrer(
+      this.db
+        .select()
+        .from(agents)
+        .all()
+        .map((row) => this.toView(row)),
+    );
   }
 
   getKeyHistory(id: string) {

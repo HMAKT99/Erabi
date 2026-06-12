@@ -117,3 +117,38 @@ describe("x402 bridge", () => {
     await expect(bridge.handlePostback(body, undefined)).rejects.toThrow(/bad HMAC/);
   });
 });
+
+describe("deterministic bridge identities (seedSecret)", () => {
+  it("the same url + seed resumes the same provider across bridge restarts", async () => {
+    const node = await startReferenceNode();
+    try {
+      const prober = new MockX402Prober();
+      prober.setEndpoint("https://paid.example/v1/data", { price_usd: 0.25 });
+      const make = () =>
+        new X402Bridge({
+          registry: node.registry,
+          exchange: node.exchange,
+          attribution: node.attribution,
+          prober,
+          hmacSecret: "h",
+          seedSecret: "stable-seed",
+        });
+      const first = await make().submitEndpoint({
+        url: "https://paid.example/v1/data",
+        category: "data.market",
+      });
+      // "restart": a fresh bridge instance with the same seed re-submits
+      const second = await make().submitEndpoint({
+        url: "https://paid.example/v1/data",
+        category: "data.market",
+      });
+      expect(second.provider_id).toBe(first.provider_id);
+      expect(second.bid_id).toBe(first.bid_id);
+      // no duplicate agent in the registry
+      const agents = node.registry.listAgents();
+      expect(agents.filter((a) => a.manifest.id === first.provider_id)).toHaveLength(1);
+    } finally {
+      await node.stop();
+    }
+  });
+});

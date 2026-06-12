@@ -5,6 +5,7 @@ import {
   agentIdFromPublicKey,
   createEnvelope,
   generateKeyPair,
+  keyPairFromSeed,
   publicKeyToString,
   type KeyPair,
 } from "@erabi/crypto";
@@ -29,9 +30,33 @@ export interface X402Prober {
   probe(url: string): Promise<X402Probe | null>;
 }
 
+interface X402Requirement {
+  scheme?: string;
+  /** v1 field name. */
+  maxAmountRequired?: string | number;
+  /** v2 field name. */
+  amount?: string | number;
+  description?: string;
+  extra?: { decimals?: number };
+}
+
+function requirementToProbe(payload: { accepts?: X402Requirement[] }): X402Probe | null {
+  const requirement = payload.accepts?.find((a) => a.scheme === "exact") ?? payload.accepts?.[0];
+  const amountRaw = requirement?.maxAmountRequired ?? requirement?.amount;
+  if (amountRaw === undefined) return null;
+  const atomic = Number(amountRaw);
+  // Stablecoin convention: 6 decimals unless the requirement says otherwise.
+  const decimals = requirement?.extra?.decimals ?? 6;
+  const priceUsd = atomic / 10 ** decimals;
+  if (!Number.isFinite(priceUsd) || priceUsd <= 0) return null;
+  return { price_usd: priceUsd, description: requirement?.description };
+}
+
 /**
  * Real prober: requests the endpoint and parses the HTTP 402 payment
- * requirements body per the x402 spec. The advertised price (in the
+ * requirements per the x402 spec — v2 servers put a base64 JSON challenge in
+ * the PAYMENT-REQUIRED response header (often with an empty body); v1 (and
+ * some v2) servers put it in the JSON body. The advertised price (in the
  * asset's atomic units) becomes the standing bid.
  */
 export class HttpX402Prober implements X402Prober {
@@ -49,25 +74,23 @@ export class HttpX402Prober implements X402Prober {
       });
       if (response.status !== 402) return null;
 
-      const body = (await response.json()) as {
-        x402Version?: number;
-        accepts?: Array<{
-          scheme?: string;
-          maxAmountRequired?: string | number;
-          description?: string;
-          extra?: { decimals?: number };
-        }>;
-      };
-      const requirement = body.accepts?.find((a) => a.scheme === "exact") ?? body.accepts?.[0];
-      if (!requirement?.maxAmountRequired) return null;
+      // x402 v2: base64-encoded JSON challenge in the PAYMENT-REQUIRED header.
+      const header = response.headers.get("payment-required");
+      if (header) {
+        try {
+          const decoded = JSON.parse(Buffer.from(header, "base64").toString("utf8")) as {
+            accepts?: X402Requirement[];
+          };
+          const probe = requirementToProbe(decoded);
+          if (probe) return probe;
+        } catch {
+          // malformed header — fall through to the body
+        }
+      }
 
-      const atomic = Number(requirement.maxAmountRequired);
-      // Stablecoin convention: 6 decimals unless the requirement says otherwise.
-      const decimals = requirement.extra?.decimals ?? 6;
-      const priceUsd = atomic / 10 ** decimals;
-      if (!Number.isFinite(priceUsd) || priceUsd <= 0) return null;
-
-      return { price_usd: priceUsd, description: requirement.description };
+      // v1 (and some v2) servers: challenge in the JSON body.
+      const body = (await response.json()) as { accepts?: X402Requirement[] };
+      return requirementToProbe(body);
     } catch {
       return null; // unreachable, timeout, non-JSON — not a paywalled endpoint
     }
@@ -85,6 +108,12 @@ export class MockX402Prober implements X402Prober {
   async probe(url: string): Promise<X402Probe | null> {
     return this.endpoints.get(url) ?? null;
   }
+}
+
+/** Deterministic uuid-shaped id so restarts update the same standing bid. */
+function stableUuid(secret: string, label: string): string {
+  const h = createHmac("sha256", secret).update(label).digest("hex");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-8${h.slice(17, 20)}-${h.slice(20, 32)}`;
 }
 
 const submissionZod = z
@@ -112,6 +141,12 @@ export interface X402BridgeOptions {
   prober: X402Prober;
   /** Shared secret for HMAC-signed postbacks from the facilitator. */
   hmacSecret: string;
+  /**
+   * Derive each bridged provider's keypair deterministically from this
+   * secret + the endpoint URL, so node restarts resume the same provider
+   * identities instead of minting duplicates. Unset → random keys (demo).
+   */
+  seedSecret?: string;
   nodeId?: string;
 }
 
@@ -152,7 +187,11 @@ export class X402Bridge {
       throw new Error(`endpoint ${url} did not answer with an x402 paywall`);
     }
 
-    const keys = generateKeyPair();
+    const keys = this.options.seedSecret
+      ? keyPairFromSeed(
+          createHmac("sha256", this.options.seedSecret).update(`x402:${url}`).digest(),
+        )
+      : generateKeyPair();
     const id = agentIdFromPublicKey(keys.publicKey);
     const host = new URL(url).host;
     const manifest = {
@@ -169,19 +208,27 @@ export class X402Bridge {
       created_at: new Date().toISOString(),
     } as AgentManifest;
 
-    await this.options.registry.registerAgent(
-      createEnvelope({
-        payload: manifest,
-        secretKey: keys.secretKey,
-        keyId: id,
-        nodeId: this.nodeId,
-      }),
-      { tier: "bridge" },
-    );
+    try {
+      await this.options.registry.registerAgent(
+        createEnvelope({
+          payload: manifest,
+          secretKey: keys.secretKey,
+          keyId: id,
+          nodeId: this.nodeId,
+        }),
+        { tier: "bridge" },
+      );
+    } catch (error) {
+      // Deterministic identities re-join on restart; anything else is real.
+      const code = (error as { code?: string }).code ?? "";
+      if (code !== "agent_exists") throw error;
+    }
     this.keysByProvider.set(id, keys);
 
     const bid: Bid = {
-      bid_id: randomUUID(),
+      bid_id: this.options.seedSecret
+        ? stableUuid(this.options.seedSecret, `bid:${url}:${category}`)
+        : randomUUID(),
       provider_id: id,
       targeting: { categories: [category] },
       // The paywall price IS the standing CPA bid.

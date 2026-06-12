@@ -51,3 +51,47 @@ describe("HttpX402Prober", () => {
     expect(await offline.probe("https://down.example")).toBeNull();
   });
 });
+
+describe("HttpX402Prober — x402 v2", () => {
+  it("parses the base64 PAYMENT-REQUIRED header challenge (empty body)", async () => {
+    const challenge = Buffer.from(
+      JSON.stringify({
+        x402Version: 2,
+        accepts: [{ scheme: "exact", amount: "5000", description: "FX ticks" }],
+      }),
+    ).toString("base64");
+    const prober = new HttpX402Prober(
+      (async () =>
+        new Response("{}", {
+          status: 402,
+          headers: { "payment-required": challenge },
+        })) as typeof fetch,
+    );
+    const probe = await prober.probe("https://tick.example/latest");
+    expect(probe).toEqual({ price_usd: 0.005, description: "FX ticks" });
+  });
+
+  it("accepts the v2 `amount` field in a body challenge", async () => {
+    const prober = new HttpX402Prober(
+      (async () =>
+        new Response(
+          JSON.stringify({ x402Version: 2, accepts: [{ scheme: "exact", amount: "10000" }] }),
+          { status: 402 },
+        )) as typeof fetch,
+    );
+    const probe = await prober.probe("https://v2body.example/api");
+    expect(probe?.price_usd).toBe(0.01);
+  });
+
+  it("falls back to the body when the header is malformed", async () => {
+    const prober = new HttpX402Prober(
+      (async () =>
+        new Response(
+          JSON.stringify({ accepts: [{ scheme: "exact", maxAmountRequired: "2000" }] }),
+          { status: 402, headers: { "payment-required": "not-base64-json!!" } },
+        )) as typeof fetch,
+    );
+    const probe = await prober.probe("https://mixed.example/api");
+    expect(probe?.price_usd).toBe(0.002);
+  });
+});

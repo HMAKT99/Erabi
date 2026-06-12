@@ -1,9 +1,12 @@
+import { randomBytes } from "node:crypto";
+import { HttpX402Prober, X402Bridge } from "@erabi/bridge-x402";
 import { createMcpHttpHandler } from "@erabi/mcp-core";
-import { buildAgentCard } from "./agent-card.js";
 import { realVerifiers } from "@erabi/registry";
+import { buildAgentCard } from "./agent-card.js";
 import { parseHoldbackHours } from "./env.js";
 import { startGateway } from "./gateway.js";
 import { startReferenceNode } from "./index.js";
+import { parseX402Endpoints } from "./x402-endpoints.js";
 
 /**
  * Production entrypoint. Env:
@@ -112,6 +115,37 @@ if (gatewayPort) {
 
 if (holdbackHours) {
   console.log(`settlement holdback override active: ${JSON.stringify(holdbackHours)} hours`);
+}
+
+// Real demand: bridge curated x402-paywalled services as bridge-tier
+// providers. Every endpoint is live-probed; failures just don't activate.
+const x402Endpoints = parseX402Endpoints(process.env.ERABI_X402_ENDPOINTS);
+if (x402Endpoints !== "off" && x402Endpoints.length > 0) {
+  const bridge = new X402Bridge({
+    registry: node.registry,
+    exchange: node.exchange,
+    attribution: node.attribution,
+    prober: new HttpX402Prober(),
+    hmacSecret: process.env.ERABI_X402_HMAC_SECRET ?? randomBytes(32).toString("hex"),
+    // Same seed that keeps the node's identity durable keeps the bridged
+    // providers' identities durable across restarts.
+    seedSecret: process.env.ERABI_NODE_SEED ?? process.env.ERABI_X402_HMAC_SECRET ?? undefined,
+  });
+  const results = await Promise.allSettled(
+    x402Endpoints.map((endpoint) => bridge.submitEndpoint(endpoint)),
+  );
+  results.forEach((result, index) => {
+    if (result.status === "fulfilled") {
+      const bridged = result.value;
+      console.log(
+        `x402 bridge: ${bridged.url} live as ${bridged.provider_id.slice(0, 28)}… ($${bridged.price_usd}/call, ${bridged.category})`,
+      );
+    } else {
+      console.warn(
+        `x402 bridge: ${x402Endpoints[index]!.url} not activated — ${String(result.reason)}`,
+      );
+    }
+  });
 }
 
 console.log(`Erabi reference node up (key: ${node.keySource}, verifiers: ${

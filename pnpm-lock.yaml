@@ -509,6 +509,9 @@ importers:
       '@erabi/attribution':
         specifier: workspace:*
         version: link:../attribution
+      '@erabi/bridge-x402':
+        specifier: workspace:*
+        version: link:../bridges/x402
       '@erabi/config':
         specifier: workspace:*
         version: link:../../packages/config

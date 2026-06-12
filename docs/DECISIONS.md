@@ -2,6 +2,23 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0025 — Curated x402 bridge: real services as bridge-tier providers
+
+The node bridges a curated list of real x402-paywalled services
+(`services/node/src/x402-endpoints.ts`, live-verified against the x402 Bazaar
+2026-06-12) as bridge-tier providers at boot. Quality gates: every entry is
+**probed at boot** — only endpoints answering a valid HTTP 402 challenge
+activate, so a dead or mispriced service can never be advertised; the paywall
+price IS the standing bid; provider identities derive deterministically from
+the node seed (restarts resume, never duplicate). The prober speaks both x402
+v1 (JSON-body challenge, `maxAmountRequired`) and v2 (base64
+`PAYMENT-REQUIRED` header, `amount`). In the ledger-only era consumers pay
+the services directly via x402 out-of-band; ERABI provides reputation-ranked
+discovery with signed sponsorship disclosures, and outcome attribution
+carries the x402 receipt. Curation rule: real, useful, pay-per-call services
+only — the list is what makes `discover` worth calling. Override with
+ERABI_X402_ENDPOINTS (JSON or "off").
+
 ## 0024 — Ledger-only era runs 5-minute holdbacks (env-set, auditable)
 
 `ERABI_HOLDBACK_HOURS` (new in main.ts) overrides settlement holdback windows;

@@ -7,6 +7,7 @@ import { ENDPOINTS, getJson } from "../lib/api";
 import {
   AGENT_ECOSYSTEMS,
   CAPABILITIES,
+  PERSONAS,
   GITHUB_URL,
   QUICKSTART_PY,
   QUICKSTART_TS,
@@ -195,6 +196,27 @@ export default function Home() {
             the full story →
           </Link>
         </p>
+      </section>
+
+      {/* ---- who it's for: benefit per persona ---- */}
+      <section>
+        <h2 className="label mb-4">who it&apos;s for</h2>
+        <div className="grid gap-3 md:grid-cols-3">
+          {PERSONAS.map((persona) => (
+            <div key={persona.audience} className="panel">
+              <div className="label">{persona.audience}</div>
+              <h3 className="mt-2 text-base font-bold leading-snug">{persona.headline}</h3>
+              <ul className="mt-3 space-y-2 text-xs leading-relaxed text-terminal-dim">
+                {persona.points.map((point) => (
+                  <li key={point} className="flex gap-2">
+                    <span className="text-terminal-green">·</span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* ---- bring your agent ---- */}

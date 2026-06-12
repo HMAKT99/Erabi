@@ -228,3 +228,54 @@ describe("golden path", () => {
     expect(myRep.agent_id).toBe(coordinatorId);
   });
 });
+
+describe("welcome wagon: pending_outcomes + confirm_outcome via MCP", () => {
+  it("a provider agent counter-signs an incoming selection entirely through MCP tools", async () => {
+    // a second MCP session acts as the newcomer provider
+    const providerServer = createErabiMcpServer({ endpoints: node.urls, keyDir: null });
+    const providerClient = new Client({ name: "newcomer", version: "0" });
+    const [a, b] = InMemoryTransport.createLinkedPair();
+    await Promise.all([providerClient.connect(a), providerServer.connect(b)]);
+    const pcall = async (name: string, args: Record<string, unknown>) => {
+      const result = (await providerClient.callTool({ name, arguments: args })) as {
+        content: Array<{ type: string; text: string }>;
+        isError?: boolean;
+      };
+      const parsed = JSON.parse(result.content[0]!.text);
+      if (result.isError) throw new Error(parsed.error);
+      return parsed;
+    };
+
+    const joined = await pcall("register", {
+      name: "WelcomeWagonNewcomer",
+      capabilities: ["agent.research"],
+    });
+
+    // an established consumer selects the newcomer
+    const consumer = await Erabi.register({
+      name: "WagonConsumer",
+      capabilities: ["agent.analysis"],
+      endpoints: node.urls,
+      keyDir: null,
+    });
+    const choices = await consumer.intent({ category: "agent.research" });
+    const selection = await consumer.reportOutcome({
+      auctionId: (choices as unknown as { set: { auction_id: string } }).set.auction_id,
+      providerId: joined.agent_id,
+      kind: "selection",
+    });
+
+    // the newcomer discovers and counter-signs it via its own tools
+    const pending = await pcall("pending_outcomes", {});
+    const mine = pending.pending.find(
+      (event: { event_id: string }) => event.event_id === selection.event_id,
+    );
+    expect(mine).toBeTruthy();
+    const confirmed = await pcall("confirm_outcome", {
+      event_id: mine.event_id,
+      hash: mine.hash,
+    });
+    expect(confirmed.status).toBe("countersigned");
+    await providerClient.close();
+  });
+});

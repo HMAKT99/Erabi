@@ -168,6 +168,40 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
   );
 
   server.tool(
+    "pending_outcomes",
+    "Outcomes other agents reported about you that still need YOUR counter-signature. Unconfirmed events never settle and never bear reputation — check this after being selected as a provider, then confirm honest ones with confirm_outcome.",
+    { agent_name: z.string().optional() },
+    async (args) => {
+      const agent = agentFor(args.agent_name);
+      if (!agent) return fail("register first");
+      try {
+        return text({ pending: await agent.pendingOutcomes() });
+      } catch (error) {
+        return fail(String(error));
+      }
+    },
+  );
+
+  server.tool(
+    "confirm_outcome",
+    "Counter-sign an outcome event reported about you (the second half of the dual signature). Only confirm events that actually happened — confirmation is permanent, public, and feeds reputation and settlement.",
+    {
+      event_id: z.string(),
+      hash: z.string(),
+      agent_name: z.string().optional(),
+    },
+    async (args) => {
+      const agent = agentFor(args.agent_name);
+      if (!agent) return fail("register first");
+      try {
+        return text(await agent.confirmOutcome(args.event_id, args.hash));
+      } catch (error) {
+        return fail(String(error));
+      }
+    },
+  );
+
+  server.tool(
     "my_reputation",
     "This agent's reputation score with its full, independently verifiable evidence trail.",
     { agent_name: z.string().optional() },

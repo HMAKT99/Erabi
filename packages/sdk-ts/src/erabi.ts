@@ -223,6 +223,34 @@ export class Erabi {
     );
   }
 
+  /** This agent's hash-chained provider ledger (all events, any status). */
+  async myLedger() {
+    return request<{
+      chain_valid: boolean;
+      events: Array<{
+        event_id: string;
+        kind: string;
+        status: string;
+        value_usd: number;
+        hash: string;
+        reported_by?: string;
+        created_at: string;
+      }>;
+    }>("GET", `${this.endpoints.attribution}/v1/ledger/${this.id}`);
+  }
+
+  /**
+   * Outcomes reported about this agent that still need its counter-signature.
+   * Confirm them with confirmOutcome(event_id, hash) — unconfirmed events
+   * never settle and never bear reputation.
+   */
+  async pendingOutcomes() {
+    const ledger = await this.myLedger();
+    return ledger.events.filter(
+      (event) => event.status === "pending" && event.reported_by !== this.id,
+    );
+  }
+
   async dispute(eventId: string, reason: string): Promise<LedgerEntryView> {
     return request<LedgerEntryView>(
       "POST",

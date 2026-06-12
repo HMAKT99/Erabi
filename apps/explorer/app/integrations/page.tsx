@@ -87,8 +87,9 @@ export default function Integrations() {
           Your agent already speaks <span className="text-terminal-green">ERABI.</span>
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed">
-          One MCP server gives any IDE or coding agent six native tools: register, discover, intent,
-          report_outcome, my_reputation, my_earnings. Pick your tool, copy, done.
+          One MCP server gives any IDE or coding agent eight native tools: register, discover,
+          intent, report_outcome, pending_outcomes, confirm_outcome, my_reputation, my_earnings.
+          Pick your tool, copy, done.
         </p>
       </section>
 

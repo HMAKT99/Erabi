@@ -1,8 +1,8 @@
 {
   "name": "erabi-mcp",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "mcpName": "io.github.HMAKT99/erabi",
-  "description": "Erabi MCP server: any MCP-capable agent can join the intent exchange and transact natively (register, discover, intent, report_outcome, my_reputation, my_earnings).",
+  "description": "Erabi MCP server: any MCP-capable agent can join the intent exchange and transact natively (register, discover, intent, report_outcome, pending_outcomes, confirm_outcome, my_reputation, my_earnings).",
   "license": "Apache-2.0",
   "author": "Arun (AKT) <arunkt.bm14@gmail.com> (https://github.com/HMAKT99)",
   "type": "module",

@@ -136,8 +136,13 @@ for (const provider of providers) {
   }
 }
 
-// Consumers fire a few intents and dual-sign outcomes with fleet providers.
+// Consumers fire a few intents and dual-sign outcomes. Welcome wagon: when a
+// provider OUTSIDE the fleet appears in the consideration set (a newcomer to
+// the network), prefer it — its selection lands on its ledger immediately,
+// and it counter-signs via the confirm_outcome tool to settle and earn its
+// first reputation. The network embraces new agents within one tick.
 const byId = new Map(providers.map((p) => [p.id, p]));
+const fleetIds = new Set([...providers, ...consumers].map((a) => a.id));
 const intentsThisTick = 2 + Math.floor(Math.random() * 3);
 for (let i = 0; i < intentsThisTick; i++) {
   const consumer = pick(consumers);
@@ -150,22 +155,28 @@ for (let i = 0; i < intentsThisTick; i++) {
       constraints: { max_price_usd: dollars(0.5, 3) },
     });
     summary.intents++;
-    const candidates = [
+    const all = [
       ...choices.organic.map((o) => o.provider_id),
       ...choices.sponsored.map((s) => s.provider_id),
-    ].filter((id) => byId.has(id));
-    if (candidates.length === 0) continue;
-    const providerId = pick(candidates);
+    ];
+    const newcomers = [...new Set(all.filter((id) => !fleetIds.has(id)))];
+    const fleetCandidates = all.filter((id) => byId.has(id));
+    const providerId = newcomers.length > 0 ? pick(newcomers) : pick(fleetCandidates);
+    if (!providerId) continue;
+    const isNewcomer = !fleetIds.has(providerId);
     const provider = byId.get(providerId);
     const selection = await choices.report(providerId, "selection");
-    await provider.confirmOutcome(selection.event_id, selection.hash);
     summary.outcomes++;
+    if (isNewcomer) summary.welcomed = (summary.welcomed ?? 0) + 1;
+    // Fleet providers counter-sign themselves; newcomers counter-sign via
+    // their own confirm_outcome tool (we never hold their keys).
+    if (provider) await provider.confirmOutcome(selection.event_id, selection.hash);
     if (Math.random() < 0.8) {
       const success = await choices.report(providerId, "task_success", {
         valueUsd: dollars(0.1, 1.8),
       });
-      await provider.confirmOutcome(success.event_id, success.hash);
       summary.outcomes++;
+      if (provider) await provider.confirmOutcome(success.event_id, success.hash);
     }
   } catch (e) {
     summary.errors.push(`intent ${intent.category}: ${e.message}`);

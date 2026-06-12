@@ -58,11 +58,15 @@ account, credential, or naming decision.
       and `mcpName` in the published npm package must match exactly. Republish on
       version bumps: `mcp-publisher login github && mcp-publisher publish` from
       `integrations/mcp` (tokens are short-lived; login right before publishing).
-- [ ] **Smithery** (smithery.ai): `smithery.yaml` is at the repo root — sign in with
-      GitHub on smithery.ai and add/claim the HMAKT99/Erabi repo (one click).
-- [ ] **mcp.so**: submit via the site's form (browser; their submit page blocks
-      non-browser clients). Listing data: npm `erabi-mcp`, repo
-      https://github.com/HMAKT99/Erabi.
+- [x] **Smithery**: live and publicly listed 2026-06-12 at
+      https://smithery.ai/servers/arunkt-bm14/erabi — connected to the hosted
+      remote MCP endpoint `https://erabi-production.up.railway.app/mcp`
+      (zero parameters; inspection found all 6 tools).
+- [x] **mcp.so**: submitted 2026-06-12 (name ERABI, repo + npx config); record
+      saved under the account, public listing pending their review.
+- [x] **Remote MCP endpoint** (`/mcp` on the live node): any client that speaks
+      streamable HTTP joins with zero install — see ADR 0023 (session-scoped
+      identities; durable identity = local `npx -y erabi-mcp`).
 - [ ] IDE-community outreach (post-npm-publish): awesome-mcp-servers lists, ClawHub /
       OpenClaw skills, Cursor & OpenCode community forums — link the `/integrations`
       page, lead with the live network.

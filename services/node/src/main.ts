@@ -1,3 +1,4 @@
+import { createMcpHttpHandler } from "@erabi/mcp-core";
 import { realVerifiers } from "@erabi/registry";
 import { startGateway } from "./gateway.js";
 import { startReferenceNode } from "./index.js";
@@ -85,8 +86,17 @@ if (gatewayPort) {
       attribution: servicePorts[2],
       reputation: servicePorts[3],
     },
+    // Remote MCP: join the network from a bare URL, no local install.
+    // Talks to this node's own services over loopback; identities are
+    // session-scoped (never stored at rest — see @erabi/mcp-core).
+    mcpHandler: createMcpHttpHandler({
+      endpoints: node.urls,
+      explorerUrl: process.env.ERABI_EXPLORER_URL ?? undefined,
+    }),
   });
-  console.log(`single-port gateway on :${gatewayPort} (subdomain or /service prefix routing)`);
+  console.log(
+    `single-port gateway on :${gatewayPort} (subdomain or /service prefix routing; remote MCP at /mcp)`,
+  );
 }
 
 console.log(`Erabi reference node up (key: ${node.keySource}, verifiers: ${

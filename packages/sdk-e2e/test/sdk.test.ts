@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { startReferenceNode, type ReferenceNode } from "@erabi/node";
-import { Erabi, loadKey, renderSponsored } from "../src/index.js";
+import { Erabi, loadKey, renderSponsored } from "@erabi/sdk";
 
 let node: ReferenceNode;
 let keyDir: string;

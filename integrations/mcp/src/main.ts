@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createErabiMcpServer } from "./server.js";
+import { createErabiMcpServer } from "@erabi/mcp-core";
 
 /**
  * Zero-config default: the live public network. `npx -y erabi-mcp` joins it

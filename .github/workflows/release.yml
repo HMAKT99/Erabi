@@ -49,6 +49,7 @@ jobs:
           # registry are skipped, so partial releases can be safely rerun.
           for dir in packages/constants packages/crypto packages/schemas \
                      packages/config packages/ratelimit packages/sdk-ts \
+                     packages/mcp-core \
                      integrations/mcp; do
             name=$(node -p "require('./$dir/package.json').name")
             ver=$(node -p "require('./$dir/package.json').version")

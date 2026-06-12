@@ -122,6 +122,9 @@ importers:
 
   integrations/mcp:
     dependencies:
+      '@erabi/mcp-core':
+        specifier: workspace:*
+        version: link:../../packages/mcp-core
       '@erabi/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk-ts
@@ -203,6 +206,28 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@20.19.42)
 
+  packages/mcp-core:
+    dependencies:
+      '@erabi/sdk':
+        specifier: workspace:*
+        version: link:../sdk-ts
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.0.0
+        version: 1.29.0(zod@3.25.76)
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.19.42
+        version: 20.19.42
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@20.19.42)
+
   packages/ratelimit:
     devDependencies:
       '@types/node':
@@ -243,6 +268,24 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@20.19.42)
 
+  packages/sdk-e2e:
+    devDependencies:
+      '@erabi/node':
+        specifier: workspace:*
+        version: link:../../services/node
+      '@erabi/sdk':
+        specifier: workspace:*
+        version: link:../sdk-ts
+      '@types/node':
+        specifier: ^20.19.42
+        version: 20.19.42
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@20.19.42)
+
   packages/sdk-py:
     devDependencies:
       '@erabi/node':
@@ -270,9 +313,6 @@ importers:
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
-      '@erabi/node':
-        specifier: workspace:*
-        version: link:../../services/node
       '@types/node':
         specifier: ^20.19.42
         version: 20.19.42
@@ -481,6 +521,9 @@ importers:
       '@erabi/exchange':
         specifier: workspace:*
         version: link:../exchange
+      '@erabi/mcp-core':
+        specifier: workspace:*
+        version: link:../../packages/mcp-core
       '@erabi/registry':
         specifier: workspace:*
         version: link:../registry

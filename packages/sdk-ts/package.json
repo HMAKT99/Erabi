@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@erabi/constants": "workspace:*",
@@ -27,7 +27,6 @@
     "@erabi/schemas": "workspace:*"
   },
   "devDependencies": {
-    "@erabi/node": "workspace:*",
     "@types/node": "^20.19.42",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"

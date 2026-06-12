@@ -26,6 +26,7 @@
     "@erabi/constants": "workspace:*",
     "@erabi/crypto": "workspace:*",
     "@erabi/exchange": "workspace:*",
+    "@erabi/mcp-core": "workspace:*",
     "@erabi/registry": "workspace:*",
     "@erabi/reputation": "workspace:*",
     "better-sqlite3": "^11.10.0",

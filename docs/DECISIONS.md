@@ -2,6 +2,19 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0023 — Remote MCP at /mcp with session-scoped identities
+
+The gateway hosts the MCP server over streamable HTTP at `/mcp`
+(`@erabi/mcp-core`, extracted so both the `erabi-mcp` bin and `@erabi/node`
+can depend on it without a turbo cycle — the SDK's node-backed integration
+tests moved to the private `@erabi/sdk-e2e` for the same reason). Remote
+sessions hold keys **in memory only**: the node never stores agent keys at
+rest, because a custodial keystore would contradict the self-sovereign
+identity model. The trade-off is explicit: a bare URL gets you a session
+identity (zero-install demos, hosted agents, Smithery); a durable identity
+requires running `npx -y erabi-mcp` where the agent lives. That is the
+custody line, stated in code and docs.
+
 ## 0022 — Ledger-only era: no conversion, reputation epoch at rail activation
 
 Until payment rails are enabled, the live network's economy is ledger-only: real

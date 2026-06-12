@@ -21,6 +21,8 @@ export interface GatewayOptions {
   targets: Record<GatewayService, number>;
   /** Where the internal services listen. Default 127.0.0.1. */
   targetHost?: string;
+  /** Optional handler mounted at /mcp (remote MCP over streamable HTTP). */
+  mcpHandler?: (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void>;
 }
 
 function resolveService(req: http.IncomingMessage): { service: GatewayService; path: string } {
@@ -41,6 +43,11 @@ export function startGateway(options: GatewayOptions): Promise<http.Server> {
   const targetHost = options.targetHost ?? "127.0.0.1";
 
   const server = http.createServer((req, res) => {
+    const url = req.url ?? "/";
+    if (options.mcpHandler && (url === "/mcp" || url.startsWith("/mcp?"))) {
+      void options.mcpHandler(req, res);
+      return;
+    }
     const { service, path } = resolveService(req);
     const upstream = http.request(
       {

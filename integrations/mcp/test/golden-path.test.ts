@@ -18,7 +18,7 @@ import { Erabi, loadKey } from "@erabi/sdk";
 import { createEnvelope } from "@erabi/crypto";
 import { MockX402Prober, X402Bridge } from "@erabi/bridge-x402";
 import { verificationToken } from "@erabi/registry";
-import { createErabiMcpServer } from "../src/server.js";
+import { createErabiMcpServer } from "@erabi/mcp-core";
 
 const HMAC_SECRET = "golden-secret";
 

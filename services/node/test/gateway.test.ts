@@ -1,4 +1,5 @@
 import http, { type Server } from "node:http";
+import { createMcpHttpHandler } from "@erabi/mcp-core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 /** fetch() forbids overriding Host, so host-routing tests go raw. */
@@ -36,6 +37,7 @@ beforeAll(async () => {
       attribution: ports[2]!,
       reputation: ports[3]!,
     },
+    mcpHandler: createMcpHttpHandler({ endpoints: node.urls }),
   });
   gatewayUrl = `http://127.0.0.1:${(gateway.address() as { port: number }).port}`;
 });
@@ -91,5 +93,95 @@ describe("single-port gateway (Railway/Render mode)", () => {
     } finally {
       broken.close();
     }
+  });
+});
+
+describe("remote MCP at /mcp", () => {
+  it("initializes a session, lists the six tools, and registers a live agent", async () => {
+    const post = (body: unknown, sessionId?: string) =>
+      fetch(`${gatewayUrl}/mcp`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json, text/event-stream",
+          ...(sessionId ? { "mcp-session-id": sessionId } : {}),
+        },
+        body: JSON.stringify(body),
+      });
+
+    const parse = async (response: Response) => {
+      const text = await response.text();
+      const data = text
+        .split("\n")
+        .filter((line) => line.startsWith("data:"))
+        .map((line) => JSON.parse(line.slice(5)));
+      return data[0] ?? JSON.parse(text);
+    };
+
+    const init = await post({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: "2024-11-05",
+        capabilities: {},
+        clientInfo: { name: "test", version: "0" },
+      },
+    });
+    expect(init.status).toBe(200);
+    const session = init.headers.get("mcp-session-id");
+    expect(session).toBeTruthy();
+    const initBody = await parse(init);
+    expect(initBody.result.serverInfo.name).toBe("erabi");
+
+    await post({ jsonrpc: "2.0", method: "notifications/initialized" }, session!);
+
+    const list = await post(
+      { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} },
+      session!,
+    );
+    const tools = (await parse(list)).result.tools.map((tool: { name: string }) => tool.name);
+    expect(tools.sort()).toEqual([
+      "discover",
+      "intent",
+      "my_earnings",
+      "my_reputation",
+      "register",
+      "report_outcome",
+    ]);
+
+    const register = await post(
+      {
+        jsonrpc: "2.0",
+        id: 3,
+        method: "tools/call",
+        params: {
+          name: "register",
+          arguments: { name: "RemoteJoiner", capabilities: ["agent.research"] },
+        },
+      },
+      session!,
+    );
+    const result = JSON.parse((await parse(register)).result.content[0].text);
+    expect(result.agent_id).toMatch(/^erabi:agent:/);
+    expect(result.live_page).toContain("/agents/");
+
+    // session-scoped: a second initialize gets its own session id
+    const second = await post({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: "2024-11-05",
+        capabilities: {},
+        clientInfo: { name: "test2", version: "0" },
+      },
+    });
+    expect(second.headers.get("mcp-session-id")).not.toBe(session);
+  });
+
+  it("rejects sessionless non-POST requests", async () => {
+    const response = await fetch(`${gatewayUrl}/mcp`, { method: "GET" });
+    expect(response.status).toBe(400);
   });
 });

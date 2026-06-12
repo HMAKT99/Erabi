@@ -590,6 +590,12 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@20.19.42)
 
+  tools:
+    dependencies:
+      '@erabi/sdk':
+        specifier: workspace:*
+        version: link:../packages/sdk-ts
+
 packages:
 
   '@alloc/quick-lru@5.2.0':

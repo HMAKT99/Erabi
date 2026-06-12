@@ -11,7 +11,7 @@ import {
   type KeyPair,
 } from "@erabi/crypto";
 import type { AgentManifest, ConsiderationSet } from "@erabi/schemas";
-import { request } from "./http.js";
+import { ErabiSdkError, request } from "./http.js";
 import { DEFAULT_KEY_DIR, loadKey, saveKey } from "./keystore.js";
 import { renderSponsored, type LabelOptions } from "./labeling.js";
 
@@ -147,8 +147,21 @@ export class Erabi {
       created_at: new Date().toISOString(),
     } as AgentManifest;
 
-    const erabi = new Erabi(id, manifest, keys, endpoints, nodeId);
-    await request("POST", `${endpoints.registry}/v1/agents`, erabi.signed(manifest));
+    let erabi = new Erabi(id, manifest, keys, endpoints, nodeId);
+    try {
+      await request("POST", `${endpoints.registry}/v1/agents`, erabi.signed(manifest));
+    } catch (error) {
+      // Idempotent re-join: an identity persisted in keyDir is already on the
+      // registry — resume it under its registered manifest instead of failing.
+      const rejoining =
+        existing !== null && error instanceof ErabiSdkError && error.code === "agent_exists";
+      if (!rejoining) throw error;
+      const view = await request<{ manifest: AgentManifest }>(
+        "GET",
+        `${endpoints.registry}/v1/agents/${encodeURIComponent(id)}`,
+      );
+      erabi = new Erabi(id, view.manifest, keys, endpoints, nodeId);
+    }
     if (keyDir) saveKey(keyDir, options.name, keys.secretKey, id);
     return erabi;
   }

@@ -1,0 +1,31 @@
+name: Reference fleet
+
+# Keeps the public network's demo liquidity alive: the reference fleet joins
+# (idempotent re-join from a deterministic seed), refreshes standing bids, and
+# trades a few dual-signed intents. Real protocol events, ledger-only economy.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: fleet
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter "@erabi/tools..."
+      - run: pnpm --filter "@erabi/sdk..." build
+      - name: Fleet tick
+        env:
+          ERABI_FLEET_SEED: ${{ secrets.ERABI_FLEET_SEED }}
+        run: node tools/fleet.mjs

@@ -62,15 +62,20 @@ if (phase === "register") {
 } else if (phase === "verify") {
   for (const spec of AGENTS) {
     const agent = await load(spec);
-    const res = await fetch(`${endpoints.registry}/v1/agents/${encodeURIComponent(agent.id)}/verify`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(agent.signed({ method: METHOD })),
-    });
+    const res = await fetch(
+      `${endpoints.registry}/v1/agents/${encodeURIComponent(agent.id)}/verify`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(agent.signed({ method: METHOD })),
+      },
+    );
     const body = await res.json();
-    console.log(`${spec.name}: ${res.status} → tier=${body.tier ?? JSON.stringify(body).slice(0, 160)}`);
+    console.log(
+      `${spec.name}: ${res.status} → tier=${body.tier ?? JSON.stringify(body).slice(0, 160)}`,
+    );
   }
 } else {
-  console.error('usage: node tools/verify-founder-agents.mjs <register|verify>');
+  console.error("usage: node tools/verify-founder-agents.mjs <register|verify>");
   process.exit(1);
 }

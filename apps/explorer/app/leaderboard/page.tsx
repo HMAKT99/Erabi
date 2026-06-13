@@ -36,7 +36,20 @@ export default function Leaderboard() {
       setEarners(beacon?.top_earners ?? []);
       const agents = await getJson<{ agents: AgentRow[] }>(`${ENDPOINTS.registry}/v1/agents`);
       const all = agents?.agents ?? [];
-      setByReputation([...all].sort((a, b) => b.reputation - a.reputation).slice(0, 15));
+      // Reputation desc, then verified/staked above unverified at equal score
+      // (verified is the stronger trust signal — truthful tie-break, and it
+      // surfaces agents that proved a human owner).
+      const tierRank: Record<string, number> = { staked: 3, verified: 2, bridge: 1, unverified: 0 };
+      setByReputation(
+        [...all]
+          .sort(
+            (a, b) =>
+              b.reputation - a.reputation ||
+              (tierRank[b.tier] ?? 0) - (tierRank[a.tier] ?? 0) ||
+              a.manifest.name.localeCompare(b.manifest.name),
+          )
+          .slice(0, 15),
+      );
       const counts = new Map<string, number>();
       for (const agent of all) {
         const ref = agent.manifest.referrer;

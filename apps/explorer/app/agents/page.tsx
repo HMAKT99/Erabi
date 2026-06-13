@@ -12,10 +12,21 @@ interface AgentRow {
 
 const PAGE_SIZE = 25;
 
+/**
+ * "Active" = the agent has earned confirmed dual-signed history (reputation
+ * above the cold-start baseline of 50), or it's a live bridged service
+ * provider. This is the honest "alive" signal the registry list can compute:
+ * updated_at does not move on trades, so a literal time-window filter would
+ * be fabricated. Nothing is hidden — "all" shows every registered agent.
+ */
+const BASELINE_REPUTATION = 50;
+const isActive = (a: AgentRow) => a.reputation > BASELINE_REPUTATION || a.tier === "bridge";
+
 export default function AgentDirectory() {
   const [agents, setAgents] = useState<AgentRow[]>([]);
   const [query, setQuery] = useState("");
   const [capability, setCapability] = useState("");
+  const [view, setView] = useState<"active" | "all">("active");
   const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -29,18 +40,21 @@ export default function AgentDirectory() {
     [agents],
   );
 
+  const activeCount = useMemo(() => agents.filter(isActive).length, [agents]);
+
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return agents
       .filter(
         (agent) =>
+          (view === "all" || isActive(agent)) &&
           (!capability || agent.manifest.capabilities.includes(capability)) &&
           (!needle ||
             agent.manifest.name.toLowerCase().includes(needle) ||
             agent.manifest.id.toLowerCase().includes(needle)),
       )
-      .sort((a, b) => b.reputation - a.reputation);
-  }, [agents, query, capability]);
+      .sort((a, b) => b.reputation - a.reputation || b.created_at.localeCompare(a.created_at));
+  }, [agents, query, capability, view]);
 
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visible = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -73,8 +87,31 @@ export default function AgentDirectory() {
             </option>
           ))}
         </select>
-        <span className="text-xs text-terminal-dim">{filtered.length} agents</span>
+        <div className="flex overflow-hidden rounded border border-terminal-border text-xs">
+          <button
+            onClick={() => {
+              setView("active");
+              setPage(0);
+            }}
+            className={`px-2 py-1 ${view === "active" ? "bg-terminal-green text-terminal-bg" : "text-terminal-dim"}`}
+          >
+            active {activeCount}
+          </button>
+          <button
+            onClick={() => {
+              setView("all");
+              setPage(0);
+            }}
+            className={`px-2 py-1 ${view === "all" ? "bg-terminal-green text-terminal-bg" : "text-terminal-dim"}`}
+          >
+            all {agents.length}
+          </button>
+        </div>
       </section>
+      <p className="px-1 text-[11px] text-terminal-dim">
+        active = confirmed dual-signed history, plus live bridged services · nothing hidden, “all”
+        shows every registered agent
+      </p>
 
       <section className="panel">
         <table className="w-full text-xs">

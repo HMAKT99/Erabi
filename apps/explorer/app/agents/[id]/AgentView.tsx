@@ -121,18 +121,16 @@ export default function AgentPage() {
             value={recruits === null ? "—" : `${recruits} agent${recruits === 1 ? "" : "s"}`}
           />
         </dl>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <img
-            src={`${ENDPOINTS.attribution}/v1/badge/${encodeURIComponent(agentId)}.svg`}
-            alt="Erabi badge"
-            className="h-6"
-          />
-          <CopyButton
-            text={`[![ERABI](${ENDPOINTS.attribution}/v1/badge/${encodeURIComponent(agentId)}.svg)](${EXPLORER_URL}/agents/${encodeURIComponent(agentId)})`}
-            label="copy README badge"
-          />
-        </div>
       </section>
+
+      {/* ---- wear your verifiable trust: the share / embed loop ---- */}
+      <ShareTrust
+        agentId={agentId}
+        name={agent.manifest.name}
+        tier={agent.tier}
+        reputation={reputation}
+        fallbackScore={agent.reputation}
+      />
 
       <section className="grid gap-6 md:grid-cols-2">
         <div className="panel">
@@ -224,6 +222,64 @@ export default function AgentPage() {
         )}
       </section>
     </main>
+  );
+}
+
+function ShareTrust({
+  agentId,
+  name,
+  tier,
+  reputation,
+  fallbackScore,
+}: {
+  agentId: string;
+  name: string;
+  tier: string;
+  reputation: ReputationView | null;
+  fallbackScore: number;
+}) {
+  const enc = encodeURIComponent(agentId);
+  const permalink = `${EXPLORER_URL}/agents/${enc}`;
+  const badgeUrl = `${ENDPOINTS.attribution}/v1/badge/${enc}.svg`;
+  const score = reputation?.score ?? fallbackScore;
+  const events = reputation?.confirmed_events ?? 0;
+  const verified = tier !== "unverified";
+
+  const markdown = `[![ERABI verified trust](${badgeUrl})](${permalink})`;
+  const html = `<a href="${permalink}"><img src="${badgeUrl}" alt="ERABI verified trust" height="20"></a>`;
+
+  // Share line claims only what's true on the ledger — no inflation.
+  const proofParts: string[] = [];
+  if (verified) proofParts.push(`verified (${tier})`);
+  if (events > 0) proofParts.push(`${events} dual-signed outcome${events === 1 ? "" : "s"}`);
+  const proof = proofParts.length ? ` — ${proofParts.join(" · ")}` : "";
+  const shareText = `🤖 ${name} has a verifiable track record on ERABI: rep ${score}${proof}, fully auditable. The open trust layer for AI agents.`;
+  const shareIntent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(permalink)}`;
+
+  return (
+    <section className="panel">
+      <h2 className="label mb-3">wear your verifiable trust — anywhere</h2>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={badgeUrl} alt="ERABI verified trust badge" className="h-6" />
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+        <CopyButton text={markdown} label="copy markdown" />
+        <CopyButton text={html} label="copy html" />
+        <a
+          href={shareIntent}
+          target="_blank"
+          rel="noreferrer"
+          className="rounded border border-terminal-green bg-terminal-green px-3 py-1.5 font-bold text-terminal-bg hover:opacity-90"
+        >
+          share on X →
+        </a>
+        <CopyButton text={`${shareText} ${permalink}`} label="copy share text" />
+      </div>
+      <p className="mt-3 text-xs text-terminal-dim">
+        every number on this badge is live and recomputable from public, dual-signed evidence — it
+        can&apos;t be faked or bought. Drop it in your README, your site, or your agent&apos;s
+        profile.
+      </p>
+    </section>
   );
 }
 

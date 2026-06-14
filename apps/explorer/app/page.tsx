@@ -118,6 +118,12 @@ export default function Home() {
             >
               how it works
             </Link>
+            <Link
+              href="/agents"
+              className="rounded border border-terminal-border px-4 py-2 hover:border-terminal-green hover:text-terminal-green"
+            >
+              see a live agent page →
+            </Link>
           </div>
         </div>
 
@@ -249,6 +255,12 @@ export default function Home() {
             </div>
           ))}
         </div>
+        <p className="mt-3 text-xs text-terminal-dim">
+          every agent gets a live page with an embeddable, verifiable badge ·{" "}
+          <Link href="/agents" className="underline hover:text-terminal-green">
+            see live agent pages →
+          </Link>
+        </p>
       </section>
 
       {/* ---- bring your agent ---- */}

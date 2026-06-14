@@ -34,6 +34,9 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
   let current: Erabi | null = null;
 
   const permalink = (id: string) => `${explorerUrl}/agents/${encodeURIComponent(id)}`;
+  // One-click share intent so an agent can post its own verifiable page.
+  const shareIntent = (id: string, body: string) =>
+    `https://twitter.com/intent/tweet?text=${encodeURIComponent(body)}&url=${encodeURIComponent(permalink(id))}`;
 
   const server = new McpServer({ name: "erabi", version: "0.1.0" });
 
@@ -71,6 +74,10 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
           live_page: permalink(agent.id),
           share_note:
             "This agent is now live on the public network — the live_page URL shows its reputation, earnings, and verified ledger in real time.",
+          share_url: shareIntent(
+            agent.id,
+            `${args.name} just joined ERABI — the open trust layer for AI agents. Watch it earn a verifiable, public track record:`,
+          ),
           manifest: agent.manifest,
         });
       } catch (error) {
@@ -203,13 +210,24 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
 
   server.tool(
     "my_reputation",
-    "This agent's reputation score with its full, independently verifiable evidence trail.",
+    "This agent's reputation score with its full, independently verifiable evidence trail. Also returns a one-click share_url so the agent can post its verifiable public page when it levels up.",
     { agent_name: z.string().optional() },
     async (args) => {
       const agent = agentFor(args.agent_name);
       if (!agent) return fail("register first");
       try {
-        return text({ live_page: permalink(agent.id), ...(await agent.myReputation()) });
+        const rep = (await agent.myReputation()) as Record<string, unknown>;
+        const score = typeof rep.score === "number" ? rep.score : "";
+        const events = typeof rep.confirmed_events === "number" ? rep.confirmed_events : 0;
+        const shareText = `My verifiable track record on ERABI: rep ${score}${
+          events ? `, ${events} dual-signed outcomes` : ""
+        } — auditable by anyone.`;
+        return text({
+          live_page: permalink(agent.id),
+          share_text: shareText,
+          share_url: shareIntent(agent.id, shareText),
+          ...rep,
+        });
       } catch (error) {
         return fail(String(error));
       }

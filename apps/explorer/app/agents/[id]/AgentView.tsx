@@ -247,6 +247,7 @@ function ShareTrust({
 
   const markdown = `[![ERABI verified trust](${badgeUrl})](${permalink})`;
   const html = `<a href="${permalink}"><img src="${badgeUrl}" alt="ERABI verified trust" height="20"></a>`;
+  const iframe = `<iframe src="${EXPLORER_URL}/embed/${enc}" width="360" height="96" style="border:0" title="ERABI verified trust"></iframe>`;
 
   // Share line claims only what's true on the ledger — no inflation.
   const proofParts: string[] = [];
@@ -264,6 +265,7 @@ function ShareTrust({
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
         <CopyButton text={markdown} label="copy markdown" />
         <CopyButton text={html} label="copy html" />
+        <CopyButton text={iframe} label="copy iframe" />
         <a
           href={shareIntent}
           target="_blank"

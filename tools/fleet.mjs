@@ -143,6 +143,27 @@ for (const provider of providers) {
 // first reputation. The network embraces new agents within one tick.
 const byId = new Map(providers.map((p) => [p.id, p]));
 const fleetIds = new Set([...providers, ...consumers].map((a) => a.id));
+
+// Bridge-tier providers (real x402 services) are registered identities the
+// fleet does NOT hold keys for, so it can never counter-sign an outcome with
+// them — selecting one yields a one-sided event that never settles. They bid
+// across every category, so without this they'd always crowd out the fleet's
+// own confirmable providers and settlement stalls. Exclude them from the
+// "newcomer" set: the fleet then picks its own providers (outcomes settle) and
+// still welcomes any GENUINE external agent that joins.
+const bridgeIds = new Set();
+try {
+  const res = await fetch(`${endpoints.registry}/v1/agents`);
+  if (res.ok) {
+    const body = await res.json();
+    for (const a of body.agents ?? []) {
+      if (a.tier === "bridge" && a.manifest?.id) bridgeIds.add(a.manifest.id);
+    }
+  }
+} catch (e) {
+  summary.errors.push(`bridge lookup: ${e.message}`);
+}
+
 const intentsThisTick = 2 + Math.floor(Math.random() * 3);
 for (let i = 0; i < intentsThisTick; i++) {
   const consumer = pick(consumers);
@@ -159,7 +180,7 @@ for (let i = 0; i < intentsThisTick; i++) {
       ...choices.organic.map((o) => o.provider_id),
       ...choices.sponsored.map((s) => s.provider_id),
     ];
-    const newcomers = [...new Set(all.filter((id) => !fleetIds.has(id)))];
+    const newcomers = [...new Set(all.filter((id) => !fleetIds.has(id) && !bridgeIds.has(id)))];
     const fleetCandidates = all.filter((id) => byId.has(id));
     const providerId = newcomers.length > 0 ? pick(newcomers) : pick(fleetCandidates);
     if (!providerId) continue;

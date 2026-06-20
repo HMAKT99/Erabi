@@ -182,7 +182,19 @@ for (let i = 0; i < intentsThisTick; i++) {
     ];
     const newcomers = [...new Set(all.filter((id) => !fleetIds.has(id) && !bridgeIds.has(id)))];
     const fleetCandidates = all.filter((id) => byId.has(id));
-    const providerId = newcomers.length > 0 ? pick(newcomers) : pick(fleetCandidates);
+    // Only the fleet's own providers can be counter-signed, so they must be the
+    // DEFAULT selection or nothing settles. Most "newcomers" on the network are
+    // dormant test registrations that never counter-sign, so we welcome a real
+    // one only occasionally (~20%) — enough to embrace a genuinely live joiner
+    // without letting dead agents starve settlement.
+    let providerId;
+    if (fleetCandidates.length > 0 && (newcomers.length === 0 || Math.random() < 0.8)) {
+      providerId = pick(fleetCandidates);
+    } else if (newcomers.length > 0) {
+      providerId = pick(newcomers);
+    } else {
+      providerId = pick(fleetCandidates);
+    }
     if (!providerId) continue;
     const isNewcomer = !fleetIds.has(providerId);
     const provider = byId.get(providerId);

@@ -25,6 +25,28 @@ const EVENT_COLORS: Record<string, string> = {
   "settlement.confirmed": "text-terminal-green",
 };
 
+/** A short, human-readable detail per event so the feed reads like activity,
+ * not a repeated type log (e.g. "Compass-Planner", "api.search", "$0.04"). */
+function eventDetail(event: TickerEvent): string {
+  const d = event.data ?? {};
+  switch (event.type) {
+    case "agent.registered":
+      return typeof d.name === "string" ? d.name : "new agent";
+    case "bid.placed": {
+      const cat = Array.isArray(d.categories) ? d.categories[0] : undefined;
+      return typeof cat === "string" ? cat : "standing bid";
+    }
+    case "intent.received":
+      return typeof d.category === "string" ? d.category : "moment of choice";
+    case "auction.cleared":
+      return typeof d.category === "string" ? d.category : "auction";
+    case "settlement.confirmed":
+      return typeof d.value_usd === "number" ? `$${d.value_usd.toFixed(2)}` : "settled";
+    default:
+      return "";
+  }
+}
+
 const MCP_CONFIG = `{
   "mcpServers": {
     "erabi": {
@@ -149,7 +171,7 @@ export default function Home() {
             </span>
             live network
           </h2>
-          <div className="flex min-h-[12rem] flex-1 flex-col gap-1 overflow-y-auto text-sm">
+          <div className="flex min-h-[12rem] max-h-[32rem] flex-1 flex-col gap-1.5 overflow-y-auto text-sm">
             {events.length === 0 ? (
               <div className="m-auto text-center text-terminal-dim">
                 <p>listening for events…</p>
@@ -159,9 +181,12 @@ export default function Home() {
               </div>
             ) : (
               events.map((event, index) => (
-                <div key={index} className="flex gap-2">
-                  <span className="shrink-0 text-terminal-dim">{event.ts.slice(11, 19)}</span>
+                <div key={index} className="flex items-baseline gap-2">
+                  <span className="shrink-0 tabular-nums text-terminal-dim">
+                    {event.ts.slice(11, 19)}
+                  </span>
                   <span className={`shrink-0 ${EVENT_COLORS[event.type] ?? ""}`}>{event.type}</span>
+                  <span className="truncate text-terminal-dim">{eventDetail(event)}</span>
                 </div>
               ))
             )}

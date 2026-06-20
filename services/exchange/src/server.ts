@@ -90,6 +90,11 @@ export function buildServer(
       "access-control-allow-origin": "*",
     });
     reply.raw.write(`event: hello\ndata: ${JSON.stringify({ node: "exchange" })}\n\n`);
+    // Replay recent history (oldest first) so the feed shows activity on
+    // connect instead of sitting empty between fleet ticks.
+    for (const event of service.bus.recent()) {
+      reply.raw.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+    }
     const unsubscribe = service.bus.subscribe((event) => {
       reply.raw.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
     });

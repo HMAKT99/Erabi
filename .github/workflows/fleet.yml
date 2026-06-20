@@ -5,7 +5,10 @@ name: Reference fleet
 # trades a few dual-signed intents. Real protocol events, ledger-only economy.
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    # Launch-window cadence: tick every 10 min so the live feed visibly moves
+    # while visitors watch. Revert to "*/30 * * * *" after launch to conserve
+    # CI minutes (GitHub's scheduler is best-effort and may lag under load).
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 concurrency:

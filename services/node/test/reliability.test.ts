@@ -285,6 +285,7 @@ describe("reliability index API", () => {
       publicBaseUrl: "https://node.example/index",
       explorerUrl: "https://explorer.example",
       registryUrl: "https://node.example/registry",
+      nodePublicKey: "ed25519:testnodekey",
     });
     return { app, store };
   }
@@ -316,6 +317,16 @@ describe("reliability index API", () => {
     });
     const missing = await app.inject({ method: "GET", url: "/v1/services/nope" });
     expect(missing.statusCode).toBe(404);
+    await app.close();
+    store.close();
+  });
+
+  it("publishes the node key as the verification anchor", async () => {
+    const { app, store } = await makeApp();
+    const key = await app.inject({ method: "GET", url: "/v1/key" });
+    expect(key.json()).toEqual({ node_key: "ed25519:testnodekey", algorithm: "ed25519" });
+    const list = await app.inject({ method: "GET", url: "/v1/services" });
+    expect(list.json().node_key).toBe("ed25519:testnodekey");
     await app.close();
     store.close();
   });

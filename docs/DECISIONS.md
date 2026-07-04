@@ -14,8 +14,9 @@ and the node key — it lives in `services/node/src/reliability/` with its
 own `reliability.sqlite`, and the four protocol services stay untouched.
 Each probe is published as a signed attestation (`erabi.x402.probe/0.1`):
 a detached ed25519 signature over RFC 8785 canonical JSON with the node
-key — the same convention as DisclosureRecords (ADR 0012); the frozen
-protocol signing vectors are untouched. The attestation is the reusable
+key (published at `/index/v1/key`) — the same convention as
+DisclosureRecords (ADR 0012); the frozen protocol signing vectors are
+untouched. The attestation is the reusable
 unit of verification: an agent fetches and verifies it instead of
 re-probing the service itself. The index keys on **slugs**, not provider
 ids — bridged identities churn across restarts when the node runs without

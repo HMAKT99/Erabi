@@ -21,8 +21,8 @@ GET https://erabi-production.up.railway.app/index/v1/services/{slug}/attestation
 ```
 
 Verify the attestation (detached ed25519 over the canonicalized `payload`;
-the signing key is the node key published in the registry's
-`/.well-known/erabi.json`), then decide with the measured uptime, latency,
+the signing key is served at
+`https://erabi-production.up.railway.app/index/v1/key`), then decide with the measured uptime, latency,
 and price. `discover` results for x402 services include the same data in a
 `reliability` field.
 

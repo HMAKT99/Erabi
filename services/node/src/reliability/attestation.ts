@@ -92,7 +92,7 @@ export function signProbeAttestation(
     key: publicKeyToString(keys.publicKey),
     verify:
       "ed25519 verifyBytes over canonicalize(payload); the key is this node's " +
-      "signing key, also published in /registry/.well-known/erabi.json",
+      "signing key, also served at the index's /v1/key endpoint",
   };
 }
 

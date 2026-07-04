@@ -152,9 +152,8 @@ export default function ServiceView() {
         </div>
         <p className="mt-2 text-xs text-terminal-dim">
           Every probe is published as a detached ed25519 signature over the canonicalized payload,
-          signed by the node key in{" "}
-          <code className="text-terminal-text">/registry/.well-known/erabi.json</code>. Your agent
-          can verify and reuse it — no need to burn a call re-checking the service.
+          signed by the node key served at <code className="text-terminal-text">/index/v1/key</code>
+          . Your agent can verify and reuse it — no need to burn a call re-checking the service.
         </p>
         <div className="mt-3 flex items-center gap-3">
           <code className="truncate text-xs text-terminal-text">

@@ -9,6 +9,8 @@ export interface ReliabilityServerOptions {
   explorerUrl?: string;
   /** Registry public base, for the DNS claim flow. */
   registryUrl?: string;
+  /** The node's public signing key (verifies every attestation served here). */
+  nodePublicKey?: string;
   logger?: boolean;
 }
 
@@ -63,6 +65,13 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
 
   app.get("/healthz", async () => ({ ok: true }));
 
+  // The verification anchor: the key every attestation from this node is
+  // signed with. Served from the index itself so verification is self-serve.
+  app.get("/v1/key", async (_request, reply) => {
+    reply.header("cache-control", "public, max-age=300");
+    return { node_key: options.nodePublicKey ?? null, algorithm: "ed25519" };
+  });
+
   const publicSummary = (summary: ServiceSummary) => ({
     ...summary,
     attestation_url: base
@@ -86,11 +95,12 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
       .map(publicSummary);
     return {
       count: services.length,
+      node_key: options.nodePublicKey ?? null,
       services,
       // §9.4 convention: every public surface tells an agent how to use it.
       usage: {
         attestations:
-          "GET /v1/services/{slug}/attestation returns this node's latest signed probe — verify it (ed25519 over canonical JSON) and reuse it instead of re-probing the service yourself.",
+          "GET /v1/services/{slug}/attestation returns this node's latest signed probe — verify it (ed25519 over canonical JSON against node_key, also at /v1/key) and reuse it instead of re-probing the service yourself.",
         discover:
           "x402 services also appear in registry /v1/discover results with a reliability field.",
       },
@@ -158,7 +168,7 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
         sig: attestation.sig,
         key: attestation.key,
         verify:
-          "ed25519 verifyBytes over canonicalize(payload); the key is this node's signing key, also published in the registry's /.well-known/erabi.json",
+          "ed25519 verifyBytes over canonicalize(payload); the key is this node's signing key, also served at /v1/key on this index",
       };
     },
   );

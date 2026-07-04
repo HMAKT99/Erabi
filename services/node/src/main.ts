@@ -191,6 +191,7 @@ if (x402Endpoints !== "off" && x402Endpoints.length > 0) {
     publicBaseUrl: indexPublicBase || undefined,
     explorerUrl: process.env.ERABI_EXPLORER_URL ?? "https://erabi-explorer.vercel.app",
     registryUrl: publicUrls.registry,
+    nodePublicKey: node.publicKey,
     logger: production,
   });
   await indexApp.listen({

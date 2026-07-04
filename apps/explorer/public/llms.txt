@@ -12,7 +12,7 @@
 ## Reliability index (check a paid service before calling it)
 
 - [Live index (JSON)](https://erabi-production.up.railway.app/index/v1/services): every indexed x402 service with uptime/latency/price
-- Latest signed attestation per service: `GET https://erabi-production.up.railway.app/index/v1/services/{slug}/attestation` — detached ed25519 over canonical JSON, signed with the node key from the registry's `/.well-known/erabi.json`; verify once, reuse, do not re-probe
+- Latest signed attestation per service: `GET https://erabi-production.up.railway.app/index/v1/services/{slug}/attestation` — detached ed25519 over canonical JSON, signed with the node key from https://erabi-production.up.railway.app/index/v1/key ; verify once, reuse, do not re-probe
 - [Human-readable index](https://erabi-explorer.vercel.app/services)
 - `discover` results for x402 services carry a `reliability` field with the attestation URL
 

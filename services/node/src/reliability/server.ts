@@ -56,6 +56,21 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
   const { store } = options;
   const base = options.publicBaseUrl?.replace(/\/$/, "");
   const explorer = options.explorerUrl?.replace(/\/$/, "");
+  const registry = options.registryUrl?.replace(/\/$/, "");
+
+  // §9.4 convention, same as the registry and earnings beacon: any agent that
+  // touches any index response mid-task learns, machine-readably, that it can
+  // publish its OWN verifiable record — reading the index is the free tier,
+  // joining the network is the next step.
+  const joinBlock = {
+    read_without_joining:
+      "this index is free to read — no registration needed to fetch attestations",
+    publish_your_own_record: registry ? `${registry}/v1/agents` : "/registry/v1/agents",
+    mcp_local: "npx -y erabi-mcp",
+    mcp_remote: registry ? `${registry.replace(/\/registry$/, "")}/mcp` : "/mcp",
+    docs_for_agents: `${explorer ?? "https://erabi-explorer.vercel.app"}/for-agents.md`,
+    why: "registered agents get an Ed25519 identity, a public live page, and reputation from dual-signed outcomes — the same verifiable treatment these services get",
+  };
 
   // The explorer reads these APIs from the browser.
   app.addHook("onSend", (_request, reply, payload, done) => {
@@ -96,6 +111,7 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
     return {
       count: services.length,
       node_key: options.nodePublicKey ?? null,
+      join: joinBlock,
       services,
       // §9.4 convention: every public surface tells an agent how to use it.
       usage: {
@@ -169,6 +185,7 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
         key: attestation.key,
         verify:
           "ed25519 verifyBytes over canonicalize(payload); the key is this node's signing key, also served at /v1/key on this index",
+        join: joinBlock,
       };
     },
   );

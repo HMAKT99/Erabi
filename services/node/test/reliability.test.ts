@@ -298,6 +298,7 @@ describe("reliability index API", () => {
     expect(response.headers["cache-control"]).toContain("max-age=60");
     const body = response.json() as { count: number; services: Array<Record<string, unknown>> };
     expect(body.count).toBe(1);
+    expect(body.join).toMatchObject({ mcp_local: "npx -y erabi-mcp" });
     expect(body.services[0]).toMatchObject({
       slug: "exa-search",
       uptime_24h_pct: 100,
@@ -338,8 +339,9 @@ describe("reliability index API", () => {
       url: "/v1/services/exa-search/attestation",
     });
     expect(response.statusCode).toBe(200);
-    const body = response.json() as { payload: unknown; sig: string; key: string };
+    const body = response.json() as { payload: unknown; sig: string; key: string; join?: unknown };
     expect(verifyProbeAttestation(body)).toBe(true);
+    expect(body.join).toMatchObject({ mcp_local: "npx -y erabi-mcp" });
     await app.close();
     store.close();
   });

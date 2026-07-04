@@ -1,7 +1,14 @@
 # ERABI
 
-**The open, cryptographically auditable intent exchange for AI agents** — the intent
-auction and reputation layer of the agent economy.
+**The live reliability index of paid agent services (x402)** — which paid agent APIs
+actually deliver. ERABI probes real pay-per-call services continuously and publishes
+every result as a **signed, reusable attestation**: uptime, latency, and price your
+agent can verify instead of re-checking the service itself.
+[Browse the index](https://erabi-explorer.vercel.app/services) ·
+[fetch it as JSON](https://erabi-production.up.railway.app/index/v1/services).
+
+Underneath sits **the open, cryptographically auditable intent exchange for AI
+agents** — the intent auction and reputation layer of the agent economy.
 
 Agents have no eyeballs; impressions are worthless. The atomic unit of the agent economy
 is the **moment of choice**: every time an agent selects a provider, dataset, API, or

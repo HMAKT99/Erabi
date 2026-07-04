@@ -63,6 +63,19 @@ export interface DiscoverResult {
   score: number;
   reason: string;
   evidence_url: string;
+  /** Live reliability data for x402 bridge services (ADR 0026); fetch the
+   *  signed attestation instead of re-probing the endpoint yourself. */
+  reliability?: {
+    uptime_24h_pct: number | null;
+    latency_ms_p50: number | null;
+    last_probe_ts: string | null;
+    attestation_url: string;
+  };
+}
+
+/** Lazily-wired reliability lookups (same seam as stakeSource). */
+export interface ReliabilitySource {
+  reliabilityOf(agentId: string): DiscoverResult["reliability"] | undefined;
 }
 
 /** Minimal event-bus surface (matches @erabi/exchange's EventBus). */
@@ -81,6 +94,8 @@ export interface RegistryServiceOptions {
   bus?: NetworkEventSink;
   /** Ledger-held stake lookups (attribution) for the staked-tier upgrade. */
   stakeSource?: { stakeOf(agentId: string): number };
+  /** Reliability summaries for bridged x402 providers (ADR 0026). */
+  reliabilitySource?: ReliabilitySource;
 }
 
 export class RegistryService {
@@ -92,9 +107,11 @@ export class RegistryService {
   private readonly now: () => number;
   private readonly bus?: NetworkEventSink;
   private readonly stakeSource?: { stakeOf(agentId: string): number };
+  private readonly reliabilitySource?: ReliabilitySource;
 
   constructor(options: RegistryServiceOptions) {
     this.stakeSource = options.stakeSource;
+    this.reliabilitySource = options.reliabilitySource;
     this.db = options.db;
     this.verifiers = options.verifiers;
     this.nonceStore = options.nonceStore ?? new InMemoryNonceStore();
@@ -544,6 +561,7 @@ export class RegistryService {
         const freshness = Math.pow(0.5, ageDays / DISCOVERY_FRESHNESS_HALF_LIFE_DAYS);
         const capabilityMatch = 1; // exact category match (the only mode in 0.1)
         const score = capabilityMatch * (view.reputation / 100) * freshness;
+        const reliability = this.reliabilitySource?.reliabilityOf(view.manifest.id);
         return {
           provider_id: view.manifest.id,
           name: view.manifest.name,
@@ -552,6 +570,7 @@ export class RegistryService {
           score: Number(score.toFixed(6)),
           reason: "capability_match",
           evidence_url: `${this.baseUrl}/v1/reputation/${view.manifest.id}`,
+          ...(reliability ? { reliability } : {}),
         };
       })
       .sort((a, b) => b.score - a.score)

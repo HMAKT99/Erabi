@@ -121,7 +121,10 @@ describe("probeX402Detailed", () => {
     ).toString("base64");
     const detailed = await probeX402Detailed("https://tick.example/latest", {
       fetchImpl: (async () =>
-        new Response("{}", { status: 402, headers: { "payment-required": challenge } })) as typeof fetch,
+        new Response("{}", {
+          status: 402,
+          headers: { "payment-required": challenge },
+        })) as typeof fetch,
     });
     expect(detailed.alive).toBe(true);
     expect(detailed.x402_version).toBe("v2-header");

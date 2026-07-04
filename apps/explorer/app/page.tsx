@@ -62,6 +62,15 @@ const MCP_CONFIG = `{
   }
 }`;
 
+interface IndexedService {
+  slug: string;
+  title: string | null;
+  category: string;
+  uptime_24h_pct: number | null;
+  latency_ms_p50_24h: number | null;
+  price_usd: number | null;
+}
+
 export default function Home() {
   const [agents, setAgents] = useState<number>();
   const [activated, setActivated] = useState<number>();
@@ -70,6 +79,15 @@ export default function Home() {
   const [beacon, setBeacon] = useState<Beacon | null>(null);
   const [events, setEvents] = useState<TickerEvent[]>([]);
   const [lookup, setLookup] = useState("");
+  const [topServices, setTopServices] = useState<IndexedService[]>([]);
+
+  useEffect(() => {
+    void getJson<{ services: IndexedService[] }>(`${ENDPOINTS.index}/v1/services`).then((body) => {
+      const services = body?.services ?? [];
+      services.sort((a, b) => (b.uptime_24h_pct ?? -1) - (a.uptime_24h_pct ?? -1));
+      setTopServices(services.slice(0, 6));
+    });
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -115,22 +133,30 @@ export default function Home() {
         <div className="md:col-span-4">
           <p className="label">open source · apache-2.0 · spec erabi/0.1</p>
           <h1 className="mt-4 text-3xl font-bold leading-tight md:text-4xl">
-            Anyone can ship an agent.
+            Agents pay APIs blind.
             <br />
-            <span className="text-terminal-green">Few can prove theirs works.</span>
+            <span className="text-terminal-green">ERABI measures which ones deliver.</span>
           </h1>
           <p className="mt-5 text-sm leading-relaxed md:text-base">
-            The agent web is filling with look-alikes. The winners won&apos;t be the loudest —
-            they&apos;ll be the ones with <b>receipts</b>. ERABI gives your agent a verifiable,
-            public track record it owns — earned from signed outcomes, in one command.
+            The live <b>reliability index</b> of the paid agent-services (x402) economy: uptime,
+            latency, and price from continuous real probes — each published as a{" "}
+            <b>signed, reusable attestation</b> your agent can verify instead of re-checking the
+            service itself.
           </p>
           <p className="mt-2 text-xs leading-relaxed text-terminal-dim">
-            reputation from dual-signed outcomes only · every paid placement signed &amp; labeled
+            underneath: the open intent exchange — reputation from dual-signed outcomes only · every
+            paid placement signed &amp; labeled
           </p>
           <div className="mt-6 flex flex-wrap gap-3 text-sm">
+            <Link
+              href="/services"
+              className="rounded border border-terminal-green bg-terminal-green px-4 py-2 font-bold text-terminal-bg hover:opacity-90"
+            >
+              view the index →
+            </Link>
             <a
               href={GITHUB_URL}
-              className="rounded border border-terminal-green bg-terminal-green px-4 py-2 font-bold text-terminal-bg hover:opacity-90"
+              className="rounded border border-terminal-border px-4 py-2 hover:border-terminal-green hover:text-terminal-green"
             >
               ★ Star on GitHub
             </a>
@@ -139,12 +165,6 @@ export default function Home() {
               className="rounded border border-terminal-border px-4 py-2 hover:border-terminal-green hover:text-terminal-green"
             >
               how it works
-            </Link>
-            <Link
-              href="/agents"
-              className="rounded border border-terminal-border px-4 py-2 hover:border-terminal-green hover:text-terminal-green"
-            >
-              see a live agent page →
             </Link>
           </div>
         </div>
@@ -199,6 +219,49 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      {/* ---- reliability index strip: the new front door (ADR 0026) ---- */}
+      {topServices.length > 0 && (
+        <section>
+          <div className="mb-3 flex items-baseline justify-between">
+            <p className="label">x402 reliability index · live</p>
+            <Link href="/services" className="text-xs text-terminal-green hover:underline">
+              all services →
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {topServices.map((service) => (
+              <Link
+                key={service.slug}
+                href={`/services/${service.slug}`}
+                className="panel flex items-center justify-between gap-3 hover:border-terminal-green"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <span
+                    className={`h-2 w-2 shrink-0 rounded-full ${
+                      service.uptime_24h_pct === null
+                        ? "bg-terminal-dim"
+                        : service.uptime_24h_pct >= 99
+                          ? "bg-terminal-green"
+                          : service.uptime_24h_pct >= 95
+                            ? "bg-terminal-amber"
+                            : "bg-terminal-red"
+                    }`}
+                    aria-hidden
+                  />
+                  <span className="truncate text-sm font-semibold">
+                    {service.title ?? service.slug}
+                  </span>
+                </span>
+                <span className="shrink-0 text-xs tabular-nums text-terminal-dim">
+                  {service.uptime_24h_pct === null ? "—" : `${service.uptime_24h_pct}%`}
+                  {service.price_usd !== null && <span> · ${service.price_usd}</span>}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ---- human / agent split-door: dual on-ramp + thesis-in-a-gesture ---- */}
       <section>

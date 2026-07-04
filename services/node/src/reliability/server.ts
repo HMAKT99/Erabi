@@ -65,10 +65,16 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
 
   const publicSummary = (summary: ServiceSummary) => ({
     ...summary,
-    attestation_url: base ? `${base}/v1/services/${summary.slug}/attestation` : `/v1/services/${summary.slug}/attestation`,
-    badge_url: base ? `${base}/v1/services/${summary.slug}/badge.svg` : `/v1/services/${summary.slug}/badge.svg`,
+    attestation_url: base
+      ? `${base}/v1/services/${summary.slug}/attestation`
+      : `/v1/services/${summary.slug}/attestation`,
+    badge_url: base
+      ? `${base}/v1/services/${summary.slug}/badge.svg`
+      : `/v1/services/${summary.slug}/badge.svg`,
     ...(explorer ? { page: `${explorer}/services/${summary.slug}` } : {}),
-    ...(summary.service_id && explorer ? { agent_page: `${explorer}/agents/${summary.service_id}` } : {}),
+    ...(summary.service_id && explorer
+      ? { agent_page: `${explorer}/agents/${summary.service_id}` }
+      : {}),
   });
 
   app.get("/v1/services", async (_request, reply) => {
@@ -85,7 +91,8 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
       usage: {
         attestations:
           "GET /v1/services/{slug}/attestation returns this node's latest signed probe — verify it (ed25519 over canonical JSON) and reuse it instead of re-probing the service yourself.",
-        discover: "x402 services also appear in registry /v1/discover results with a reliability field.",
+        discover:
+          "x402 services also appear in registry /v1/discover results with a reliability field.",
       },
     };
   });
@@ -93,7 +100,9 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
   app.get<{ Params: { slug: string } }>("/v1/services/:slug", async (request, reply) => {
     const summary = store.summary(request.params.slug);
     if (!summary) {
-      return reply.status(404).send({ error: { code: "unknown_service", message: "no such service" } });
+      return reply
+        .status(404)
+        .send({ error: { code: "unknown_service", message: "no such service" } });
     }
     reply.header("cache-control", "public, max-age=60");
     return {
@@ -115,7 +124,9 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
     async (request, reply) => {
       const { slug } = request.params;
       if (!store.service(slug)) {
-        return reply.status(404).send({ error: { code: "unknown_service", message: "no such service" } });
+        return reply
+          .status(404)
+          .send({ error: { code: "unknown_service", message: "no such service" } });
       }
       const window = (request.query.window ?? "24h") as HistoryWindow;
       if (!(window in WINDOWS)) {
@@ -132,22 +143,25 @@ export function buildReliabilityServer(options: ReliabilityServerOptions): Fasti
     },
   );
 
-  app.get<{ Params: { slug: string } }>("/v1/services/:slug/attestation", async (request, reply) => {
-    const attestation = store.latestAttestation(request.params.slug);
-    if (!attestation) {
-      return reply
-        .status(404)
-        .send({ error: { code: "no_attestation", message: "no attestation recorded yet" } });
-    }
-    reply.header("cache-control", "public, max-age=60");
-    return {
-      payload: JSON.parse(attestation.payload) as unknown,
-      sig: attestation.sig,
-      key: attestation.key,
-      verify:
-        "ed25519 verifyBytes over canonicalize(payload); the key is this node's signing key, also published in the registry's /.well-known/erabi.json",
-    };
-  });
+  app.get<{ Params: { slug: string } }>(
+    "/v1/services/:slug/attestation",
+    async (request, reply) => {
+      const attestation = store.latestAttestation(request.params.slug);
+      if (!attestation) {
+        return reply
+          .status(404)
+          .send({ error: { code: "no_attestation", message: "no attestation recorded yet" } });
+      }
+      reply.header("cache-control", "public, max-age=60");
+      return {
+        payload: JSON.parse(attestation.payload) as unknown,
+        sig: attestation.sig,
+        key: attestation.key,
+        verify:
+          "ed25519 verifyBytes over canonicalize(payload); the key is this node's signing key, also published in the registry's /.well-known/erabi.json",
+      };
+    },
+  );
 
   app.get<{ Params: { slug: string } }>("/v1/services/:slug/badge.svg", async (request, reply) => {
     const summary = store.summary(request.params.slug);

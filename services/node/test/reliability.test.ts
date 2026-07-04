@@ -42,7 +42,11 @@ describe("ReliabilityStore", () => {
     const first = new ReliabilityStore(":memory:");
     first.close();
     const second = new ReliabilityStore(":memory:");
-    second.upsertService({ slug: "exa-search", url: "https://api.exa.ai/search", category: "api.search" });
+    second.upsertService({
+      slug: "exa-search",
+      url: "https://api.exa.ai/search",
+      category: "api.search",
+    });
     expect(second.services()).toHaveLength(1);
     second.close();
   });
@@ -57,7 +61,11 @@ describe("ReliabilityStore", () => {
       service_id: "erabi:agent:abc",
     });
     // Re-seed without title/service_id (e.g. boot before bridge activation).
-    store.upsertService({ slug: "exa-search", url: "https://api.exa.ai/search", category: "api.search" });
+    store.upsertService({
+      slug: "exa-search",
+      url: "https://api.exa.ai/search",
+      category: "api.search",
+    });
     const row = store.service("exa-search");
     expect(row?.title).toBe("Exa Search");
     expect(row?.service_id).toBe("erabi:agent:abc");
@@ -72,8 +80,18 @@ describe("ReliabilityStore", () => {
     store.recordProbe("s", "2026-07-04T14:05:00.000Z", aliveProbe({ latency_ms: 300 }));
     const rollups = store.rollupsSince("s", "2026-07-04T00");
     expect(rollups).toHaveLength(2);
-    expect(rollups[0]).toMatchObject({ hour: "2026-07-04T13", probes: 2, ok: 1, latency_ms_max: 100 });
-    expect(rollups[1]).toMatchObject({ hour: "2026-07-04T14", probes: 1, ok: 1, latency_ms_max: 300 });
+    expect(rollups[0]).toMatchObject({
+      hour: "2026-07-04T13",
+      probes: 2,
+      ok: 1,
+      latency_ms_max: 100,
+    });
+    expect(rollups[1]).toMatchObject({
+      hour: "2026-07-04T14",
+      probes: 1,
+      ok: 1,
+      latency_ms_max: 300,
+    });
     store.close();
   });
 
@@ -100,7 +118,13 @@ describe("ReliabilityStore", () => {
     const now = new Date("2026-07-04T15:00:00.000Z");
     store.recordProbe("s", "2026-05-01T00:00:00.000Z", aliveProbe()); // >30d old
     store.recordProbe("s", "2026-07-04T14:00:00.000Z", aliveProbe());
-    store.saveAttestation({ slug: "s", ts: "2026-07-04T14:00:00.000Z", payload: "{}", sig: "x", key: "k" });
+    store.saveAttestation({
+      slug: "s",
+      ts: "2026-07-04T14:00:00.000Z",
+      payload: "{}",
+      sig: "x",
+      key: "k",
+    });
     const result = store.prune(now);
     expect(result.probes).toBe(1);
     expect(store.probesSince("s", "2026-01-01T00:00:00.000Z")).toHaveLength(1);
@@ -126,7 +150,11 @@ describe("probe attestations", () => {
     expect(verifyProbeAttestation(signed)).toBe(true);
     // The signature is a plain detached ed25519 over canonicalize(payload).
     expect(
-      verifyBytes(utf8.encode(canonicalize(signed.payload)), signed.sig, publicKeyFromString(signed.key)),
+      verifyBytes(
+        utf8.encode(canonicalize(signed.payload)),
+        signed.sig,
+        publicKeyFromString(signed.key),
+      ),
     ).toBe(true);
     // Tampering breaks it.
     const tampered = { ...signed, payload: { ...signed.payload, alive: false } };
@@ -152,7 +180,12 @@ describe("probe attestations", () => {
 describe("reliability loop", () => {
   const endpoints: CuratedX402Endpoint[] = [
     { slug: "up-service", url: "https://up.example/api", category: "api.search", title: "Up" },
-    { slug: "down-service", url: "https://down.example/api", category: "data.market", title: "Down" },
+    {
+      slug: "down-service",
+      url: "https://down.example/api",
+      category: "data.market",
+      title: "Down",
+    },
   ];
 
   const fakeFetch = (async (input: RequestInfo | URL) => {
@@ -207,12 +240,12 @@ describe("reliability loop", () => {
   });
 
   it("derives a slug from the host when none is given", () => {
-    expect(slugForEndpoint({ url: "https://www.example-api.com/v1/x", category: "api.search" })).toBe(
-      "example-api-com",
-    );
-    expect(slugForEndpoint({ slug: "explicit", url: "https://x.example", category: "api.search" })).toBe(
-      "explicit",
-    );
+    expect(
+      slugForEndpoint({ url: "https://www.example-api.com/v1/x", category: "api.search" }),
+    ).toBe("example-api-com");
+    expect(
+      slugForEndpoint({ slug: "explicit", url: "https://x.example", category: "api.search" }),
+    ).toBe("explicit");
   });
 });
 
@@ -289,7 +322,10 @@ describe("reliability index API", () => {
 
   it("serves a verifiable attestation", async () => {
     const { app, store } = await makeApp();
-    const response = await app.inject({ method: "GET", url: "/v1/services/exa-search/attestation" });
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/services/exa-search/attestation",
+    });
     expect(response.statusCode).toBe(200);
     const body = response.json() as { payload: unknown; sig: string; key: string };
     expect(verifyProbeAttestation(body)).toBe(true);
@@ -299,11 +335,20 @@ describe("reliability index API", () => {
 
   it("serves history windows and rejects bad ones", async () => {
     const { app, store } = await makeApp();
-    const day = await app.inject({ method: "GET", url: "/v1/services/exa-search/history?window=24h" });
+    const day = await app.inject({
+      method: "GET",
+      url: "/v1/services/exa-search/history?window=24h",
+    });
     expect(day.json().probes).toHaveLength(1);
-    const week = await app.inject({ method: "GET", url: "/v1/services/exa-search/history?window=7d" });
+    const week = await app.inject({
+      method: "GET",
+      url: "/v1/services/exa-search/history?window=7d",
+    });
     expect(week.json().hourly).toHaveLength(1);
-    const bad = await app.inject({ method: "GET", url: "/v1/services/exa-search/history?window=1y" });
+    const bad = await app.inject({
+      method: "GET",
+      url: "/v1/services/exa-search/history?window=1y",
+    });
     expect(bad.statusCode).toBe(400);
     await app.close();
     store.close();

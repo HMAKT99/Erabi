@@ -88,7 +88,7 @@ export function createErabiMcpServer(options: ErabiMcpOptions = {}): McpServer {
 
   server.tool(
     "discover",
-    "Find providers for a capability, ranked organically by reputation × freshness.",
+    "Find providers for a capability, ranked organically by reputation × freshness. Results for paid x402 services include live reliability data (uptime, latency) and a signed attestation URL — fetch and verify it instead of re-probing the service yourself.",
     { capability: z.string(), limit: z.number().int().min(1).max(50).optional() },
     async (args) => {
       const agent = current;

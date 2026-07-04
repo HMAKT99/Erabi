@@ -31,7 +31,14 @@ registry     https://<url>/registry
 exchange     https://<url>/exchange
 attribution  https://<url>/attribution
 reputation   https://<url>/reputation
+index        https://<url>/index        (x402 reliability index, ADR 0026)
 ```
+
+Reliability index knobs (optional): `ERABI_PROBE_INTERVAL_MS` (default 600000 =
+10 min) sets the probe cadence; `INDEX_PORT` (default 4005) the loopback port.
+The explorer derives its index URL from `NEXT_PUBLIC_ERABI_REGISTRY_URL`
+(`…/registry` → `…/index`); set `NEXT_PUBLIC_ERABI_INDEX_URL` only when the
+layouts differ.
 
 With your own domain later: attach `registry.<domain>` etc. as custom domains on the
 same Railway service, set `ERABI_DOMAIN=<domain>` (instead of the base URL), and the

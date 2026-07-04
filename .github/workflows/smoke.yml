@@ -45,11 +45,29 @@ jobs:
           curl -sf --max-time 15 "$BASE/attribution/v1/stats/earnings" | grep -q '"confirmed_events"' || exit 1
           curl -sf --max-time 15 "$BASE/registry/v1/stats" | grep -q '"agents"' || exit 1
 
+      - name: Node — reliability index live and fresh (ADR 0026)
+        run: |
+          BASE=https://erabi-production.up.railway.app
+          LIST=$(curl -sf --max-time 15 "$BASE/index/v1/services")
+          COUNT=$(echo "$LIST" | grep -o '"slug"' | wc -l)
+          [ "$COUNT" -ge 10 ] || { echo "::error::index has $COUNT services (<10)"; exit 1; }
+          echo "index lists $COUNT services"
+          ATT=$(curl -sf --max-time 15 "$BASE/index/v1/services/exa-search/attestation")
+          echo "$ATT" | grep -q '"sig"' || { echo "::error::attestation missing signature"; exit 1; }
+          # freshness watchdog: the newest attestation must be < 30 minutes old
+          TS=$(echo "$ATT" | grep -o '"ts":"[^"]*"' | head -1 | cut -d'"' -f4)
+          AGE=$(( $(date +%s) - $(date -d "$TS" +%s) ))
+          [ "$AGE" -lt 1800 ] || { echo "::error::attestation stale (${AGE}s old) — probe loop dead?"; exit 1; }
+          echo "attestation fresh (${AGE}s old)"
+          curl -sfI --max-time 15 "$BASE/index/v1/services/exa-search/badge.svg" \
+            | grep -qi 'content-type: *image/svg+xml' || { echo "::error::badge not svg"; exit 1; }
+          echo "badge ok"
+
       - name: Explorer — pages live and wired to the node
         run: |
           EXPLORER=https://erabi-explorer.vercel.app
           curl -sf --max-time 15 "$EXPLORER" -o /tmp/home.html
-          for page in about builder integrations agents leaderboard disclosures dashboard; do
+          for page in about builder integrations agents leaderboard disclosures dashboard services; do
             curl -sf --max-time 15 -o /dev/null "$EXPLORER/$page" \
               || { echo "::error::/$page broken"; exit 1; }
             echo "/$page ok"

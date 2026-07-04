@@ -3,6 +3,14 @@ export const ENDPOINTS = {
   exchange: process.env.NEXT_PUBLIC_ERABI_EXCHANGE_URL ?? "http://localhost:4002",
   attribution: process.env.NEXT_PUBLIC_ERABI_ATTRIBUTION_URL ?? "http://localhost:4003",
   reputation: process.env.NEXT_PUBLIC_ERABI_REPUTATION_URL ?? "http://localhost:4004",
+  // Reliability index (ADR 0026). Derived from the registry URL in gateway
+  // deployments (…/registry → …/index) so no extra env var is required;
+  // override with NEXT_PUBLIC_ERABI_INDEX_URL when the layouts differ.
+  index:
+    process.env.NEXT_PUBLIC_ERABI_INDEX_URL ??
+    ((process.env.NEXT_PUBLIC_ERABI_REGISTRY_URL ?? "").endsWith("/registry")
+      ? (process.env.NEXT_PUBLIC_ERABI_REGISTRY_URL ?? "").replace(/\/registry$/, "/index")
+      : "http://localhost:4005"),
 };
 
 /** Remote MCP front door: one URL, zero install (gateway mounts it at /mcp). */

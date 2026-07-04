@@ -129,6 +129,12 @@ export class ReliabilityStore {
       .all() as ServiceRow[];
   }
 
+  serviceByAgentId(agentId: string): ServiceRow | undefined {
+    return this.db.prepare("SELECT * FROM services WHERE service_id = ?").get(agentId) as
+      | ServiceRow
+      | undefined;
+  }
+
   service(slug: string): ServiceRow | undefined {
     return this.db.prepare("SELECT * FROM services WHERE slug = ?").get(slug) as
       | ServiceRow
@@ -212,9 +218,7 @@ export class ReliabilityStore {
       .map((row) => row.latency_ms)
       .filter((value): value is number => value !== null)
       .sort((a, b) => a - b);
-    const p50 = latencies.length
-      ? latencies[Math.floor((latencies.length - 1) / 2)]!
-      : null;
+    const p50 = latencies.length ? latencies[Math.floor((latencies.length - 1) / 2)]! : null;
 
     const last = this.lastProbe(slug);
     return {
@@ -229,10 +233,7 @@ export class ReliabilityStore {
       latency_ms: last?.latency_ms ?? null,
       price_usd: last?.price_usd ?? this.lastKnownPrice(slug),
       x402_version: last?.x402_version ?? null,
-      uptime_24h_pct: pct(
-        raw24h.filter((row) => row.alive === 1).length,
-        raw24h.length,
-      ),
+      uptime_24h_pct: pct(raw24h.filter((row) => row.alive === 1).length, raw24h.length),
       uptime_7d_pct: windowStats(7 * 24),
       uptime_30d_pct: windowStats(30 * 24),
       latency_ms_p50_24h: p50,

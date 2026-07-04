@@ -271,6 +271,55 @@ describe("discovery", () => {
     service.setReputation(agent.id, 95);
     expect(service.getAgent(agent.id).reputation).toBe(70); // unverified ceiling
   });
+
+  it("attaches reliability to results when a reliabilitySource is wired (ADR 0026)", async () => {
+    const provider = makeAgent("BridgedApi", ["data.financial"]);
+    const withSource = new RegistryService({
+      db: createDb(),
+      verifiers: new Map([
+        ["dns", dns],
+        ["github", new MockGithubVerifier()],
+      ]),
+      nodeId: "erabi-node-test",
+      baseUrl: BASE_URL,
+      reliabilitySource: {
+        reliabilityOf: (agentId) =>
+          agentId === provider.id
+            ? {
+                uptime_24h_pct: 99.3,
+                latency_ms_p50: 240,
+                last_probe_ts: "2026-07-04T13:05:00.000Z",
+                attestation_url: "https://node.example/index/v1/services/api/attestation",
+              }
+            : undefined,
+      },
+    });
+    const sourcedApp = buildServer(withSource);
+    try {
+      await sourcedApp.inject({ method: "POST", url: "/v1/agents", payload: provider.envelope });
+      const response = await sourcedApp.inject({
+        method: "POST",
+        url: "/v1/discover",
+        payload: { capability: "data.financial" },
+      });
+      const [result] = response.json().results;
+      expect(result.provider_id).toBe(provider.id);
+      expect(result.reliability).toMatchObject({ uptime_24h_pct: 99.3, latency_ms_p50: 240 });
+    } finally {
+      await sourcedApp.close();
+    }
+  });
+
+  it("omits the reliability field without a source (unchanged contract)", async () => {
+    await register(makeAgent("Plain", ["agent.research"]));
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/discover",
+      payload: { capability: "agent.research" },
+    });
+    const [result] = response.json().results;
+    expect(result).not.toHaveProperty("reliability");
+  });
 });
 
 describe("key rotation", () => {

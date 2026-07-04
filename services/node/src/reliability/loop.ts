@@ -46,9 +46,9 @@ export function seedServices(options: ReliabilityLoopOptions): void {
 }
 
 /** One probing pass over all endpoints: record, roll up, sign, store. */
-export async function runProbeTick(options: ReliabilityLoopOptions): Promise<
-  Array<{ slug: string; alive: boolean }>
-> {
+export async function runProbeTick(
+  options: ReliabilityLoopOptions,
+): Promise<Array<{ slug: string; alive: boolean }>> {
   const results: Array<{ slug: string; alive: boolean }> = [];
   for (const [index, endpoint] of options.endpoints.entries()) {
     if (index > 0 && (options.staggerMs ?? 2_000) > 0) {
@@ -106,10 +106,7 @@ export function startReliabilityLoop(options: ReliabilityLoopOptions): {
 } {
   seedServices(options);
   void runProbeTick(options); // first pass immediately — data from minute one
-  const interval = setInterval(
-    () => void runProbeTick(options),
-    options.intervalMs ?? 600_000,
-  );
+  const interval = setInterval(() => void runProbeTick(options), options.intervalMs ?? 600_000);
   interval.unref();
   return {
     stop() {

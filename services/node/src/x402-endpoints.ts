@@ -160,5 +160,8 @@ export function parseX402Endpoints(raw: string | undefined): CuratedX402Endpoint
 /** Slug for the reliability index: explicit, else derived from the host. */
 export function slugForEndpoint(endpoint: CuratedX402Endpoint): string {
   if (endpoint.slug) return endpoint.slug;
-  return new URL(endpoint.url).host.replace(/^www\./, "").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+  return new URL(endpoint.url).host
+    .replace(/^www\./, "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .toLowerCase();
 }

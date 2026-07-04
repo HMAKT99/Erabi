@@ -2,6 +2,30 @@
 
 Deviations and choices not fully specified by the project brief, newest first.
 
+## 0026 — The x402 reliability index is node machinery, not a protocol service
+
+The node continuously probes every curated x402 endpoint (10-minute
+staggered in-node interval — not an external cron: probe rows and the
+signing key live on this node's volume, and external schedulers lag too
+much for honest uptime measurement; smoke.yml watches attestation freshness
+instead) and publishes the results as a public reliability index at the
+`/index` gateway prefix. This is **node-operator machinery** like nonces
+and the node key — it lives in `services/node/src/reliability/` with its
+own `reliability.sqlite`, and the four protocol services stay untouched.
+Each probe is published as a signed attestation (`erabi.x402.probe/0.1`):
+a detached ed25519 signature over RFC 8785 canonical JSON with the node
+key — the same convention as DisclosureRecords (ADR 0012); the frozen
+protocol signing vectors are untouched. The attestation is the reusable
+unit of verification: an agent fetches and verifies it instead of
+re-probing the service itself. The index keys on **slugs**, not provider
+ids — bridged identities churn across restarts when the node runs without
+a seed — and deliberately lists services that fail activation: an index
+that hides dead services is not a reliability index. `discover` results
+for bridged providers carry an optional `reliability` field via a
+late-bound `reliabilitySource` (the stakeSource seam). Badge copy says
+"ERABI probed", not "verified" — the claim is exactly what the node
+measured.
+
 ## 0025 — Curated x402 bridge: real services as bridge-tier providers
 
 The node bridges a curated list of real x402-paywalled services

@@ -75,6 +75,12 @@ const servicePorts: [number, number, number, number] = [
 ];
 const indexPort = Number(process.env.INDEX_PORT ?? 4005);
 
+// Late-bound like the registry's stakeSource: the store is created after the
+// node starts (it needs the bridge results), but discover() can already close
+// over it. Undefined until then → results simply omit the reliability field.
+let reliabilityStore: ReliabilityStore | undefined;
+const indexPublicBase = base ? `${base}/index` : "";
+
 const node = await startReferenceNode({
   ports: servicePorts,
   // In gateway mode the services stay on loopback; only the gateway is public.
@@ -83,6 +89,20 @@ const node = await startReferenceNode({
   dataDir: process.env.ERABI_DATA_DIR,
   nodeId: process.env.ERABI_NODE_ID ?? "erabi-node-dev-1",
   nodeSeedHex: process.env.ERABI_NODE_SEED,
+  reliabilitySource: {
+    reliabilityOf(agentId) {
+      const row = reliabilityStore?.serviceByAgentId(agentId);
+      if (!row) return undefined;
+      const summary = reliabilityStore?.summary(row.slug);
+      if (!summary) return undefined;
+      return {
+        uptime_24h_pct: summary.uptime_24h_pct,
+        latency_ms_p50: summary.latency_ms_p50_24h,
+        last_probe_ts: summary.last_probe_ts,
+        attestation_url: `${indexPublicBase}/v1/services/${row.slug}/attestation`,
+      };
+    },
+  },
   verifiers: useRealVerifiers
     ? realVerifiers({ githubToken: process.env.ERABI_GITHUB_TOKEN })
     : undefined,
@@ -129,7 +149,6 @@ if (holdbackHours) {
 // providers. Every endpoint is live-probed; failures just don't activate.
 const x402Endpoints = parseX402Endpoints(process.env.ERABI_X402_ENDPOINTS);
 let reliabilityLoop: { stop(): void } | undefined;
-let reliabilityStore: ReliabilityStore | undefined;
 if (x402Endpoints !== "off" && x402Endpoints.length > 0) {
   const bridge = new X402Bridge({
     registry: node.registry,
@@ -169,14 +188,15 @@ if (x402Endpoints !== "off" && x402Endpoints.length > 0) {
   );
   const indexApp = buildReliabilityServer({
     store: reliabilityStore,
-    publicBaseUrl: base ? `${base}/index` : undefined,
+    publicBaseUrl: indexPublicBase || undefined,
     explorerUrl: process.env.ERABI_EXPLORER_URL ?? "https://erabi-explorer.vercel.app",
     registryUrl: publicUrls.registry,
     logger: production,
   });
   await indexApp.listen({
     port: indexPort,
-    host: process.env.ERABI_HOST ?? (gatewayPort ? "127.0.0.1" : production ? "0.0.0.0" : "127.0.0.1"),
+    host:
+      process.env.ERABI_HOST ?? (gatewayPort ? "127.0.0.1" : production ? "0.0.0.0" : "127.0.0.1"),
   });
   node.apps.push(indexApp);
   reliabilityLoop = startReliabilityLoop({

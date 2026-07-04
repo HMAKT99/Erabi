@@ -1,4 +1,11 @@
-import { canonicalize, signBytes, verifyBytes, publicKeyToString, publicKeyFromString, type KeyPair } from "@erabi/crypto";
+import {
+  canonicalize,
+  signBytes,
+  verifyBytes,
+  publicKeyToString,
+  publicKeyFromString,
+  type KeyPair,
+} from "@erabi/crypto";
 import { SPEC_VERSION } from "@erabi/constants";
 import type { DetailedX402Probe } from "@erabi/bridge-x402";
 

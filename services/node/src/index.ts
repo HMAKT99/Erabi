@@ -1,13 +1,19 @@
 import { createServer } from "node:net";
 import path from "node:path";
 import type { FastifyInstance } from "fastify";
-import { InMemoryNonceStore, publicKeyToString, type KeyPair, type NonceStore } from "@erabi/crypto";
+import {
+  InMemoryNonceStore,
+  publicKeyToString,
+  type KeyPair,
+  type NonceStore,
+} from "@erabi/crypto";
 import {
   buildServer as buildRegistryServer,
   createDb as createRegistryDb,
   MockDnsVerifier,
   MockGithubVerifier,
   RegistryService,
+  type ReliabilitySource,
   type VerifierSet,
 } from "@erabi/registry";
 import {
@@ -47,6 +53,8 @@ export interface ReferenceNodeOptions {
   verifiers?: VerifierSet;
   /** Shared replay protection; defaults to SQLite under dataDir, else in-memory. */
   nonceStore?: NonceStore;
+  /** Reliability lookups for bridged x402 providers, late-bound like stakeSource (ADR 0026). */
+  reliabilitySource?: ReliabilitySource;
   /** Enable fastify logging (production). */
   logger?: boolean;
   /**
@@ -149,6 +157,7 @@ export async function startReferenceNode(
     nonceStore,
     bus,
     stakeSource: { stakeOf: (id) => attributionRef?.stakeOf(id) ?? 0 },
+    ...(options.reliabilitySource ? { reliabilitySource: options.reliabilitySource } : {}),
   });
   const directory = registryDirectory(registry);
 

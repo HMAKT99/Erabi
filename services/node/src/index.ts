@@ -1,7 +1,7 @@
 import { createServer } from "node:net";
 import path from "node:path";
 import type { FastifyInstance } from "fastify";
-import { InMemoryNonceStore, publicKeyToString, type NonceStore } from "@erabi/crypto";
+import { InMemoryNonceStore, publicKeyToString, type KeyPair, type NonceStore } from "@erabi/crypto";
 import {
   buildServer as buildRegistryServer,
   createDb as createRegistryDb,
@@ -29,6 +29,8 @@ import { loadOrCreateNodeKeys, SqliteNonceStore } from "./durability.js";
 
 export * from "./durability.js";
 export * from "./gateway.js";
+export * from "./reliability/index.js";
+export { slugForEndpoint, type CuratedX402Endpoint } from "./x402-endpoints.js";
 
 export interface ReferenceNodeOptions {
   nodeId?: string;
@@ -75,6 +77,8 @@ export interface ReferenceNode {
   /** Where the node signing key came from: env seed, key file, or ephemeral. */
   keySource: "env" | "file" | "ephemeral";
   publicKey: string;
+  /** Node signing keys — used by the reliability index to sign probe attestations (ADR 0026). */
+  keys: KeyPair;
   apps: FastifyInstance[];
   stop(): Promise<void>;
 }
@@ -201,6 +205,7 @@ export async function startReferenceNode(
     mockRail,
     keySource,
     publicKey: publicKeyToString(keys.publicKey),
+    keys,
     apps,
     async stop() {
       await Promise.all(apps.map((app) => app.close()));

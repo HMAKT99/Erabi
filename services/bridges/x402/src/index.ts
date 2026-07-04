@@ -30,6 +30,21 @@ export interface X402Prober {
   probe(url: string): Promise<X402Probe | null>;
 }
 
+/**
+ * Full result of a single reliability probe. `alive` means the endpoint
+ * answered with a parseable x402 challenge carrying a positive price — the
+ * same condition under which the boot bridge would activate it.
+ */
+export interface DetailedX402Probe {
+  alive: boolean;
+  http_status: number | null;
+  latency_ms: number | null;
+  price_usd: number | null;
+  x402_version: "v1-body" | "v2-header" | null;
+  description?: string;
+  error: "timeout" | "network" | "non_402" | "bad_challenge" | null;
+}
+
 interface X402Requirement {
   scheme?: string;
   /** v1 field name. */
@@ -53,11 +68,109 @@ function requirementToProbe(payload: { accepts?: X402Requirement[] }): X402Probe
 }
 
 /**
+ * Detailed reliability probe: requests the endpoint and parses the HTTP 402
+ * payment requirements per the x402 spec — v2 servers put a base64 JSON
+ * challenge in the PAYMENT-REQUIRED response header (often with an empty
+ * body); v1 (and some v2) servers put it in the JSON body. Unlike
+ * `X402Prober.probe`, this never collapses failures into null: it reports
+ * status, latency, challenge version, and a failure class, which is what the
+ * reliability index records.
+ */
+export async function probeX402Detailed(
+  url: string,
+  options: { fetchImpl?: typeof fetch; timeoutMs?: number } = {},
+): Promise<DetailedX402Probe> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const started = performance.now();
+  let response: Response;
+  try {
+    response = await fetchImpl(url, {
+      method: "GET",
+      headers: { accept: "application/json", "user-agent": "erabi-bridge-x402" },
+      signal: AbortSignal.timeout(options.timeoutMs ?? 10_000),
+    });
+  } catch (error) {
+    const name = (error as { name?: string }).name ?? "";
+    return {
+      alive: false,
+      http_status: null,
+      latency_ms: null,
+      price_usd: null,
+      x402_version: null,
+      error: name === "TimeoutError" || name === "AbortError" ? "timeout" : "network",
+    };
+  }
+  const latencyMs = Math.max(0, Math.round(performance.now() - started));
+
+  if (response.status !== 402) {
+    return {
+      alive: false,
+      http_status: response.status,
+      latency_ms: latencyMs,
+      price_usd: null,
+      x402_version: null,
+      error: "non_402",
+    };
+  }
+
+  // x402 v2: base64-encoded JSON challenge in the PAYMENT-REQUIRED header.
+  const header = response.headers.get("payment-required");
+  if (header) {
+    try {
+      const decoded = JSON.parse(Buffer.from(header, "base64").toString("utf8")) as {
+        accepts?: X402Requirement[];
+      };
+      const probe = requirementToProbe(decoded);
+      if (probe) {
+        return {
+          alive: true,
+          http_status: 402,
+          latency_ms: latencyMs,
+          price_usd: probe.price_usd,
+          x402_version: "v2-header",
+          description: probe.description,
+          error: null,
+        };
+      }
+    } catch {
+      // malformed header — fall through to the body
+    }
+  }
+
+  // v1 (and some v2) servers: challenge in the JSON body.
+  try {
+    const body = (await response.json()) as { accepts?: X402Requirement[] };
+    const probe = requirementToProbe(body);
+    if (probe) {
+      return {
+        alive: true,
+        http_status: 402,
+        latency_ms: latencyMs,
+        price_usd: probe.price_usd,
+        x402_version: "v1-body",
+        description: probe.description,
+        error: null,
+      };
+    }
+  } catch {
+    // malformed body — fall through to bad_challenge
+  }
+
+  return {
+    alive: false,
+    http_status: 402,
+    latency_ms: latencyMs,
+    price_usd: null,
+    x402_version: null,
+    error: "bad_challenge",
+  };
+}
+
+/**
  * Real prober: requests the endpoint and parses the HTTP 402 payment
- * requirements per the x402 spec — v2 servers put a base64 JSON challenge in
- * the PAYMENT-REQUIRED response header (often with an empty body); v1 (and
- * some v2) servers put it in the JSON body. The advertised price (in the
- * asset's atomic units) becomes the standing bid.
+ * requirements per the x402 spec. The advertised price (in the asset's
+ * atomic units) becomes the standing bid. Thin wrapper over
+ * `probeX402Detailed` preserving the original null-collapsing contract.
  */
 export class HttpX402Prober implements X402Prober {
   constructor(
@@ -66,34 +179,12 @@ export class HttpX402Prober implements X402Prober {
   ) {}
 
   async probe(url: string): Promise<X402Probe | null> {
-    try {
-      const response = await this.fetchImpl(url, {
-        method: "GET",
-        headers: { accept: "application/json", "user-agent": "erabi-bridge-x402" },
-        signal: AbortSignal.timeout(this.options.timeoutMs ?? 10_000),
-      });
-      if (response.status !== 402) return null;
-
-      // x402 v2: base64-encoded JSON challenge in the PAYMENT-REQUIRED header.
-      const header = response.headers.get("payment-required");
-      if (header) {
-        try {
-          const decoded = JSON.parse(Buffer.from(header, "base64").toString("utf8")) as {
-            accepts?: X402Requirement[];
-          };
-          const probe = requirementToProbe(decoded);
-          if (probe) return probe;
-        } catch {
-          // malformed header — fall through to the body
-        }
-      }
-
-      // v1 (and some v2) servers: challenge in the JSON body.
-      const body = (await response.json()) as { accepts?: X402Requirement[] };
-      return requirementToProbe(body);
-    } catch {
-      return null; // unreachable, timeout, non-JSON — not a paywalled endpoint
-    }
+    const detailed = await probeX402Detailed(url, {
+      fetchImpl: this.fetchImpl,
+      timeoutMs: this.options.timeoutMs,
+    });
+    if (!detailed.alive || detailed.price_usd === null) return null;
+    return { price_usd: detailed.price_usd, description: detailed.description };
   }
 }
 

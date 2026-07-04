@@ -11,7 +11,7 @@ import http from "node:http";
  * Zero dependencies; SSE streams pipe straight through.
  */
 
-const SERVICES = ["registry", "exchange", "attribution", "reputation"] as const;
+const SERVICES = ["registry", "exchange", "attribution", "reputation", "index"] as const;
 export type GatewayService = (typeof SERVICES)[number];
 
 export interface GatewayOptions {

@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import path from "node:path";
 import { HttpX402Prober, X402Bridge } from "@erabi/bridge-x402";
 import { createMcpHttpHandler } from "@erabi/mcp-core";
 import { realVerifiers } from "@erabi/registry";
@@ -6,6 +7,11 @@ import { buildAgentCard } from "./agent-card.js";
 import { parseHoldbackHours } from "./env.js";
 import { startGateway } from "./gateway.js";
 import { startReferenceNode } from "./index.js";
+import {
+  buildReliabilityServer,
+  ReliabilityStore,
+  startReliabilityLoop,
+} from "./reliability/index.js";
 import { parseX402Endpoints } from "./x402-endpoints.js";
 
 /**
@@ -67,6 +73,7 @@ const servicePorts: [number, number, number, number] = [
   Number(process.env.ATTRIBUTION_PORT ?? 4003),
   Number(process.env.REPUTATION_PORT ?? 4004),
 ];
+const indexPort = Number(process.env.INDEX_PORT ?? 4005);
 
 const node = await startReferenceNode({
   ports: servicePorts,
@@ -97,6 +104,7 @@ if (gatewayPort) {
       exchange: servicePorts[1],
       attribution: servicePorts[2],
       reputation: servicePorts[3],
+      index: indexPort,
     },
     // Remote MCP: join the network from a bare URL, no local install.
     // Talks to this node's own services over loopback; identities are
@@ -120,6 +128,8 @@ if (holdbackHours) {
 // Real demand: bridge curated x402-paywalled services as bridge-tier
 // providers. Every endpoint is live-probed; failures just don't activate.
 const x402Endpoints = parseX402Endpoints(process.env.ERABI_X402_ENDPOINTS);
+let reliabilityLoop: { stop(): void } | undefined;
+let reliabilityStore: ReliabilityStore | undefined;
 if (x402Endpoints !== "off" && x402Endpoints.length > 0) {
   const bridge = new X402Bridge({
     registry: node.registry,
@@ -134,9 +144,11 @@ if (x402Endpoints !== "off" && x402Endpoints.length > 0) {
   const results = await Promise.allSettled(
     x402Endpoints.map((endpoint) => bridge.submitEndpoint(endpoint)),
   );
+  const serviceIdsByUrl = new Map<string, string>();
   results.forEach((result, index) => {
     if (result.status === "fulfilled") {
       const bridged = result.value;
+      serviceIdsByUrl.set(bridged.url, bridged.provider_id);
       console.log(
         `x402 bridge: ${bridged.url} live as ${bridged.provider_id.slice(0, 28)}… ($${bridged.price_usd}/call, ${bridged.category})`,
       );
@@ -146,6 +158,38 @@ if (x402Endpoints !== "off" && x402Endpoints.length > 0) {
       );
     }
   });
+
+  // Reliability index (ADR 0026): continuously probe every curated service —
+  // including ones that failed activation — and publish signed attestations
+  // agents can fetch instead of re-verifying the endpoint themselves.
+  reliabilityStore = new ReliabilityStore(
+    process.env.ERABI_DATA_DIR
+      ? path.join(process.env.ERABI_DATA_DIR, "reliability.sqlite")
+      : ":memory:",
+  );
+  const indexApp = buildReliabilityServer({
+    store: reliabilityStore,
+    publicBaseUrl: base ? `${base}/index` : undefined,
+    explorerUrl: process.env.ERABI_EXPLORER_URL ?? "https://erabi-explorer.vercel.app",
+    registryUrl: publicUrls.registry,
+    logger: production,
+  });
+  await indexApp.listen({
+    port: indexPort,
+    host: process.env.ERABI_HOST ?? (gatewayPort ? "127.0.0.1" : production ? "0.0.0.0" : "127.0.0.1"),
+  });
+  node.apps.push(indexApp);
+  reliabilityLoop = startReliabilityLoop({
+    store: reliabilityStore,
+    endpoints: x402Endpoints,
+    nodeKeys: node.keys,
+    nodeId: node.nodeId,
+    serviceIdsByUrl,
+    intervalMs: Number(process.env.ERABI_PROBE_INTERVAL_MS ?? 600_000),
+  });
+  console.log(
+    `reliability index on :${indexPort} — probing ${x402Endpoints.length} x402 services every ${Number(process.env.ERABI_PROBE_INTERVAL_MS ?? 600_000) / 60_000} min`,
+  );
 }
 
 console.log(`Erabi reference node up (key: ${node.keySource}, verifiers: ${
@@ -182,8 +226,10 @@ const nightly = setInterval(
     try {
       const redacted = node.exchange.applyRetention();
       const clusters = node.attribution.analyzeSettlementGraph();
+      const pruned = reliabilityStore?.prune();
       console.log(
-        `maintenance(nightly): ${redacted} tuples redacted, ${clusters.length} suspicious clusters`,
+        `maintenance(nightly): ${redacted} tuples redacted, ${clusters.length} suspicious clusters` +
+          (pruned ? `, reliability pruned ${pruned.probes} probes` : ""),
       );
       for (const cluster of clusters) {
         console.warn("settlement-graph cluster flagged:", JSON.stringify(cluster));
@@ -201,6 +247,10 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, () => {
     clearInterval(everyMinute);
     clearInterval(nightly);
-    void node.stop().then(() => process.exit(0));
+    reliabilityLoop?.stop();
+    void node.stop().then(() => {
+      reliabilityStore?.close();
+      process.exit(0);
+    });
   });
 }

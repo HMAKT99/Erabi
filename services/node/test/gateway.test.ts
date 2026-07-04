@@ -20,13 +20,24 @@ function getWithHost(url: string, host: string): Promise<{ status: number; body:
 }
 import { startGateway } from "../src/gateway.js";
 import { startReferenceNode, type ReferenceNode } from "../src/index.js";
+import { buildReliabilityServer, ReliabilityStore } from "../src/reliability/index.js";
 
 let node: ReferenceNode;
 let gateway: Server;
 let gatewayUrl: string;
+let reliabilityStore: ReliabilityStore;
 
 beforeAll(async () => {
   node = await startReferenceNode();
+  reliabilityStore = new ReliabilityStore(":memory:");
+  reliabilityStore.upsertService({
+    slug: "exa-search",
+    url: "https://api.exa.ai/search",
+    category: "api.search",
+  });
+  const indexApp = buildReliabilityServer({ store: reliabilityStore });
+  await indexApp.listen({ port: 0, host: "127.0.0.1" });
+  node.apps.push(indexApp);
   const ports = node.apps.map((app) => (app.server.address() as { port: number }).port);
   gateway = await startGateway({
     port: 0,
@@ -36,6 +47,7 @@ beforeAll(async () => {
       exchange: ports[1]!,
       attribution: ports[2]!,
       reputation: ports[3]!,
+      index: ports[4]!,
     },
     mcpHandler: createMcpHttpHandler({ endpoints: node.urls }),
     agentCard: { name: "Erabi Intent Exchange", url: "https://example.com" },
@@ -46,6 +58,7 @@ beforeAll(async () => {
 afterAll(async () => {
   gateway.close();
   await node.stop();
+  reliabilityStore.close();
 });
 
 describe("single-port gateway (Railway/Render mode)", () => {
@@ -72,6 +85,18 @@ describe("single-port gateway (Railway/Render mode)", () => {
     expect(wellKnown.spec).toBe("erabi/0.1");
   });
 
+  it("routes /index to the reliability index (ADR 0026)", async () => {
+    const index = (await fetch(`${gatewayUrl}/index/v1/services`).then((r) => r.json())) as {
+      count: number;
+      services: Array<{ slug: string }>;
+    };
+    expect(index.count).toBe(1);
+    expect(index.services[0]?.slug).toBe("exa-search");
+
+    const badge = await fetch(`${gatewayUrl}/index/v1/services/exa-search/badge.svg`);
+    expect(badge.headers.get("content-type")).toContain("image/svg+xml");
+  });
+
   it("routes by host subdomain", async () => {
     const exchange = await getWithHost(`${gatewayUrl}/v1/stats`, "exchange.erabi.example");
     expect(JSON.parse(exchange.body)).toHaveProperty("intents");
@@ -84,7 +109,7 @@ describe("single-port gateway (Railway/Render mode)", () => {
     const broken = await startGateway({
       port: 0,
       host: "127.0.0.1",
-      targets: { registry: 1, exchange: 1, attribution: 1, reputation: 1 },
+      targets: { registry: 1, exchange: 1, attribution: 1, reputation: 1, index: 1 },
     });
     try {
       const url = `http://127.0.0.1:${(broken.address() as { port: number }).port}`;

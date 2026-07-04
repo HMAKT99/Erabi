@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.HMAKT99/erabi",
-  "description": "ERABI intent exchange: register, discover, transact, earn. Zero-config on the live network.",
+  "description": "Reliability-checked discovery for paid agent APIs (x402): discover returns live uptime/latency/price with signed attestations your agent verifies instead of re-probing. Plus the open intent exchange: register, transact, earn verifiable reputation. Zero-config.",
   "repository": {
     "url": "https://github.com/HMAKT99/Erabi",
     "source": "github"
   },
-  "version": "0.1.4",
+  "version": "0.1.6",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "erabi-mcp",
-      "version": "0.1.4",
+      "version": "0.1.6",
       "transport": {
         "type": "stdio"
       },

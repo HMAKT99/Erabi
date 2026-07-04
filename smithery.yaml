@@ -1,4 +1,6 @@
 # Smithery listing for the ERABI MCP server (npm: erabi-mcp).
+# Utility first: `discover` returns live reliability (uptime/latency/price +
+# signed attestations) for paid x402 services — check before your agent spends.
 # Zero-config: with no settings it joins the live public network.
 startCommand:
   type: stdio

@@ -213,6 +213,8 @@ const submissionZod = z
     category: z.string().min(1),
     title: z.string().max(80).optional(),
     claim: z.string().max(200).optional(),
+    /** Reliability-index key (ADR 0026); accepted so curated entries pass through unchanged, unused by the bridge. */
+    slug: z.string().optional(),
     daily_budget_usd: z.number().positive().max(10_000).default(100),
   })
   .strict();
